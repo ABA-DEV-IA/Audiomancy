@@ -1,64 +1,27 @@
-{
-  "categories": {
-    "mood":[
-        {
-        "title": "Peps",
-        "subtitle": "(musique de fond)",
-        "color": "text-[#FF934F]",
-        "image": "/images/peps-bg.png",
-        "description": "Énergie et dynamisme"
-        },
-        {
-        "title": "Défouloir",
-        "subtitle": "(musique de fond)",
-        "color": "text-[#FF934F]",
-        "image": "/images/defouloir-bg.png",
-        "description": "Puissance et intensité"
-        },
-        {
-        "title": "Sortez les mouchoirs",
-        "subtitle": "(musique de fond)",
-        "color": "text-[#FF934F]",
-        "image": "/images/mouchoirs-bg.png",
-        "description": "Émotion et mélancolie"
-        }
-    ],
-    "activity": [
-        {
-          "title": "Travail",
-          "subtitle": "(concentration)",
-          "color": "text-[#FF934F]",
-          "image": "/images/bulby.jpg",
-          "description": "Musique pour rester productif"
-        },
-        {
-          "title": "Sport",
-          "subtitle": "(rythme intense)",
-          "color": "text-[#FF934F]",
-          "image": "/images/sport-bg.png",
-          "description": "Énergie pour vos entraînements"
-        },
-        {
-          "title": "Cuisine",
-          "subtitle": "(ambiance fun)",
-          "color": "text-[#FF934F]",
-          "image": "/images/cooking-bg.png",
-          "description": "Des sons pour mijoter en rythme"
-        },
-        {
-          "title": "Lecture",
-          "subtitle": "(calme et sérénité)",
-          "color": "text-[#FF934F]",
-          "image": "/images/reading-bg.png",
-          "description": "Accompagnement sonore pour vos livres"
-        },
-        {
-          "title": "Fête",
-          "subtitle": "(ambiance festive)",
-          "color": "text-[#FF934F]",
-          "image": "/images/party-bg.png",
-          "description": "Boostez vos soirées avec du bon son"
-        }
-      ]
+[
+  {
+    "title": "Amour et relations",
+    "category": "Amour",
+    "duration": "12:30"
+  },
+  {
+    "title": "Carrière professionnelle",
+    "category": "Carrière",
+    "duration": "8:45"
+  },
+  {
+    "title": "Santé et bien-être",
+    "category": "Santé",
+    "duration": "15:20"
+  },
+  {
+    "title": "Finances personnelles",
+    "category": "Argent",
+    "duration": "10:15"
+  },
+  {
+    "title": "Spiritualité",
+    "category": "Spirituel",
+    "duration": "20:30"
   }
-}
+]

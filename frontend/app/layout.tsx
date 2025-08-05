@@ -6,6 +6,9 @@ import './globals.css'
 export const metadata: Metadata = {
   title: 'Audiomancy',
   description: 'application de génération de playlist via intelligence artificielle',
+  icons: {
+    icon: 'images/favicon.png'
+  },
 }
 
 export default function RootLayout({

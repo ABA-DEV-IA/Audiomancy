@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import categoriesList from "@/config/categories.json"; // Ton JSON
+import categoriesList from "@/config/categories_du_jour.json";
 import { homeConfig } from "@/config/home.config";
 import { CategoryCard } from "@/components/category-card";
 

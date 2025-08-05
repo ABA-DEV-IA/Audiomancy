@@ -3,33 +3,32 @@
 import { Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
+import Categories from "@/config/categories.json"
 
-interface SearchPageProps {
-  onPlaylistClick: () => void
+// Fonction utilitaire pour normaliser l'id
+function formatId(str: string | undefined): string {
+  if (!str) return ""
+  return str
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/\s+/g, "_")
 }
 
-export function SearchPage({ onPlaylistClick }: SearchPageProps) {
-  const searchResults = [
-    { title: "Amour et relations", category: "Amour", duration: "12:30" },
-    { title: "Carrière professionnelle", category: "Carrière", duration: "8:45" },
-    { title: "Santé et bien-être", category: "Santé", duration: "15:20" },
-    { title: "Finances personnelles", category: "Argent", duration: "10:15" },
-    { title: "Spiritualité", category: "Spirituel", duration: "20:30" },
-  ]
+interface SearchPageProps {
+  onTrackClick: (id: string) => void
+}
 
+export function SearchPage({ onTrackClick }: SearchPageProps) {
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
+      <div className="bg-[#6A0DAD] text-white p-8 text-center">
+        <h1 className="text-4xl font-bold mb-2 tracking-wider">RECHERCHE</h1>
+        <p className="text-[#D9B3FF] italic">~ Trouver vos envies ~</p>
+      </div>
       <div className="bg-[#2B2B2B] text-white p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold text-[#D9B3FF]">RECHERCHES</h1>
-          <div className="flex items-center space-x-4">
-            <span className="text-[#FF934F]">●</span>
-            <span className="text-[#A3D5FF]">●</span>
-            <span className="text-[#4CE0B3]">●</span>
-          </div>
-        </div>
-
+        <h1>Recherche</h1>
         {/* Search Bar */}
         <div className="relative max-w-md">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -43,11 +42,11 @@ export function SearchPage({ onPlaylistClick }: SearchPageProps) {
       {/* Results */}
       <div className="flex-1 bg-[#2B2B2B] p-6">
         <div className="max-w-2xl mx-auto space-y-3">
-          {searchResults.map((result, index) => (
+          {Categories.map((result, index) => (
             <Card
               key={index}
               className="bg-[#301934] border-[#A45EE5] hover:bg-[#A45EE5] hover:bg-opacity-20 transition-colors cursor-pointer"
-              onClick={onPlaylistClick}
+              onClick={() => onTrackClick(formatId(result.title))}
             >
               <CardContent className="p-4 flex items-center justify-between">
                 <div>

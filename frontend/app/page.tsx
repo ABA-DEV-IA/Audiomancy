@@ -14,8 +14,22 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState("categories")
   const [sidebarOpen, setSidebarOpen] = useState(true)
 
+  const [currentTrackId, setCurrentTrackId] = useState<string | null>(null)
+  const [currentPlaylistId, setCurrentPlaylistId] = useState<string | null>("default") // playlist par défaut
+
+  // Aller sur la page lecture avec un morceau spécifique et playlist associée
+  const goToLecture = (trackId: string, playlistId: string = "default") => {
+    setCurrentTrackId(trackId)
+    setCurrentPlaylistId(playlistId)
+    setCurrentPage("lecture")
+  }
+
   const handlePageChange = (page: string) => {
     setCurrentPage(page)
+    if (page !== "lecture") {
+      setCurrentTrackId(null)
+      setCurrentPlaylistId(null)
+    }
   }
 
   const handleGenerationComplete = () => {
@@ -26,28 +40,33 @@ export default function App() {
     setCurrentPage("categories")
   }
 
-  const handlePlaylistClick = () => {
-    setCurrentPage("lecture")
-  }
-
-  const handleCategoryClick = () => {
-    setCurrentPage("lecture")
-  }
-
   const renderPage = () => {
     switch (currentPage) {
       case "categories":
-        return <HomePage onCategoryClick={handleCategoryClick} />
+        // Ici il faut que HomePage appelle onCategoryClick avec un vrai trackId
+        // Par exemple :
+        return <HomePage onCategoryClick={(trackId: string) => goToLecture(trackId, "default")} />
       case "generation":
-        return <GenerationPage onBack={handleGenerationBack} onComplete={handleGenerationComplete} />
+        return (
+          <GenerationPage
+            onBack={handleGenerationBack}
+            onComplete={handleGenerationComplete}
+          />
+        )
       case "lecture":
-        return <LecturePage />
+        return (
+          <LecturePage
+            trackId={currentTrackId}
+            playlistId={currentPlaylistId}
+          />
+        )
       case "recherches":
-        return <SearchPage onPlaylistClick={handlePlaylistClick} />
+        // Ici onTrackClick doit passer aussi playlistId si besoin, sinon "default"
+        return <SearchPage onTrackClick={(trackId: string) => goToLecture(trackId, "default")} />
       case "about":
         return <AboutPage />
       default:
-        return <HomePage onCategoryClick={handleCategoryClick} />
+        return <HomePage onCategoryClick={(trackId: string) => goToLecture(trackId, "default")} />
     }
   }
 

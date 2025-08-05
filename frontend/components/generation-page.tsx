@@ -75,7 +75,7 @@ export function GenerationPage({ onBack, onComplete }: GenerationPageProps) {
       {/* Header avec bouton retour */}
 
       <div className="bg-[#6A0DAD] text-white p-8 text-center">
-        <h1 className="text-4xl font-bold mb-2 tracking-wider">À PROPOS</h1>
+        <h1 className="text-4xl font-bold mb-2 tracking-wider">GÉNÉRATION</h1>
         <p className="text-[#D9B3FF] italic">~ Générer vos envies ~</p>
       </div>
 
