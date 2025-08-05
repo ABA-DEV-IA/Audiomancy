@@ -14,4 +14,5 @@ azure-storage-blob
 azure-keyvault-secrets
 validators 
 orjson
-duckduckgo-search
+pylint
+mypy

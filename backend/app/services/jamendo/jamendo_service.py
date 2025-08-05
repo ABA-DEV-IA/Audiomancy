@@ -1,9 +1,22 @@
 from app.services.jamendo.jamendo_client import fetch_tracks
+from app.utils.formatter import format_jamendo_tracks
 
-def get_tracks_for_reader(tags: str, duration_min: int, duration_max: int) -> list[dict]:
-    """Récupère et nettoie une liste de morceaux pour le lecteur."""
+def get_tracks_for_reader(tags: str, duration_min: int, duration_max: int, limit: int = 10) -> list[dict]:
+    """
+    Fetch and format a list of music tracks from Jamendo API for the reader.
+
+    Args:
+        tags (str): Fuzzy tags separated by "+" (e.g., "magic+fantasy+cinematic").
+        duration_min (int): Minimum duration in seconds.
+        duration_max (int): Maximum duration in seconds.
+        limit (int): Number of tracks to return.
+
+    Returns:
+        list[dict]: A list of formatted music tracks.
+    """
+
     params = {
-        "limit": 20,
+        "limit": limit,
         "fuzzytags": tags,
         "speed": "low+medium",
         "vocalinstrumental": "instrumental",
@@ -16,17 +29,5 @@ def get_tracks_for_reader(tags: str, duration_min: int, duration_max: int) -> li
     if "results" not in data:
         return []
 
-    results_clean = []
-    for track in data["results"]:
-        results_clean.append({
-            "id": track["id"],
-            "title": track["name"],
-            "artist": track["artist_name"],
-            "audio_url": track["audio"],
-            "duration": track["duration"],
-            "license": track.get("license_ccurl"),
-            "tags": track.get("musicinfo", {}).get("tags", {}).get("vartags", []),
-            "image": track.get("album_image")
-        })
+    return format_jamendo_tracks(data["results"])
 
-    return results_clean
