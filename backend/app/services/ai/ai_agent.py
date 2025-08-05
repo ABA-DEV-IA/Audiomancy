@@ -1,78 +1,61 @@
-from langchain.agents import initialize_agent, AgentType
+from langchain.agents import initialize_agent
+from langchain.agents.agent_types import AgentType
+from langchain.tools import Tool
+from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
+#from langchain.agents import initialize_agent, AgentType
 from tools.web_search import web_search
+from tools.tags import choose_tags
 from utils.azure_openai import get_llm
 
-def get_agent():
-    llm = get_llm()
-    tools = [web_search]
-    return initialize_agent(
-        tools,
-        llm,
-        agent = AgentType.OPENAI_FUNCTIONS,
-        verbose = True
-    )
+
+with open("backend/app/services/ai/utils/system_prompt.txt", "r", encoding="utf-8") as f:
+    system_prompt = f.read()
+
+
+class AI_Agent:
+
+    def __init__(self, verbose=True):
+
+        self.llm = get_llm()
+
+        self.tools = [
+            Tool.from_function(
+                func=web_search,
+                name="web_search",
+                description="Search for information about a work mentioned by the user."
+            ),
+            Tool.from_function(
+                func=choose_tags,
+                name="choose_tags",
+                description="Tool for choosing the most relevant tags based on the user prompt from a predefined list."
+            )
+        ]
+
+        self.prompt = ChatPromptTemplate.from_messages([
+            ("system", system_prompt),
+            ("human", "{input}"),
+            MessagesPlaceholder(variable_name="agent_scratchpad")
+        ])
+
+        self.agent = initialize_agent(
+            llm = self.llm,
+            tools = self.tools,
+            prompt = self.prompt,
+            agent = AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION,
+            verbose = True,
+            handle_parsing_errors=True,
+        )
+
+
+    def search(self, prompt: str):
+
+        response = self.agent.invoke({
+            "input": prompt
+        })
+
+        print(response["output"])
 
 
 
-
-
-
-
-
-
-
-# import os
-# #import base64
-# from openai import AzureOpenAI
-# from dotenv import load_dotenv
-
-# load_dotenv(override=True)
-
-# endpoint = os.getenv("ENDPOINT_URL")
-# deployment = os.getenv("DEPLOYMENT_NAME")
-# subscription_key = os.getenv("AZURE_OPENAI_API_KEY")
-
-# client = AzureOpenAI(
-#     azure_endpoint=endpoint,
-#     api_key=subscription_key,
-#     api_version="2025-01-01-preview",
-# )
-
-
-# def detect_works(message):
-#     """
-#     Function calling the GPT-4o-mini model and analyzing the user's message to detect a potential work cited.
-#     Returns the result in JSON format {"work": "Harry Potter", "type": "book"}
-
-#     Args:
-#         message: user message
-
-#     Returns:
-#         json: response in the format {"work": "Harry Potter", "type": "book"}, or {"work": null} if no work cited is found.
-#     """
-
-#     user_message = f"Text : {message}"
-#     messages = [
-#         {
-#             "role": "system",
-#             "content": "You are a cultural assistant. Your task is to extract any mentioned work of art (video game, book, movie, etc.) from a given user message.  \nRespond in JSON format like this:\n{\"work\": \"The Witcher 3\", \"type\": \"video game\"}\n\nIf no work is detected, respond:\n{\"work\": null}"
-#         },
-#         {
-#             "role": "user",
-#             "content": user_message
-#         }
-#     ]
-
-
-#     response = client.chat.completions.create(
-#         model=deployment,
-#         messages=messages,
-#         max_tokens=800,
-#         temperature=0.5,
-#     )
-
-#     return response.choices[0].message.content
-
-
-# message = "Je suis de bonne humeur crée moi une playlist adaptée."
-# print(detect_works(message))
+agent = AI_Agent()
+agent.search(prompt="Je voudrais une ambiance du style Harry Potter pour étudier")

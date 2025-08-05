@@ -1,7 +1,7 @@
 import json
 from langchain.tools import tool
 
-with open("backend\app\services\ai\data\jamendo_tags_list.json", "r", encoding="utf-8") as f:
+with open("backend/app/services/ai/data/jamendo_tags_list.json", "r", encoding="utf-8") as f:
     TAGS = json.load(f)
 
 

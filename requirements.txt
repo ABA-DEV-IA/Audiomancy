@@ -1,6 +1,6 @@
 azure
 dotenv
-ddgs
+ddgs #duckduckgo-search
 openai
 langchain
 langchain-openai
