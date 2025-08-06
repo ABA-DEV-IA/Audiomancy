@@ -1,11 +1,28 @@
+"""
+Utility functions for normalizing and formatting raw Jamendo track data.
+
+Includes functions to clean up license URLs and convert Jamendo's native data
+structure into the response model expected by the API.
+
+Functions:
+    normalize_license_url: Cleans license URL by removing region-specific suffixes.
+    format_jamendo_track: Formats a single raw track into a JamendoTrackResponse.
+"""
+
 from urllib.parse import urlparse, urlunparse
 from app.utils.license import LICENSE_MAP  # Renommé depuis tracks.py
+from typing import Dict, Any
+from typing import List
 
 def normalize_license_url(url: str) -> str:
     """
-    Normalize a Jamendo license URL by converting to HTTPS and removing regional suffix (e.g., /be/, /fr/).
-    Returns the base URL for LICENSE_MAP lookup.
+    Converts a Jamendo license URL to a normalized base form by:
+    - enforcing HTTPS
+    - removing region-specific suffixes (e.g., /be/, /fr/)
+
+    This form is used to match against LICENSE_MAP keys.
     """
+
     if not url:
         return ""
     
@@ -19,7 +36,7 @@ def normalize_license_url(url: str) -> str:
     normalized_path = "/".join(path_parts) + "/"
     return f"https://{parsed.netloc}{normalized_path}"  # Force HTTPS
 
-def format_jamendo_track(track: dict) -> dict:
+def format_jamendo_track(track: Dict[str, Any]) -> Dict[str, Any]:
     """
     Format a raw Jamendo track dictionary into a clean JSON structure,
     with a human-readable license name and regionalized license URL.
@@ -48,7 +65,7 @@ def format_jamendo_track(track: dict) -> dict:
         "image": track.get("album_image"),
     }
 
-def format_jamendo_tracks(tracks: list) -> list:
+def format_jamendo_tracks(tracks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """
     Format a list of raw Jamendo track dictionaries.
     """
