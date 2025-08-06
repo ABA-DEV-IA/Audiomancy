@@ -8,6 +8,12 @@ def web_search(query: str) -> str:
     with DDGS() as ddgs:
         results = ddgs.text(query, max_results=1)
         for r in results:
-            return r["body"]
+            source = r.get("href", "unknown")
+            text = r.get("body", "")
+            print(f"[web_search] Query: {query}")
+            print(f"[web_search] Source: {source}")
+            print(f"[web_search] Text: {text}")
+            return f"{text}\n\n(Source: {source})"
         
-    return "No information found."
+    print(f"[web_search] Query: {query} - NO RESULT")
+    return "NO RESULT"

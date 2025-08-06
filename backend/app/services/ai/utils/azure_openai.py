@@ -30,5 +30,6 @@ def get_llm():
         azure_endpoint=endpoint,
         azure_deployment=deployment,
         api_key=subscription_key,
-        api_version="2025-01-01-preview"
+        api_version="2025-01-01-preview",
+        temperature=0
 )

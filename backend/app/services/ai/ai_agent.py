@@ -1,4 +1,4 @@
-from langchain.agents import AgentExecutor, create_react_agent
+from langchain.agents import AgentExecutor, create_openai_functions_agent
 from langchain.tools import Tool
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
 from tools.web_search import web_search
@@ -13,30 +13,35 @@ class AI_Agent:
         self.llm = get_llm()
 
         self.tools = [
-            Tool.from_function(func=web_search, name="web_search",
-                               description="Search for information about history or themes covered about a mentioned work, in english or french ONLY."),
-            Tool.from_function(func=choose_tags, name="choose_tags",
-                               description="Validate 3 tags from the predefined list, space-separated string.")
+            Tool.from_function(
+                func=web_search,
+                name="web_search",
+                description="Search for information about history or themes covered about a mentioned work, in english or french ONLY.")
         ]
 
         self.prompt = ChatPromptTemplate.from_messages([
             ("system", system_prompt),
             ("human", "{input}"),
-        ])
+            MessagesPlaceholder(variable_name="agent_scratchpad"),
+        ]).partial(
+                tools="\n".join([f"{tool.name}: {tool.description}" for tool in self.tools]),
+                tool_names=", ".join([tool.name for tool in self.tools])
+            )
 
 
-        agent_struct = create_react_agent(
+        agent_struct = create_openai_functions_agent(
             llm=self.llm,
             tools=self.tools,
             prompt=self.prompt
         )
         
-        self.agent = AgentExecutor.from_agent_and_tools(
+        self.agent = AgentExecutor(
             agent=agent_struct, 
             tools=self.tools,
             verbose=verbose, 
             handle_parsing_errors=True,
-            max_iterations=5
+            max_iterations=5,
+            early_stopping_method="force"
         )
 
     def search(self, prompt: str):
@@ -54,5 +59,4 @@ class AI_Agent:
 
 
 agent = AI_Agent()
-result = agent.search(prompt="Je voudrais une ambiance du style Harry Potter pour étudier")
-print(result)
+result = agent.search(prompt="Je voudrais une playlist de fond pour une partie d'Elden Ring")
