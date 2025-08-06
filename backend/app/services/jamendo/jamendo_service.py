@@ -26,8 +26,7 @@ def get_tracks_for_reader(tags: str, duration_min: int, duration_max: int, limit
     Returns:
         List[JamendoTrackResponse]: Formatted list of music tracks.
     """
-
-
+    
     params = {
         "limit": limit,
         "fuzzytags": tags,
