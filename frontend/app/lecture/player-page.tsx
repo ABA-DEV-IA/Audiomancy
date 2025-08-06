@@ -1,12 +1,13 @@
-"use client"
-
-import { useState, useEffect, useRef } from "react"
-import { usePlaylist } from "@/hooks/usePlaylist"
 import { Footer } from "@/components/footer"
 import { useRouter } from "next/navigation"
+import { RefObject } from "react"
 
-interface LecturePageProps {
+interface PlayerPageProps {
   params: { id: string }
+  tracks: any[]
+  currentTrackIndex: number
+  onSelectTrack: (index: number) => void
+  audioRef: RefObject<HTMLAudioElement>
 }
 
 function formatDuration(seconds: number) {
@@ -15,34 +16,14 @@ function formatDuration(seconds: number) {
   return `${mins}:${secs.toString().padStart(2, "0")}`
 }
 
-export default function LecturePage({ params }: LecturePageProps) {
-  const { tracks, loading, error, fetchTracks } = usePlaylist()
-  const [currentTrackIndex, setCurrentTrackIndex] = useState(0)
-  const audioRef = useRef<HTMLAudioElement>(null)
+export default function PlayerPage({
+  params,
+  tracks,
+  currentTrackIndex,
+  onSelectTrack,
+  audioRef
+}: PlayerPageProps) {
   const router = useRouter()
-
-  useEffect(() => {
-    if (params.id) {
-      fetchTracks(params.id)
-    }
-  }, [fetchTracks, params.id])
-
-  const handleSelectTrack = (index: number) => {
-    setCurrentTrackIndex(index)
-  }
-
-  if (loading) {
-    return <div className="p-6 text-white">Chargement des pistes...</div>
-  }
-
-  if (error) {
-    return <div className="p-6 text-red-500">Erreur : {error}</div>
-  }
-
-  if (tracks.length === 0) {
-    return <div className="p-6 text-white">Aucune piste trouvée.</div>
-  }
-
   const currentTrack = tracks[currentTrackIndex]
 
   return (
@@ -58,9 +39,7 @@ export default function LecturePage({ params }: LecturePageProps) {
           >
             ← Retour
           </button>
-
         </div>
-
 
         {/* PLAYER */}
         <div className="bg-white rounded-lg p-8 mb-6 w-full max-w-4xl mx-auto flex flex-col items-center text-black shadow-lg">
@@ -78,11 +57,11 @@ export default function LecturePage({ params }: LecturePageProps) {
             autoPlay
             className="w-full mb-4"
           />
-          <p className="text-gray-700">Durée : {formatDuration(currentTrack.duration)}</p>
-        
-        
-          {/* Tags */}
-          {currentTrack.tags && currentTrack.tags.length > 0 && (
+          <p className="text-gray-700">
+            Durée : {formatDuration(currentTrack.duration)}
+          </p>
+
+          {currentTrack.tags?.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-4">
               {currentTrack.tags.map((tag: string, index: number) => (
                 <span
@@ -95,7 +74,6 @@ export default function LecturePage({ params }: LecturePageProps) {
             </div>
           )}
 
-          {/* Lien licence */}
           {currentTrack.license && (
             <a
               href={currentTrack.license}
@@ -106,10 +84,7 @@ export default function LecturePage({ params }: LecturePageProps) {
               {currentTrack.license}
             </a>
           )}
-        
-        
         </div>
-
 
         {/* TRACK LIST */}
         <div className="bg-[#1E1E1E] rounded p-4">
@@ -119,9 +94,11 @@ export default function LecturePage({ params }: LecturePageProps) {
               <li
                 key={track.id}
                 className={`p-2 rounded cursor-pointer ${
-                  index === currentTrackIndex ? "bg-[#6A0DAD]" : "hover:bg-[#3A3A3A]"
+                  index === currentTrackIndex
+                    ? "bg-[#6A0DAD]"
+                    : "hover:bg-[#3A3A3A]"
                 }`}
-                onClick={() => handleSelectTrack(index)}
+                onClick={() => onSelectTrack(index)}
               >
                 {track.title} - {track.artist}
               </li>
@@ -130,7 +107,6 @@ export default function LecturePage({ params }: LecturePageProps) {
         </div>
       </div>
 
-      {/* FOOTER */}
       <Footer />
     </div>
   )

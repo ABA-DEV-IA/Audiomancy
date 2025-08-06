@@ -59,7 +59,7 @@ export function CategoryCard({ category, onClick }: CategoryProps) {
             </div>
           </div>
           <p
-            className={`text-sm ${category.color} italic font-medium drop-shadow-md`}
+            className={`text-sm text-[#FF934F] italic font-medium drop-shadow-md`}
           >
             {category.subtitle}
           </p>
