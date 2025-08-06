@@ -2,7 +2,6 @@ from langchain.agents import AgentExecutor, create_openai_functions_agent
 from langchain.tools import Tool
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
 from tools.web_search import web_search
-from tools.tags import choose_tags
 from utils.azure_openai import get_llm
 
 with open("backend/app/services/ai/utils/system_prompt.txt", "r", encoding="utf-8") as f:
