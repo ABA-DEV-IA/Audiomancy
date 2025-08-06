@@ -1,5 +1,5 @@
 {
-  "genres": [
+  "tags": [
     "8bit",
     "acidhouse",
     "acidjazz",
@@ -123,58 +123,7 @@
     "tribal",
     "triphop",
     "world",
-    "zouk"
-  ],
-  "instruments": [
-    "accordion",
-    "acousticguitar",
-    "bagpipes",
-    "banjo",
-    "bass",
-    "bassoon",
-    "brass",
-    "cello",
-    "classicalguitar",
-    "clavichord",
-    "computer",
-    "doublebass",
-    "drummachine",
-    "drums",
-    "electricbass",
-    "electricguitar",
-    "electricpiano",
-    "electroamplified",
-    "flute",
-    "glockenspiel",
-    "guitar",
-    "hammond",
-    "harmonica",
-    "harp",
-    "harpsichord",
-    "horn",
-    "melodica",
-    "orchestra",
-    "organ",
-    "percussion",
-    "piano",
-    "pipeorgan",
-    "sampler",
-    "saxophone",
-    "sitar",
-    "steelpan",
-    "strings",
-    "synthesizer",
-    "trombone",
-    "trumpet",
-    "tuba",
-    "vibraphone",
-    "viola",
-    "violin",
-    "vocoder",
-    "wind",
-    "xylophone"
-  ],
-  "vartags": [
+    "zouk",
     "17sonsrecords",
     "80s",
     "90s",
@@ -443,16 +392,5 @@
     "wolrd",
     "wtc",
     "yeye"
-  ],
-  "speed": [
-    "high",
-    "low",
-    "medium",
-    "veryhigh",
-    "verylow"
-  ],
-  "vocalinstrumental": [
-    "instrumental",
-    "vocal"
   ]
 }
