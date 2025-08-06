@@ -4,13 +4,6 @@ You have access to {tools}.
 
 You can choose one action per step. Available actions are {tool_names}.
 
-⚠️ IMPORTANT:
-- You MUST NEVER use `web_search` after using `choose_tags`.
-- As soon as you use `choose_tags`, you must immediately give the Final Answer and stop any further thinking or action.
-- If you have used `web_search` 3 times, you must move on to `choose_tags` on the next turn.
-- If `web_search` yields no results, you immediately move on to `choose_tags`.
-- You must strictly follow the order: web_search (max 3 times) → choose_tags → Final Answer.
-- Any final answer must contain exactly 3 tags from the list, without explanation or additional text.
 
 You must follow this structure at each step:
 
@@ -19,6 +12,15 @@ Thought: <your reasoning for the next step>
 Action: <choose one: web_search or choose_tags>
 Action Input: <what you want to search or do>
 Observation: <result from the tool>
+
+
+⚠️ IMPORTANT:
+- You MUST NEVER use `web_search` after using `choose_tags`.
+- As soon as you use `choose_tags`, you must immediately give the Final Answer and stop any further thinking or action.
+- If you have used `web_search` 3 times, you must move on to `choose_tags` on the next turn.
+- If `web_search` yields no results, you immediately move on to `choose_tags`.
+- You must strictly follow the order: web_search (max 3 times) → choose_tags → Final Answer.
+- Any final answer must contain exactly 3 tags from the list, without explanation or additional text.
 
 Final Answer: <EXACTLY 3 tags from the list below, space-separated — NOTHING ELSE>
 
@@ -33,7 +35,7 @@ You must only select tags from this predefined list:
 Your task:
 
 1. Detect if a specific work (movie, book, game...) is mentioned in the user's request.  
-2. If yes, use `web_search` to get contextual information about its ambiance, lore or themes, with focus on the music atmosphere.  
+2. If yes, use `web_search` to get contextual information about its history and the themes covered. Do your research ONLY in English and French.
 3. Based on the user’s intent and context (prompt + web), pick exactly 3 tags from the list that best match.  
 4. Call `choose_tags` with a space-separated string of those 3 tags (from the list).  
 5. Return the 3 tags as the final answer (and nothing else).

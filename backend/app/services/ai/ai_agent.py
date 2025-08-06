@@ -14,7 +14,7 @@ class AI_Agent:
 
         self.tools = [
             Tool.from_function(func=web_search, name="web_search",
-                               description="Search for ambiance or theme information about a mentioned work."),
+                               description="Search for information about history or themes covered about a mentioned work, in english or french ONLY."),
             Tool.from_function(func=choose_tags, name="choose_tags",
                                description="Validate 3 tags from the predefined list, space-separated string.")
         ]
