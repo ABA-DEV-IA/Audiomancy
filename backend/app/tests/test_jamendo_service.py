@@ -9,6 +9,7 @@ import pytest
 from unittest.mock import patch
 from app.services.jamendo.jamendo_service import get_tracks_for_reader
 
+
 @patch("app.services.jamendo.jamendo_service.fetch_tracks")
 def test_get_tracks_for_reader_returns_formatted(mock_fetch):
     """
@@ -34,6 +35,7 @@ def test_get_tracks_for_reader_returns_formatted(mock_fetch):
     assert len(results) == 1
     assert results[0]["title"] == "Test Song"
     assert results[0]["tags"] == ["cinematic"]
+
 
 @patch("app.services.jamendo.jamendo_service.fetch_tracks")
 def test_get_tracks_for_reader_empty_results(mock_fetch):

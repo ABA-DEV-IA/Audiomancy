@@ -14,6 +14,7 @@ from typing import Dict, Any
 
 BASE_URL = "https://api.jamendo.com/v3.0/tracks/"
 
+
 def fetch_tracks(params: Dict[str, Any]) -> Dict[str, Any]:
     """
     Perform a GET request to Jamendo API with given parameters.
