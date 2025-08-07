@@ -13,6 +13,7 @@ from app.utils.formatter import format_jamendo_tracks
 from typing import List
 from app.models.jamendo import JamendoTrackResponse
 
+
 def get_tracks_for_reader(tags: str, duration_min: int, duration_max: int, limit: int = 10) -> List[JamendoTrackResponse]:
     """
     Fetches and formats tracks from Jamendo based on provided filters.
@@ -26,7 +27,6 @@ def get_tracks_for_reader(tags: str, duration_min: int, duration_max: int, limit
     Returns:
         List[JamendoTrackResponse]: Formatted list of music tracks.
     """
-    
     params = {
         "limit": limit,
         "fuzzytags": tags,
@@ -42,4 +42,3 @@ def get_tracks_for_reader(tags: str, duration_min: int, duration_max: int, limit
         return []
 
     return format_jamendo_tracks(data["results"])
-

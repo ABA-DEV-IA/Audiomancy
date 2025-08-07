@@ -8,6 +8,7 @@ into structured response objects.
 import pytest
 from app.utils.formatter import normalize_license_url, format_jamendo_track
 
+
 def test_normalize_license_url_removes_region():
     """
     Ensure that the license URL normalization removes any regional suffixes.
@@ -16,11 +17,13 @@ def test_normalize_license_url_removes_region():
     expected = "https://creativecommons.org/licenses/by/4.0/"
     assert normalize_license_url(url) == expected
 
+
 def test_normalize_license_url_empty():
     """
     Ensure that an empty URL returns an empty string.
     """
     assert normalize_license_url("") == ""
+
 
 def test_format_jamendo_track_minimal_data():
     """

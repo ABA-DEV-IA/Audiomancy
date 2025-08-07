@@ -13,6 +13,7 @@ from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional
 from enum import IntEnum
 
+
 class LimitEnum(IntEnum):
     """
     Enum representing allowed limits for the number of tracks returned by the API.
@@ -20,6 +21,7 @@ class LimitEnum(IntEnum):
     ten = 10
     twenty_five = 25
     fifty = 50
+
 
 class JamendoTrackRequest(BaseModel):
     """
@@ -46,6 +48,7 @@ class JamendoTrackRequest(BaseModel):
             }
         }
     )
+
 
 class JamendoTrackResponse(BaseModel):
     """
