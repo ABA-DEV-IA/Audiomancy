@@ -16,7 +16,6 @@ validators
 orjson
 pylint
 mypy
-azure
 dotenv
 ddgs #duckduckgo-search
 langchain
