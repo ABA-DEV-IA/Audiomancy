@@ -1,6 +1,23 @@
+pytest
+httpx
+fastapi
+uvicorn
+pydantic
+python-dotenv
+openai
+tenacity
+tiktoken
+pytest-asyncio
+azure-identity
+azure-core
+azure-storage-blob
+azure-keyvault-secrets
+validators 
+orjson
+pylint
+mypy
 azure
 dotenv
 ddgs #duckduckgo-search
-openai
 langchain
 langchain-openai
