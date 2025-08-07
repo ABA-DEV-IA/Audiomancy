@@ -1,5 +1,8 @@
+""" Web search tool for AI agent """
+
 from langchain.tools import tool
 from ddgs import DDGS
+
 
 @tool
 def web_search(query: str) -> str:
@@ -20,5 +23,5 @@ def web_search(query: str) -> str:
             source = r.get("href", "unknown")
             text = r.get("body", "")
             return f"{text}\n\n(Source: {source})"
-        
+
     return "NO RESULT"

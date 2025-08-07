@@ -1,5 +1,8 @@
-from ai_agent import AI_Agent
+""" Module for testing the AI agent """
+
+from ai_agent import AIAgent
 from utils.filter_final_answer import filter_final_answer
+
 
 def execution_test():
     """
@@ -11,10 +14,11 @@ def execution_test():
     """
 
     prompt = input("Exprimez votre souhait...")
-    agent = AI_Agent()
+    agent = AIAgent()
     response = agent.run(prompt)
     print("\n🎵 Tags générés :")
     print(filter_final_answer(response))
+
 
 if __name__ == "__main__":
     execution_test()

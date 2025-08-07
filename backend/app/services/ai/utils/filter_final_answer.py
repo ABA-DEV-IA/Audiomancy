@@ -1,3 +1,5 @@
+""" Module providing the function filtering the final response from the agent """
+
 
 def filter_final_answer(text: str) -> str:
     """
@@ -13,7 +15,7 @@ def filter_final_answer(text: str) -> str:
     Returns:
         str: The final answer if found, the whole text otherwise.
     """
-    
+
     final_answer = None
 
     for line in text.splitlines():
@@ -23,5 +25,5 @@ def filter_final_answer(text: str) -> str:
 
     if final_answer is None:
         return text.strip()
-    
+
     return final_answer

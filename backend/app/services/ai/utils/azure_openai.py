@@ -1,6 +1,9 @@
+""" Module creating the LLM for the AI agent """
+
 import os
 from langchain_openai import AzureChatOpenAI
 from dotenv import load_dotenv
+
 
 def get_llm():
     """
@@ -26,4 +29,4 @@ def get_llm():
         api_key=subscription_key,
         api_version="2025-01-01-preview",
         temperature=0
-)
+    )
