@@ -1,23 +1,17 @@
 import os
-#from openai import AzureOpenAI
 from langchain_openai import AzureChatOpenAI
 from dotenv import load_dotenv
 
 def get_llm():
     """
-    Returns an instance of AzureOpenAI, the client for the Azure OpenAI
-    service. The instance is configured from the following environment
-    variables:
+    Returns an instance of the AzureChatOpenAI language model.
 
-    - ENDPOINT_URL: the URL of the Azure OpenAI service
-    - DEPLOYMENT_NAME: the name of the deployment to use
-    - AZURE_OPENAI_API_KEY: the subscription key for the deployment
-
-    The API version is set to "2025-01-01-preview", which is the latest
-    available version at the time of writing.
+    The endpoint, deployment name, and subscription key are loaded from environment
+    variables. The API version is set to "2025-01-01-preview" and the temperature is set
+    to 0.
 
     Returns:
-        AzureOpenAI: the configured client
+        AzureChatOpenAI: the LLM instance
     """
 
     load_dotenv(override=True)
