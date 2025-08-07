@@ -28,7 +28,7 @@ def fetch_tracks(params: Dict[str, Any]) -> Dict[str, Any]:
     Raises:
         RuntimeError: If the request fails.
     """
-    params["client_id"] = settings.JAMENDO_CLIENT_ID
+    params["client_id"] = settings.jamendo_client_id
     params["format"] = "json"
 
     try:
