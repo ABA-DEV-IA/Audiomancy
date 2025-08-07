@@ -3,10 +3,10 @@
 import { useEffect, useRef, useState } from "react"
 import { usePlaylist } from "@/hooks/usePlaylist"
 import { useRouter } from "next/navigation"
-import LoadingPage from "./loading-page"
-import ErrorPage from "./error-page"
-import NoTracksPage from "./notrack-page"
-import PlayerPage from "./player-page"
+import LoadingPage from "./loadingSection"
+import ErrorPage from "./errorSection"
+import NoTracksPage from "./notrackSection"
+import PlayerPage from "./playerSection"
 
 interface LecturePageProps {
   params: { id: string }

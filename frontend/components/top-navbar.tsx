@@ -16,9 +16,9 @@ export function TopNavbar() {
 
       {/* User Icon */}
       <div className="flex items-center">
-        <Button variant="ghost" size="icon" className="text-[#A3D5FF]">
+        {/* <Button variant="ghost" size="icon" className="text-[#A3D5FF]">
           <User className="h-5 w-5" />
-        </Button>
+        </Button> */}
       </div>
     </div>
   )

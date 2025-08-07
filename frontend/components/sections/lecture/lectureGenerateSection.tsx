@@ -2,49 +2,46 @@
 
 import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
-import { useGeneratePlaylist } from "@/hooks/use_generate_playlist"
-import LoadingPage from "./loading-page"
-import ErrorPage from "./error-page"
-import NoTracksPage from "./notrack-page"
-import PlayerPage from "./player-page"
+
+import { useGeneratePlaylist } from "@/hooks/useGeneratePlaylist"
 import { useGeneration } from "@/context/generation_context"
+import { Track } from "@/types/track"
+
+import LoadingPage from "@/components/sections/lecture/loadingSection"
+import ErrorPage from "@/components/sections/lecture/errorSection"
+import NoTracksPage from "@/components/sections/lecture/notrackSection"
+import PlayerPage from "@/components/sections/lecture/playerSection"
 
 export default function LecturePageGenerate() {
   const { wish, playlistSize } = useGeneration()
-  
-  console.log("Wish:", wish)
-  console.log("Playlist size:", playlistSize)
   const router = useRouter()
 
-  const [playlist, setPlaylist] = useState<string[]>([])
+  const [playlist, setPlaylist] = useState<Track[]>([])
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0)
   const audioRef = useRef<HTMLAudioElement>(null)
+  const hasStartedRef = useRef(false)
 
   const { loading, error, progress, start } = useGeneratePlaylist(
     wish,
     playlistSize,
-    (data) => {
-      setPlaylist(data.playlist || [])
-    }
+    (data) => setPlaylist(data || [])
   )
 
-  // Lancer la génération si données présentes
   useEffect(() => {
-    if (!wish || !playlistSize) return
-
-    // Lance la génération uniquement si les deux sont valides
+    if (!wish || !playlistSize || hasStartedRef.current) return
+    hasStartedRef.current = true
     start()
   }, [wish, playlistSize, start])
 
   if (!wish || !playlistSize) return <LoadingPage />
   if (loading) return <LoadingPage />
   if (error) return <ErrorPage error={error} />
-  if (!playlist || playlist.length === 0) return <NoTracksPage />
+  if (!playlist.length) return <NoTracksPage />
 
   return (
     <PlayerPage
       tracks={playlist}
-      params={{ id: "generated" }} // ou autre identifiant fictif
+      params={{ id: "generated" }}
       currentTrackIndex={currentTrackIndex}
       onSelectTrack={setCurrentTrackIndex}
       audioRef={audioRef}

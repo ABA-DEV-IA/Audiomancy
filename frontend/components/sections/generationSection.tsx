@@ -44,11 +44,6 @@ export function GenerationPage({ onBack }: GenerationPageProps) {
       <div className="bg-[#6A0DAD] text-white p-8 text-center">
         <h1 className="text-4xl font-bold mb-2 tracking-wider">GÉNÉRATION</h1>
         <p className="text-[#D9B3FF] italic">~ Générer vos envies ~</p>
-        {onBack && (
-          <button onClick={onBack} className="absolute top-6 left-6 text-white hover:text-[#D9B3FF]">
-            <ArrowLeft size={28} />
-          </button>
-        )}
       </div>
 
       <div className="flex-1 bg-[#2B2B2B] flex items-center justify-center p-8 relative">

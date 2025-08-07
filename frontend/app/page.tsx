@@ -1,13 +1,13 @@
 "use client"
 
 import { useState } from "react"
-import { Sidebar } from "@/components/sidebar"
+import { Sidebar } from "@/components/layout/sidebar"
 import { TopNavbar } from "@/components/top-navbar"
-import { HomePage } from "@/components/home-page"
-import { SearchPage } from "@/components/search-page"
-import { AboutPage } from "@/components/about-page"
-import { GenerationPage } from "@/components/generation-page"
-import { Footer } from "@/components/footer"
+import { HomePage } from "@/components/sections/homeSection"
+import { SearchPage } from "@/components/sections/searchSection"
+import { AboutPage } from "@/components/sections/aboutSection"
+import { GenerationPage } from "@/components/sections/generationSection"
+import { Footer } from "@/components/layout/footer"
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState("categories")

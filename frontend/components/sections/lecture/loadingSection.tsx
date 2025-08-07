@@ -1,4 +1,4 @@
-import { Footer } from "@/components/footer"
+import { Footer } from "@/components/layout/footer"
 import { useRouter } from "next/navigation"
 
 export default function LoadingPage() {

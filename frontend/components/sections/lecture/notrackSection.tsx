@@ -1,11 +1,7 @@
-import { Footer } from "@/components/footer"
+import { Footer } from "@/components/layout/footer"
 import { useRouter } from "next/navigation"
 
-interface ErrorPageProps {
-  error: string
-}
-
-export default function ErrorPage({ error }: ErrorPageProps) {
+export default function NoTracksPage() {
   const router = useRouter()
 
   return (
@@ -13,8 +9,8 @@ export default function ErrorPage({ error }: ErrorPageProps) {
       <div className="flex flex-col flex-grow p-6">
         {/* HEADER */}
         <div className="bg-[#6A0DAD] text-white p-6 mb-6 rounded">
-          <h1 className="text-2xl font-bold">Erreur</h1>
-          <p className="mt-2">Une erreur est survenue lors du chargement de la playlist.</p>
+          <h1 className="text-2xl font-bold">Aucune piste trouvée</h1>
+          <p className="mt-2">La playlist demandée ne contient aucun morceau.</p>
           <button
             onClick={() => router.push("/")}
             className="bg-white text-[#6A0DAD] font-semibold px-4 py-2 mt-4 rounded hover:bg-gray-100 transition"
@@ -23,10 +19,10 @@ export default function ErrorPage({ error }: ErrorPageProps) {
           </button>
         </div>
 
-        {/* ERROR MESSAGE */}
-        <div className="bg-red-100 text-red-800 rounded-lg p-6 w-full max-w-3xl mx-auto shadow-lg">
-          <h2 className="text-xl font-bold mb-2">Message d'erreur :</h2>
-          <p className="text-sm break-words">{error}</p>
+        {/* EMPTY STATE */}
+        <div className="bg-[#1E1E1E] text-gray-300 rounded-lg p-6 w-full max-w-3xl mx-auto shadow-lg text-center">
+          <p className="text-lg">Nous n’avons trouvé aucune piste pour cette playlist.</p>
+          <p className="text-sm mt-2 text-gray-400">Vérifiez que le nom de la playlist est correct ou essayez une autre.</p>
         </div>
       </div>
 

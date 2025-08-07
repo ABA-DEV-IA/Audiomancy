@@ -2,7 +2,7 @@
 "use client"
 
 import { GenerationProvider } from "@/context/generation_context"
-import LecturePageGenerate from "../lecture-page-generate"
+import LecturePageGenerate from "@/components/sections/lecture/lectureGenerateSection"
 
 export default function Page() {
   return (
