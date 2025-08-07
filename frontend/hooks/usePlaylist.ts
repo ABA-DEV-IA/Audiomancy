@@ -1,7 +1,7 @@
 // src/hooks/usePlaylist.ts
-import { useState, useCallback } from "react";
-import { Track } from "@/types/track";
-import { fetchPlaylistTracks } from "@/services/playlistService";
+import { useState, useCallback } from 'react';
+import { Track } from '@/types/track';
+import { fetchPlaylistTracks } from '@/services/playlistService';
 
 export function usePlaylist() {
   const [tracks, setTracks] = useState<Track[]>([]);
@@ -10,7 +10,7 @@ export function usePlaylist() {
 
   const fetchTracks = useCallback(async (playlistId: string) => {
     if (!playlistId) {
-      setError("Aucun ID de playlist fourni");
+      setError('Aucun ID de playlist fourni');
       return;
     }
 
@@ -26,5 +26,7 @@ export function usePlaylist() {
     }
   }, []);
 
-  return { tracks, loading, error, fetchTracks };
+  return {
+    tracks, loading, error, fetchTracks,
+  };
 }

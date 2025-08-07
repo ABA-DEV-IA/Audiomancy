@@ -1,61 +1,61 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import { Sidebar } from "@/components/layout/sidebar"
-import { TopNavbar } from "@/components/top-navbar"
-import { HomePage } from "@/components/sections/homeSection"
-import { SearchPage } from "@/components/sections/searchSection"
-import { AboutPage } from "@/components/sections/aboutSection"
-import { GenerationPage } from "@/components/sections/generationSection"
-import { Footer } from "@/components/layout/footer"
+import { useState } from 'react';
+import { Sidebar } from '@/components/layout/sidebar';
+import { TopNavbar } from '@/components/top-navbar';
+import { HomePage } from '@/components/sections/homeSection';
+import { SearchPage } from '@/components/sections/searchSection';
+import { AboutPage } from '@/components/sections/aboutSection';
+import { GenerationPage } from '@/components/sections/generationSection';
+import { Footer } from '@/components/layout/footer';
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState("categories")
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [currentPage, setCurrentPage] = useState('categories');
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   // Nouvel état pour l'id du morceau sélectionné
-  const [currentTrackId, setCurrentTrackId] = useState<string | null>(null)
+  const [currentTrackId, setCurrentTrackId] = useState<string | null>(null);
 
   // Aller sur la page lecture avec un morceau spécifique
   const goToLecture = (id: string) => {
-    setCurrentTrackId(id)
-    setCurrentPage("lecture")
-  }
+    setCurrentTrackId(id);
+    setCurrentPage('lecture');
+  };
 
   const handlePageChange = (page: string) => {
-    setCurrentPage(page)
-    if (page !== "lecture") {
-      setCurrentTrackId(null)
+    setCurrentPage(page);
+    if (page !== 'lecture') {
+      setCurrentTrackId(null);
     }
-  }
+  };
 
   const handleGenerationComplete = () => {
-    setCurrentPage("lecture")
-  }
+    setCurrentPage('lecture');
+  };
 
   const handleGenerationBack = () => {
-    setCurrentPage("categories")
-  }
+    setCurrentPage('categories');
+  };
 
   const renderPage = () => {
     switch (currentPage) {
-      case "categories":
-        return <HomePage onCategoryClick={() => goToLecture("default")} />
-      case "generation":
+      case 'categories':
+        return <HomePage onCategoryClick={() => goToLecture('default')} />;
+      case 'generation':
         return (
           <GenerationPage
             onBack={handleGenerationBack}
             onComplete={handleGenerationComplete}
           />
-        )
-      case "recherches":
-        return <SearchPage onTrackClick={goToLecture} />
-      case "about":
-        return <AboutPage />
+        );
+      case 'recherches':
+        return <SearchPage onTrackClick={goToLecture} />;
+      case 'about':
+        return <AboutPage />;
       default:
-        return <HomePage onCategoryClick={() => goToLecture("default")} />
+        return <HomePage onCategoryClick={() => goToLecture('default')} />;
     }
-  }
+  };
 
   return (
     <div className="flex h-screen bg-[#F2E9E4]">
@@ -72,5 +72,5 @@ export default function App() {
         <Footer />
       </div>
     </div>
-  )
+  );
 }

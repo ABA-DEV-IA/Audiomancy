@@ -1,7 +1,7 @@
-"use client"
+'use client';
 
-import { User } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { User } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export function TopNavbar() {
   return (
@@ -12,7 +12,7 @@ export function TopNavbar() {
       </div>
 
       {/* Espace central vide */}
-      <div className="flex-1"></div>
+      <div className="flex-1" />
 
       {/* User Icon */}
       <div className="flex items-center">
@@ -21,5 +21,5 @@ export function TopNavbar() {
         </Button> */}
       </div>
     </div>
-  )
+  );
 }

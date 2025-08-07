@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { Card, CardContent } from "@/components/ui/card";
-import { useState, useEffect } from "react";
+import { Card, CardContent } from '@/components/ui/card';
+import { useState, useEffect } from 'react';
 
-const DEFAULT_CATEGORY_BG = "/images/default-category.png";
+const DEFAULT_CATEGORY_BG = '/images/default-category.png';
 
 interface CategoryProps {
   category: {
@@ -21,7 +21,7 @@ export function CategoryCard({ category, onClick }: CategoryProps) {
 
   useEffect(() => {
     if (category.image) {
-      fetch(category.image, { method: "HEAD" })
+      fetch(category.image, { method: 'HEAD' })
         .then((res) => {
           if (res.ok) {
             setBgImage(category.image);
@@ -43,7 +43,7 @@ export function CategoryCard({ category, onClick }: CategoryProps) {
           className="absolute inset-0 bg-cover bg-center transition-all duration-300 group-hover:scale-110"
           style={{
             backgroundImage: `url(${bgImage})`,
-            filter: "blur(2px) brightness(0.7)",
+            filter: 'blur(2px) brightness(0.7)',
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-black/40" />
@@ -59,7 +59,7 @@ export function CategoryCard({ category, onClick }: CategoryProps) {
             </div>
           </div>
           <p
-            className={`text-sm text-[#FF934F] italic font-medium drop-shadow-md`}
+            className="text-sm text-[#FF934F] italic font-medium drop-shadow-md"
           >
             {category.subtitle}
           </p>

@@ -1,15 +1,25 @@
-"use client"
+'use client';
 
-import { Github, Twitter, Instagram, Mail } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import {
+  Github, Twitter, Instagram, Mail,
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export function Footer() {
   const socialLinks = [
-    { name: "GitHub", icon: Github, href: "https://github.com/aruide/Audiomancy", color: "#4CE0B3" },
-    { name: "Twitter", icon: Twitter, href: "#", color: "#A3D5FF" },
-    { name: "Instagram", icon: Instagram, href: "#", color: "#FF7BAC" },
-    { name: "Email", icon: Mail, href: "mailto:contact@audiomancy.com", color: "#FF934F" },
-  ]
+    {
+      name: 'GitHub', icon: Github, href: 'https://github.com/aruide/Audiomancy', color: '#4CE0B3',
+    },
+    {
+      name: 'Twitter', icon: Twitter, href: '#', color: '#A3D5FF',
+    },
+    {
+      name: 'Instagram', icon: Instagram, href: '#', color: '#FF7BAC',
+    },
+    {
+      name: 'Email', icon: Mail, href: 'mailto:contact@audiomancy.com', color: '#FF934F',
+    },
+  ];
 
   return (
     <footer className="bg-[#301934] border-t border-[#A45EE5] py-4">
@@ -26,18 +36,18 @@ export function Footer() {
           {/* Réseaux sociaux */}
           <div className="flex items-center space-x-2">
             {socialLinks.map((social) => {
-              const Icon = social.icon
+              const Icon = social.icon;
               return (
                 <Button
                   key={social.name}
                   variant="ghost"
                   size="icon"
                   className="hover:bg-[#6A0DAD] transition-colors h-8 w-8"
-                  onClick={() => window.open(social.href, "_blank")}
+                  onClick={() => window.open(social.href, '_blank')}
                 >
                   <Icon className="h-4 w-4" style={{ color: social.color }} />
                 </Button>
-              )
+              );
             })}
           </div>
 
@@ -48,5 +58,5 @@ export function Footer() {
         </div>
       </div>
     </footer>
-  )
+  );
 }

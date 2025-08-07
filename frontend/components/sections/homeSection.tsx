@@ -1,54 +1,54 @@
-"use client"
+'use client';
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { Card, CardContent } from "@/components/ui/card"
-import categoriesList from "@/config/categories_du_jour.json"
-import { homeConfig } from "@/config/home.config"
-import { CategoryCard } from "@/components/category-card"
-import { formatId } from "@/utils/formatId" // ✅ Fonction utilitaire importée
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Card, CardContent } from '@/components/ui/card';
+import categoriesList from '@/config/categories_du_jour.json';
+import { homeConfig } from '@/config/home.config';
+import { CategoryCard } from '@/components/category-card';
+import { formatId } from '@/utils/formatId'; // ✅ Fonction utilitaire importée
 
 interface HomePageProps {
   onCategoryClick?: () => void
 }
 
-const DEFAULT_HEADER_COLOR = "#6A0DAD"
-const DEFAULT_CATEGORY_BG = "/images/default-category.png"
+const DEFAULT_HEADER_COLOR = '#6A0DAD';
+const DEFAULT_CATEGORY_BG = '/images/default-category.png';
 
 export function HomePage({ onCategoryClick }: HomePageProps = {}) {
-  const { header } = homeConfig
-  const { categories } = categoriesList
-  const router = useRouter()
+  const { header } = homeConfig;
+  const { categories } = categoriesList;
+  const router = useRouter();
 
   const [headerStyle, setHeaderStyle] = useState<React.CSSProperties>({
     backgroundColor: DEFAULT_HEADER_COLOR,
-  })
+  });
 
   // 🎨 Gère l'image de fond du header
   useEffect(() => {
     if (header.background) {
-      fetch(header.background, { method: "HEAD" })
+      fetch(header.background, { method: 'HEAD' })
         .then((res) => {
           if (res.ok) {
             setHeaderStyle({
               backgroundImage: `url(${header.background})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            })
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            });
           } else {
-            setHeaderStyle({ backgroundColor: DEFAULT_HEADER_COLOR })
+            setHeaderStyle({ backgroundColor: DEFAULT_HEADER_COLOR });
           }
         })
-        .catch(() => setHeaderStyle({ backgroundColor: DEFAULT_HEADER_COLOR }))
+        .catch(() => setHeaderStyle({ backgroundColor: DEFAULT_HEADER_COLOR }));
     } else {
-      setHeaderStyle({ backgroundColor: DEFAULT_HEADER_COLOR })
+      setHeaderStyle({ backgroundColor: DEFAULT_HEADER_COLOR });
     }
-  }, [header.background])
+  }, [header.background]);
 
   // ✅ Redirection vers la page lecture
   const handleCategoryClick = (id: string) => {
-    router.push(`/lecture/${id}`)
-  }
+    router.push(`/lecture/${id}`);
+  };
 
   return (
     <div className="h-full flex flex-col">
@@ -77,9 +77,9 @@ export function HomePage({ onCategoryClick }: HomePageProps = {}) {
         {/* 🔹 Mood */}
         <div className="mb-12">
           <div className="flex items-center justify-center mb-8">
-            <div className="flex-1 h-px bg-white max-w-32"></div>
+            <div className="flex-1 h-px bg-white max-w-32" />
             <span className="text-white italic mx-8 text-xl">Mood</span>
-            <div className="flex-1 h-px bg-white max-w-32"></div>
+            <div className="flex-1 h-px bg-white max-w-32" />
           </div>
 
           <div className="grid grid-cols-3 gap-8 max-w-4xl mx-auto mb-8">
@@ -97,9 +97,9 @@ export function HomePage({ onCategoryClick }: HomePageProps = {}) {
         {/* 🔹 Activités */}
         <div className="mb-12">
           <div className="flex items-center justify-center mb-8">
-            <div className="flex-1 h-px bg-white max-w-32"></div>
+            <div className="flex-1 h-px bg-white max-w-32" />
             <span className="text-white italic mx-8 text-xl">Activités</span>
-            <div className="flex-1 h-px bg-white max-w-32"></div>
+            <div className="flex-1 h-px bg-white max-w-32" />
           </div>
 
           <div className="grid grid-cols-3 gap-8 max-w-4xl mx-auto mb-8">
@@ -122,5 +122,5 @@ export function HomePage({ onCategoryClick }: HomePageProps = {}) {
         </div>
       </div>
     </div>
-  )
+  );
 }

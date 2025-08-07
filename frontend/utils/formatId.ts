@@ -1,8 +1,8 @@
 export function formatId(str: string | undefined): string {
-  if (!str) return ""
+  if (!str) return '';
   return str
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
-    .replace(/\s+/g, "_")
+    .replace(/\s+/g, '_');
 }

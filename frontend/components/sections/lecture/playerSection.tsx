@@ -1,6 +1,6 @@
-import { Footer } from "@/components/layout/footer"
-import { useRouter } from "next/navigation"
-import { RefObject } from "react"
+import { Footer } from '@/components/layout/footer';
+import { useRouter } from 'next/navigation';
+import { RefObject } from 'react';
 
 interface PlayerPageProps {
   params: { id: string }
@@ -11,9 +11,9 @@ interface PlayerPageProps {
 }
 
 function formatDuration(seconds: number) {
-  const mins = Math.floor(seconds / 60)
-  const secs = seconds % 60
-  return `${mins}:${secs.toString().padStart(2, "0")}`
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
 export default function PlayerPage({
@@ -21,10 +21,10 @@ export default function PlayerPage({
   tracks,
   currentTrackIndex,
   onSelectTrack,
-  audioRef
+  audioRef,
 }: PlayerPageProps) {
-  const router = useRouter()
-  const currentTrack = tracks[currentTrackIndex]
+  const router = useRouter();
+  const currentTrack = tracks[currentTrackIndex];
 
   return (
     <div className="flex flex-col justify-between min-h-screen bg-[#2B2B2B] text-white">
@@ -32,9 +32,12 @@ export default function PlayerPage({
         {/* HEADER */}
         <div className="bg-[#6A0DAD] text-white p-6 mb-6 rounded">
           <h1 className="text-2xl font-bold">LECTURE</h1>
-          <p className="mt-2">Playlist : {params.id}</p>
+          <p className="mt-2">
+            Playlist :
+            {params.id}
+          </p>
           <button
-            onClick={() => router.push("/")}
+            onClick={() => router.push('/')}
             className="bg-white text-[#6A0DAD] font-semibold px-4 py-2 rounded hover:bg-gray-100 transition"
           >
             ← Retour
@@ -74,7 +77,9 @@ export default function PlayerPage({
             className="w-full mb-4"
           />
           <p className="text-gray-700">
-            Durée : {formatDuration(currentTrack.duration)}
+            Durée :
+            {' '}
+            {formatDuration(currentTrack.duration)}
           </p>
 
           {currentTrack.tags?.length > 0 && (
@@ -84,7 +89,8 @@ export default function PlayerPage({
                   key={index}
                   className="bg-gray-200 text-gray-800 text-xs font-semibold px-3 py-1 rounded-full"
                 >
-                  #{tag}
+                  #
+                  {tag}
                 </span>
               ))}
             </div>
@@ -102,7 +108,7 @@ export default function PlayerPage({
               {currentTrack.license_name}
             </a>
           </div>
-        )}
+          )}
         </div>
 
         {/* TRACK LIST */}
@@ -114,12 +120,15 @@ export default function PlayerPage({
                 key={track.id}
                 className={`p-2 rounded cursor-pointer ${
                   index === currentTrackIndex
-                    ? "bg-[#6A0DAD]"
-                    : "hover:bg-[#3A3A3A]"
+                    ? 'bg-[#6A0DAD]'
+                    : 'hover:bg-[#3A3A3A]'
                 }`}
                 onClick={() => onSelectTrack(index)}
               >
-                {track.title} - {track.artist}
+                {track.title}
+                {' '}
+                -
+                {track.artist}
               </li>
             ))}
           </ul>
@@ -128,5 +137,5 @@ export default function PlayerPage({
 
       <Footer />
     </div>
-  )
+  );
 }

@@ -1,12 +1,12 @@
-import { Footer } from "@/components/layout/footer"
-import { useRouter } from "next/navigation"
+import { Footer } from '@/components/layout/footer';
+import { useRouter } from 'next/navigation';
 
 interface ErrorPageProps {
   error: string
 }
 
 export default function ErrorPage({ error }: ErrorPageProps) {
-  const router = useRouter()
+  const router = useRouter();
 
   return (
     <div className="flex flex-col justify-between min-h-screen bg-[#2B2B2B] text-white">
@@ -16,7 +16,7 @@ export default function ErrorPage({ error }: ErrorPageProps) {
           <h1 className="text-2xl font-bold">Erreur</h1>
           <p className="mt-2">Une erreur est survenue lors du chargement de la playlist.</p>
           <button
-            onClick={() => router.push("/")}
+            onClick={() => router.push('/')}
             className="bg-white text-[#6A0DAD] font-semibold px-4 py-2 mt-4 rounded hover:bg-gray-100 transition"
           >
             ← Retour à l'accueil
@@ -32,5 +32,5 @@ export default function ErrorPage({ error }: ErrorPageProps) {
 
       <Footer />
     </div>
-  )
+  );
 }

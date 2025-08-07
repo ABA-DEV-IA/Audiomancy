@@ -1,16 +1,16 @@
-import type { Metadata } from 'next'
-import { GeistSans } from 'geist/font/sans'
-import { GeistMono } from 'geist/font/mono'
-import { GenerationProvider } from "@/context/generation_context"
-import './globals.css'
+import type { Metadata } from 'next';
+import { GeistSans } from 'geist/font/sans';
+import { GeistMono } from 'geist/font/mono';
+import { GenerationProvider } from '@/context/generation_context';
+import './globals.css';
 
 export const metadata: Metadata = {
   title: 'Audiomancy',
   description: 'application de génération de playlist via intelligence artificielle',
   icons: {
-    icon: 'images/favicon.png'
+    icon: 'images/favicon.png',
   },
-}
+};
 
 export default function RootLayout({
   children,
@@ -20,18 +20,19 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <style>{`
+        <style>
+          {`
 html {
   font-family: ${GeistSans.style.fontFamily};
   --font-sans: ${GeistSans.variable};
   --font-mono: ${GeistMono.variable};
 }
-        `}</style>
+        `}
+        </style>
       </head>
       <body>
         <GenerationProvider>{children}</GenerationProvider>
       </body>
     </html>
-  )
+  );
 }
-

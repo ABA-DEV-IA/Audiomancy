@@ -1,6 +1,6 @@
-import { useState, useCallback } from "react"
-import { generatePlaylist } from "@/services/playlistService"
-import { Track } from "@/types/track"
+import { useState, useCallback } from 'react';
+import { generatePlaylist } from '@/services/playlistService';
+import { Track } from '@/types/track';
 
 type UseGeneratePlaylistReturn = {
   loading: boolean
@@ -18,32 +18,34 @@ type UseGeneratePlaylistReturn = {
 export function useGeneratePlaylist(
   wish: string,
   size: number,
-  onComplete: (tracks: Track[]) => void
+  onComplete: (tracks: Track[]) => void,
 ): UseGeneratePlaylistReturn {
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [progress, setProgress] = useState(0)
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [progress, setProgress] = useState(0);
 
   const start = useCallback(async () => {
     if (!wish || !size) {
-      setError("Paramètres invalides pour la génération de la playlist.")
-      return
+      setError('Paramètres invalides pour la génération de la playlist.');
+      return;
     }
 
-    setLoading(true)
-    setError(null)
-    setProgress(0)
+    setLoading(true);
+    setError(null);
+    setProgress(0);
 
     try {
-      const tracks = await generatePlaylist(wish, size)
-      onComplete(tracks)
+      const tracks = await generatePlaylist(wish, size);
+      onComplete(tracks);
     } catch (err: any) {
-      setError(err.message || "Une erreur est survenue.")
+      setError(err.message || 'Une erreur est survenue.');
     } finally {
-      setLoading(false)
-      setProgress(100)
+      setLoading(false);
+      setProgress(100);
     }
-  }, [wish, size, onComplete])
+  }, [wish, size, onComplete]);
 
-  return { loading, error, progress, start }
+  return {
+    loading, error, progress, start,
+  };
 }

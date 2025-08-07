@@ -1,43 +1,43 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import { ArrowLeft, Sparkles } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { useRouter } from "next/navigation"
-import { useGeneration } from "@/context/generation_context"
+import { useState } from 'react';
+import { ArrowLeft, Sparkles } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { useRouter } from 'next/navigation';
+import { useGeneration } from '@/context/generation_context';
 
 interface GenerationPageProps {
   onBack?: () => void
 }
 
 export function GenerationPage({ onBack }: GenerationPageProps) {
-  const [step, setStep] = useState(1)
-  const [wish, setWish] = useState("")
-  const [isTransitioning, setIsTransitioning] = useState(false)
-  const { setGenerationData } = useGeneration()
-  const router = useRouter()
+  const [step, setStep] = useState(1);
+  const [wish, setWish] = useState('');
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const { setGenerationData } = useGeneration();
+  const router = useRouter();
 
   const magicalTransition = (nextStep: number, callback?: () => void) => {
-    setIsTransitioning(true)
+    setIsTransitioning(true);
     setTimeout(() => {
-      setStep(nextStep)
-      setIsTransitioning(false)
-      if (callback) callback()
-    }, 800)
-  }
+      setStep(nextStep);
+      setIsTransitioning(false);
+      if (callback) callback();
+    }, 800);
+  };
 
-  const handleStart = () => magicalTransition(2)
-  const handleWishSubmit = () => magicalTransition(3)
+  const handleStart = () => magicalTransition(2);
+  const handleWishSubmit = () => magicalTransition(3);
 
   const handleSizeSelect = (size: number) => {
     // Sauvegarde dans le context global
-    setGenerationData({ wish, playlistSize: size })
+    setGenerationData({ wish, playlistSize: size });
 
     magicalTransition(0, () => {
-      router.push("/lecture/generation") // redirection automatique
-    })
-  }
+      router.push('/lecture/generation'); // redirection automatique
+    });
+  };
 
   return (
     <div className="h-full flex flex-col relative overflow-hidden">
@@ -49,7 +49,7 @@ export function GenerationPage({ onBack }: GenerationPageProps) {
       <div className="flex-1 bg-[#2B2B2B] flex items-center justify-center p-8 relative">
         <div
           className={`max-w-2xl w-full transition-all duration-700 ${
-            isTransitioning ? "opacity-0 scale-95 blur-sm" : "opacity-100 scale-100 blur-0"
+            isTransitioning ? 'opacity-0 scale-95 blur-sm' : 'opacity-100 scale-100 blur-0'
           }`}
         >
           <div className="text-center mb-12">
@@ -125,23 +125,24 @@ export function GenerationPage({ onBack }: GenerationPageProps) {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-2xl mx-auto">
                 {[10, 25, 50].map((size) => {
-                  const label = size === 10 ? "Sort Mineur" : size === 25 ? "Sort Équilibré" : "Sort Puissant"
-                  const desc = size === 10 ? "Pour une écoute rapide" : size === 25 ? "Le choix parfait" : "Pour les grandes aventures"
-                  const icon = size === 10 ? "🌙" : size === 25 ? "🌟" : "🔥"
+                  const label = size === 10 ? 'Sort Mineur' : size === 25 ? 'Sort Équilibré' : 'Sort Puissant';
+                  const desc = size === 10 ? 'Pour une écoute rapide' : size === 25 ? 'Le choix parfait' : 'Pour les grandes aventures';
+                  const icon = size === 10 ? '🌙' : size === 25 ? '🌟' : '🔥';
 
                   return (
-                    <Button
+                    <div
                       key={size}
-                      variant="outline"
                       onClick={() => handleSizeSelect(size)}
-                      className="flex flex-col items-center p-6 rounded-lg bg-[#3A1E5F] hover:bg-[#4B2A7B] transition-all duration-300"
+                      className="cursor-pointer flex flex-col justify-between p-6 rounded-lg bg-[#3A1E5F] hover:bg-[#4B2A7B] transition-all duration-300 border border-[#A45EE5] min-h-[220px]"
                     >
-                      <div className="text-4xl mb-3">{icon}</div>
-                      <h3 className="font-semibold text-lg mb-1">{label}</h3>
-                      <p className="text-[#D9B3FF]">{desc}</p>
-                      <p className="mt-2 text-xl font-bold">{size} pistes</p>
-                    </Button>
-                  )
+                      <div className="flex flex-col items-center">
+                        <div className="text-4xl mb-3">{icon}</div>
+                        <h3 className="font-semibold text-white text-lg mb-1">{label}</h3>
+                        <p className="text-[#D9B3FF] text-center">{desc}</p>
+                      </div>
+                      <p className="text-center text-xl text-[#FF934F] font-bold">{size} pistes</p>
+                    </div>
+                  );
                 })}
               </div>
             </div>
@@ -149,5 +150,5 @@ export function GenerationPage({ onBack }: GenerationPageProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }

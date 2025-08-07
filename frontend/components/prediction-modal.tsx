@@ -1,10 +1,10 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import { X, Sparkles } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Progress } from "@/components/ui/progress"
+import { useState } from 'react';
+import { X, Sparkles } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Progress } from '@/components/ui/progress';
 
 interface PredictionModalProps {
   onClose: () => void
@@ -12,12 +12,12 @@ interface PredictionModalProps {
 }
 
 export function PredictionModal({ onClose, onComplete }: PredictionModalProps) {
-  const [step, setStep] = useState(1)
-  const [wish, setWish] = useState("")
-  const [playlistSize, setPlaylistSize] = useState(25)
-  const [progress, setProgress] = useState(0)
-  const [isTransitioning, setIsTransitioning] = useState(false)
-  const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number; delay: number }>>([])
+  const [step, setStep] = useState(1);
+  const [wish, setWish] = useState('');
+  const [playlistSize, setPlaylistSize] = useState(25);
+  const [progress, setProgress] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number; delay: number }>>([]);
 
   // Générer des particules magiques
   const generateParticles = () => {
@@ -26,49 +26,49 @@ export function PredictionModal({ onClose, onComplete }: PredictionModalProps) {
       x: Math.random() * 100,
       y: Math.random() * 100,
       delay: Math.random() * 2,
-    }))
-    setParticles(newParticles)
-  }
+    }));
+    setParticles(newParticles);
+  };
 
   // Effet de transition magique
   const magicalTransition = (nextStep: number) => {
-    setIsTransitioning(true)
-    generateParticles()
+    setIsTransitioning(true);
+    generateParticles();
 
     setTimeout(() => {
-      setStep(nextStep)
-      setIsTransitioning(false)
-    }, 800)
-  }
+      setStep(nextStep);
+      setIsTransitioning(false);
+    }, 800);
+  };
 
   const handleStart = () => {
-    magicalTransition(2)
-  }
+    magicalTransition(2);
+  };
 
   const handleWishSubmit = () => {
-    magicalTransition(3)
-  }
+    magicalTransition(3);
+  };
 
   const handleSizeSelect = (size: number) => {
-    setPlaylistSize(size)
-    magicalTransition(4)
+    setPlaylistSize(size);
+    magicalTransition(4);
 
     // Simulate progress après la transition
     setTimeout(() => {
       const interval = setInterval(() => {
         setProgress((prev) => {
           if (prev >= 100) {
-            clearInterval(interval)
+            clearInterval(interval);
             setTimeout(() => {
-              onComplete()
-            }, 1000)
-            return 100
+              onComplete();
+            }, 1000);
+            return 100;
           }
-          return prev + 10
-        })
-      }, 200)
-    }, 800)
-  }
+          return prev + 10;
+        });
+      }, 200);
+    }, 800);
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -84,7 +84,7 @@ export function PredictionModal({ onClose, onComplete }: PredictionModalProps) {
                   left: `${particle.x}%`,
                   top: `${particle.y}%`,
                   animationDelay: `${particle.delay}s`,
-                  animationDuration: "1.5s",
+                  animationDuration: '1.5s',
                 }}
               />
             ))}
@@ -94,16 +94,16 @@ export function PredictionModal({ onClose, onComplete }: PredictionModalProps) {
 
             {/* Étoiles scintillantes */}
             <div className="absolute top-4 left-8 text-[#FF7BAC] animate-bounce">✨</div>
-            <div className="absolute top-12 right-12 text-[#4CE0B3] animate-bounce" style={{ animationDelay: "0.3s" }}>
+            <div className="absolute top-12 right-12 text-[#4CE0B3] animate-bounce" style={{ animationDelay: '0.3s' }}>
               ⭐
             </div>
             <div
               className="absolute bottom-16 left-12 text-[#A3D5FF] animate-bounce"
-              style={{ animationDelay: "0.6s" }}
+              style={{ animationDelay: '0.6s' }}
             >
               💫
             </div>
-            <div className="absolute bottom-8 right-8 text-[#FF934F] animate-bounce" style={{ animationDelay: "0.9s" }}>
+            <div className="absolute bottom-8 right-8 text-[#FF934F] animate-bounce" style={{ animationDelay: '0.9s' }}>
               🌟
             </div>
           </div>
@@ -124,7 +124,7 @@ export function PredictionModal({ onClose, onComplete }: PredictionModalProps) {
         </Button>
 
         <div
-          className={`text-center transition-all duration-800 ${isTransitioning ? "opacity-0 scale-95" : "opacity-100 scale-100"}`}
+          className={`text-center transition-all duration-800 ${isTransitioning ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}
         >
           <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6 relative">
             <span className="text-2xl">🔮</span>
@@ -180,14 +180,15 @@ export function PredictionModal({ onClose, onComplete }: PredictionModalProps) {
             <div className="space-y-6">
               <h2 className="text-white text-xl mb-6 flex items-center justify-center">
                 <span className="mr-2">🎵</span>
-                Taille de la playlist ?<span className="ml-2">🎵</span>
+                Taille de la playlist ?
+                <span className="ml-2">🎵</span>
               </h2>
               <div className="space-y-3 mb-6">
                 {[10, 25, 50].map((size) => (
                   <Button
                     key={size}
                     onClick={() => handleSizeSelect(size)}
-                    variant={playlistSize === size ? "default" : "outline"}
+                    variant={playlistSize === size ? 'default' : 'outline'}
                     className="w-full bg-[#6A0DAD] hover:bg-[#A45EE5] border-[#A45EE5] text-white transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-[#6A0DAD]/50"
                   >
                     {size}
@@ -202,7 +203,7 @@ export function PredictionModal({ onClose, onComplete }: PredictionModalProps) {
               <h2 className="text-white text-xl mb-6 flex items-center justify-center">
                 <span className="mr-2 animate-spin">🌟</span>
                 AUDIOMANCY consulte les astres...
-                <span className="ml-2 animate-spin" style={{ animationDirection: "reverse" }}>
+                <span className="ml-2 animate-spin" style={{ animationDirection: 'reverse' }}>
                   🌟
                 </span>
               </h2>
@@ -221,5 +222,5 @@ export function PredictionModal({ onClose, onComplete }: PredictionModalProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }

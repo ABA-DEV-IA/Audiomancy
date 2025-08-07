@@ -1,19 +1,28 @@
-"use client"
+'use client';
 
-import { Github, Star, Heart, Code } from "lucide-react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { aboutConfig } from "@/config/about.config"
+import {
+  Github, Star, Heart, Code,
+} from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { aboutConfig } from '@/config/about.config';
 
 export function AboutPage() {
-  const { project, github, creators, technologies } = aboutConfig
+  const {
+    project, github, creators, technologies,
+  } = aboutConfig;
 
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
       <div className="bg-[#6A0DAD] text-white p-8 text-center">
         <h1 className="text-4xl font-bold mb-2 tracking-wider">À PROPOS</h1>
-        <p className="text-[#D9B3FF] italic">~ Découvrez l'univers de {project.name} ~</p>
+        <p className="text-[#D9B3FF] italic">
+          ~ Découvrez l'univers de
+          {project.name}
+          {' '}
+          ~
+        </p>
       </div>
 
       {/* Content */}
@@ -30,7 +39,11 @@ export function AboutPage() {
               </div>
 
               <div className="text-[#D9B3FF] space-y-4 text-center">
-                <p className="text-lg italic">"{project.tagline}"</p>
+                <p className="text-lg italic">
+                  "
+                  {project.tagline}
+                  "
+                </p>
                 {project.description.map((text, i) => (
                   <p key={i}>{text}</p>
                 ))}
@@ -39,13 +52,13 @@ export function AboutPage() {
               <div className="flex justify-center mt-6">
                 <div className="flex items-center space-x-6 text-[#FF934F]">
                   {project.features.map((feature, index) => {
-                    const Icon = { Star, Heart, Code }[feature.icon as keyof typeof import("lucide-react")]
+                    const Icon = { Star, Heart, Code }[feature.icon as keyof typeof import('lucide-react')];
                     return (
                       <div key={index} className="flex items-center">
                         {Icon && <Icon className="h-5 w-5 mr-2" />}
                         <span>{feature.label}</span>
                       </div>
-                    )
+                    );
                   })}
                 </div>
               </div>
@@ -61,7 +74,7 @@ export function AboutPage() {
                   <CardContent className="p-6 text-center">
                     <div
                       className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl"
-                      style={{ backgroundColor: creator.color + "20" }}
+                      style={{ backgroundColor: `${creator.color}20` }}
                     >
                       {creator.avatar}
                     </div>
@@ -82,12 +95,14 @@ export function AboutPage() {
               </div>
               <h2 className="text-2xl font-bold text-white mb-4">Code Source Mystique</h2>
               <p className="text-[#D9B3FF] mb-6">
-                {project.name} est un projet open source. Découvrez nos sortilèges de code, contribuez à la magie ou
+                {project.name}
+                {' '}
+                est un projet open source. Découvrez nos sortilèges de code, contribuez à la magie ou
                 créez votre propre incantation !
               </p>
               <Button
                 className="bg-[#4CE0B3] hover:bg-[#4CE0B3]/80 text-[#2B2B2B] font-bold px-8 py-3"
-                onClick={() => window.open(github.url, "_blank")}
+                onClick={() => window.open(github.url, '_blank')}
               >
                 <Github className="h-5 w-5 mr-2" />
                 {github.label}
@@ -113,5 +128,5 @@ export function AboutPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

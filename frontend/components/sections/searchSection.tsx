@@ -1,34 +1,32 @@
-"use client"
+'use client';
 
-import { Search } from "lucide-react"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent } from "@/components/ui/card"
-import Categories from "@/config/categories.json"
-import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { Search } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@/components/ui/card';
+import Categories from '@/config/categories.json';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 function formatId(str: string | undefined): string {
-  if (!str) return ""
+  if (!str) return '';
   return str
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
-    .replace(/\s+/g, "_")
+    .replace(/\s+/g, '_');
 }
 
 export function SearchPage() {
-  const router = useRouter()
-  const [searchTerm, setSearchTerm] = useState("")
+  const router = useRouter();
+  const [searchTerm, setSearchTerm] = useState('');
 
   const handleClick = (id: string) => {
-    router.push(`/lecture/${id}`)
-  }
+    router.push(`/lecture/${id}`);
+  };
 
   // Filtre les catégories selon le texte saisi
-  const filteredCategories = Categories.filter((category) =>
-    category.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    category.description.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const filteredCategories = Categories.filter((category) => category.title.toLowerCase().includes(searchTerm.toLowerCase())
+    || category.description.toLowerCase().includes(searchTerm.toLowerCase()));
 
   return (
     <div className="h-full flex flex-col">
@@ -77,5 +75,5 @@ export function SearchPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
