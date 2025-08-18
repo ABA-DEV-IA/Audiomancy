@@ -8,16 +8,16 @@ export function usePlaylist() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchTracks = useCallback(async (playlistId: string) => {
-    if (!playlistId) {
-      setError('Aucun ID de playlist fourni');
+  const fetchTracks = useCallback(async (playlistTags: string) => {
+    if (!playlistTags) {
+      setError('Aucun tag de playlist fourni');
       return;
     }
 
     setLoading(true);
     setError(null);
     try {
-      const fetchedTracks = await fetchPlaylistTracks(playlistId);
+      const fetchedTracks = await fetchPlaylistTracks(playlistTags);
       setTracks(fetchedTracks);
     } catch (err: any) {
       setError(err.message);

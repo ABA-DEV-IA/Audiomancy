@@ -1,11 +1,21 @@
-'use client';
+"use client";
 
-import { useParams } from 'next/navigation';
-import LecturePage from '@/components/sections/lecture/lecture-page';
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import LecturePage from "@/components/sections/lecture/lecture-page";
 
 export default function Page() {
   const params = useParams();
-  const playlistId = params?.id as string;
+  const [tags, setTags] = useState<string | null>(null);
 
-  return <LecturePage params={{ id: playlistId }} />;
+  useEffect(() => {
+    const stored = sessionStorage.getItem("selectedTags");
+    if (stored) {
+      setTags(JSON.parse(stored));
+    }
+  }, []);
+
+  if (!tags) return <p>Chargement...</p>;
+
+  return <LecturePage params={{ id: params.id as string, tags }} />;
 }

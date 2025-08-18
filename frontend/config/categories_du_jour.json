@@ -6,21 +6,24 @@
         "subtitle": "(musique de fond)",
         "image": "/images/peps-bg.png",
         "description": "Énergie et dynamisme",
-        "id": "peps"
+        "id": "peps",
+        "tags": "magic+fantasy+cinematic"
         },
         {
         "title": "Défouloir",
         "subtitle": "(musique de fond)",
         "image": "/images/defouloir-bg.png",
         "description": "Puissance et intensité",
-        "id": "let_off_steam"
+        "id": "let_off_steam",
+        "tags": "magic+fantasy+cinematic"
         },
         {
         "title": "Sortez les mouchoirs",
         "subtitle": "(musique de fond)",
         "image": "/images/mouchoirs-bg.png",
         "description": "Émotion et mélancolie",
-        "id": "melancholy"
+        "id": "melancholy",
+        "tags": "magic+fantasy+cinematic"
         }
     ],
     "activity": [
@@ -29,21 +32,24 @@
           "subtitle": "(concentration)",
           "image": "/images/bulby.jpg",
           "description": "Musique pour rester productif",
-          "id": "work"
+          "id": "work",
+          "tags": "magic+fantasy+cinematic"
         },
         {
           "title": "Lecture",
           "subtitle": "(calme et sérénité)",
           "image": "/images/reading-bg.png",
           "description": "Accompagnement sonore pour vos livres",
-          "id": "reading"
+          "id": "reading",
+          "tags": "magic+fantasy+cinematic"
         },
         {
           "title": "Fête",
           "subtitle": "(ambiance festive)",
           "image": "/images/party-bg.png",
           "description": "Boostez vos soirées avec du bon son",
-          "id": "party"
+          "id": "party",
+          "tags": "magic+fantasy+cinematic"
         }
       ]
   }

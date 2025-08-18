@@ -9,7 +9,7 @@ import NoTracksPage from './notrackSection';
 import PlayerPage from './playerSection';
 
 interface LecturePageProps {
-  params: { id: string }
+  params: { id: string, tags: string }
 }
 
 export default function LecturePage({ params }: LecturePageProps) {
@@ -20,10 +20,10 @@ export default function LecturePage({ params }: LecturePageProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
-    if (params.id) {
-      fetchTracks(params.id);
+    if (params.tags) {
+      fetchTracks(params.tags);
     }
-  }, [fetchTracks, params.id]);
+  }, [fetchTracks, params.tags]);
 
   if (loading) return <LoadingPage />;
   if (error) return <ErrorPage error={error} />;

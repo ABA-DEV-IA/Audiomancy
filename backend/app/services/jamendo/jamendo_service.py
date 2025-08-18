@@ -14,7 +14,7 @@ from typing import List
 from app.models.jamendo import JamendoTrackResponse
 
 
-def get_tracks_for_reader(tags: str, duration_min: int, duration_max: int, limit: int = 10) -> List[JamendoTrackResponse]:
+def get_tracks_for_reader(tags: str, duration_min: int = 180, duration_max: int = 480, limit: int = 10) -> List[JamendoTrackResponse]:
     """
     Fetches and formats tracks from Jamendo based on provided filters.
 
