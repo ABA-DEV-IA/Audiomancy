@@ -12,6 +12,7 @@ Attributes:
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes.jamendo_routes import router as jamendo_router
+from app.routes.ai_routes import router as ai_router
 
 app = FastAPI(title="Audiomancy API")
 
@@ -32,3 +33,5 @@ app.add_middleware(
 
 # Include API routes
 app.include_router(jamendo_router)
+app.include_router(ai_router)
+

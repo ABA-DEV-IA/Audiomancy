@@ -23,10 +23,11 @@ def get_tracks_for_reader(tags: str, duration_min: int = 180, duration_max: int 
         duration_min (int): Minimum track duration (in seconds).
         duration_max (int): Maximum track duration (in seconds).
         limit (int): Maximum number of tracks to return.
-
+    
     Returns:
         List[JamendoTrackResponse]: Formatted list of music tracks.
     """
+
     params = {
         "limit": limit,
         "fuzzytags": tags,
@@ -38,6 +39,7 @@ def get_tracks_for_reader(tags: str, duration_min: int = 180, duration_max: int 
     }
 
     data = fetch_tracks(params)
+
     if "results" not in data:
         return []
 
