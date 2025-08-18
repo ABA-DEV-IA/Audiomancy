@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { generatePlaylist } from '@/services/playlistService';
+import { fetchPlaylistTracksGenerate } from '@/services/playlistService';
 import { Track } from '@/types/track';
 
 type UseGeneratePlaylistReturn = {
@@ -35,7 +35,7 @@ export function useGeneratePlaylist(
     setProgress(0);
 
     try {
-      const tracks = await generatePlaylist(wish, size);
+      const tracks = await fetchPlaylistTracksGenerate(size, wish);
       onComplete(tracks);
     } catch (err: any) {
       setError(err.message || 'Une erreur est survenue.');

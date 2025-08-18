@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import categoriesList from '@/config/categories_du_jour.json';
 import { homeConfig } from '@/config/home.config';
 import { CategoryCard } from '@/components/category-card';
-import { formatId } from '@/utils/formatId'; // ✅ Fonction utilitaire importée
+import { formatId } from '@/utils/formatId';
 
 interface HomePageProps {
   onCategoryClick?: () => void
@@ -24,7 +24,6 @@ export function HomePage({ onCategoryClick }: HomePageProps = {}) {
     backgroundColor: DEFAULT_HEADER_COLOR,
   });
 
-  // 🎨 Gère l'image de fond du header
   useEffect(() => {
     if (header.background) {
       fetch(header.background, { method: 'HEAD' })
@@ -45,8 +44,9 @@ export function HomePage({ onCategoryClick }: HomePageProps = {}) {
     }
   }, [header.background]);
 
-  // ✅ Redirection vers la page lecture
-  const handleCategoryClick = (id: string) => {
+  // Redirection vers la page lecture
+  const handleCategoryClick = (id: string, tags: string) => {
+    sessionStorage.setItem("selectedTags", JSON.stringify(tags));
     router.push(`/lecture/${id}`);
   };
 
@@ -88,7 +88,7 @@ export function HomePage({ onCategoryClick }: HomePageProps = {}) {
                 key={`mood-${index}`}
                 category={category}
                 fallbackImage={DEFAULT_CATEGORY_BG}
-                onClick={() => handleCategoryClick(category.id)} // Redirection
+                onClick={() => handleCategoryClick(category.id, category.tags)} // Redirection
               />
             ))}
           </div>
@@ -108,7 +108,7 @@ export function HomePage({ onCategoryClick }: HomePageProps = {}) {
                 key={`activity-${index}`}
                 category={category}
                 fallbackImage={DEFAULT_CATEGORY_BG}
-                onClick={() => handleCategoryClick(category.id)} // Redirection
+                onClick={() => handleCategoryClick(category.id, category.tags)} // Redirection
               />
             ))}
           </div>
