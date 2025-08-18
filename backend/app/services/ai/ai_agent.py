@@ -3,11 +3,11 @@
 from langchain.agents import AgentExecutor, create_openai_functions_agent
 from langchain.tools import Tool
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
-from tools.web_search import web_search
-from utils.azure_openai import get_llm
+from app.services.ai.tools.web_search import web_search
+from app.services.ai.utils.azure_openai import get_llm
 
 # Importing the system prompt
-with open("backend/app/services/ai/utils/system_prompt.txt", "r", encoding="utf-8") as f:
+with open("app/services/ai/utils/system_prompt.txt", "r", encoding="utf-8") as f:
     system_prompt = f.read()
 
 
