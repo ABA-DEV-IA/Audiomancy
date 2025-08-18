@@ -14,20 +14,34 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
 
+def to_snake_case(name: str) -> str:
+    """
+    Convert a Key Vault secret name to snake_case for Python attributes.
+    Examples:
+        "AZURE-OPENAI-API-KEY" -> "azure_openai_api_key"
+        "jamendo-client-id" -> "jamendo_client_id"
+    """
+    return name.lower().replace("-", "_")
+
 
 class Settings(BaseSettings):
     """
-    Application settings loaded from environment variables or Azure Key Vault.
+    Application settings loaded from .env and optionally from Azure Key Vault.
     """
-    jamendo_client_id: str = ""  # ✅ snake_case to conform with Pylint
+
+    # Example fields
+    jamendo_client_id: Optional[str] = None
+    azure_openai_api_key: Optional[str] = None
     azure_key_vault_url: Optional[str] = None
+    deployment_name: Optional[str] = None
+    endpoint_url: Optional[str] = None
+    jamendo_url: Optional[str] = None
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     def load_from_key_vault(self) -> None:
         """
-        Override config values with secrets from Azure Key Vault,
-        if AZURE_KEY_VAULT_URL is set.
+        Override settings with values from Azure Key Vault if available.
         """
         if not self.azure_key_vault_url:
             print("[INFO] No Key Vault URL provided. Using .env only.")
@@ -35,17 +49,26 @@ class Settings(BaseSettings):
 
         try:
             credential = DefaultAzureCredential()
-            client = SecretClient(vault_url=self.azure_key_vault_url, credential=credential)
-
-            # Fetch secrets from Key Vault
-            self.jamendo_client_id = (
-                client.get_secret("jamendo").value or self.jamendo_client_id
+            client = SecretClient(
+                vault_url=self.azure_key_vault_url,
+                credential=credential
             )
 
-            print("[INFO] Configuration loaded from Azure Key Vault.")
+            # Loop through all secrets in the vault
+            for secret_props in client.list_properties_of_secrets():
+                key = to_snake_case(secret_props.name)
+                value = client.get_secret(secret_props.name).value
 
-        except Exception as error:  # ✅ Avoid catching base `Exception`
+                # Dynamically inject into settings if field exists
+                if hasattr(self, key):
+                    setattr(self, key, value)
+
+            print("[INFO] Configuration successfully loaded from Azure Key Vault.")
+
+        except Exception as error:
             print(f"[WARNING] Could not load secrets from Key Vault: {error}")
 
+
+# Singleton instance
 settings = Settings()
 settings.load_from_key_vault()

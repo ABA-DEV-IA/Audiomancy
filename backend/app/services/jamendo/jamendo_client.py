@@ -11,8 +11,9 @@ Functions:
 import requests
 from app.core.config import settings
 from typing import Dict, Any
+from app.core.config import settings
 
-BASE_URL = "https://api.jamendo.com/v3.0/tracks/"
+base_url = settings.jamendo_url
 
 
 def fetch_tracks(params: Dict[str, Any]) -> Dict[str, Any]:
@@ -32,7 +33,7 @@ def fetch_tracks(params: Dict[str, Any]) -> Dict[str, Any]:
     params["format"] = "json"
 
     try:
-        response = requests.get(BASE_URL, params=params, timeout=10)
+        response = requests.get(base_url, params=params, timeout=10)
         response.raise_for_status()
         return response.json()
     except requests.RequestException as e:
