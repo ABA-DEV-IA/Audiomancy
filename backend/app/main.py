@@ -34,4 +34,3 @@ app.add_middleware(
 # Include API routes
 app.include_router(jamendo_router)
 app.include_router(ai_router)
-

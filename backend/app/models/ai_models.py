@@ -1,3 +1,19 @@
+"""
+Pydantic models for AI-powered playlist generation.
+
+This module defines the data schemas used by the playlist generation API:
+
+- PromptRequest: Represents the input payload sent by the client,
+  containing a natural language prompt and the number of tracks to return.
+
+- GeneratedTrack: Represents a track returned by the Jamendo service,
+  including metadata such as title, artist, audio URL, license information,
+  tags, and an optional image.
+
+These models ensure request validation, type safety, and structured responses
+across the API.
+"""
+
 from pydantic import BaseModel, ConfigDict
 from typing import List, Optional
 
