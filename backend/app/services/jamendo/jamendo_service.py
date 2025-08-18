@@ -14,7 +14,7 @@ from typing import List
 from app.models.jamendo import JamendoTrackResponse
 
 
-def get_tracks_for_reader(tags: str, duration_min: int, duration_max: int, limit: int = 10) -> List[JamendoTrackResponse]:
+def get_tracks_for_reader(tags: str, duration_min: int = 180, duration_max: int = 480, limit: int = 10) -> List[JamendoTrackResponse]:
     """
     Fetches and formats tracks from Jamendo based on provided filters.
 
@@ -23,10 +23,11 @@ def get_tracks_for_reader(tags: str, duration_min: int, duration_max: int, limit
         duration_min (int): Minimum track duration (in seconds).
         duration_max (int): Maximum track duration (in seconds).
         limit (int): Maximum number of tracks to return.
-
+    
     Returns:
         List[JamendoTrackResponse]: Formatted list of music tracks.
     """
+
     params = {
         "limit": limit,
         "fuzzytags": tags,
@@ -38,6 +39,7 @@ def get_tracks_for_reader(tags: str, duration_min: int, duration_max: int, limit
     }
 
     data = fetch_tracks(params)
+
     if "results" not in data:
         return []
 

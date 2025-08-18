@@ -36,7 +36,7 @@ class JamendoTrackRequest(BaseModel):
     tags: str = Field(..., description="Tags for the track search")
     duration_min: int = Field(180, ge=0, description="Minimum duration in seconds")
     duration_max: int = Field(480, ge=0, description="Maximum duration in seconds")
-    limit: LimitEnum = Field(10, description="Number of tracks to return (10, 25, or 50)")
+    limit: int= Field(10, description="Number of tracks to return (10, 25, or 50)")
 
     model_config = ConfigDict(
         json_schema_extra={
