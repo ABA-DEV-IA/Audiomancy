@@ -1,0 +1,40 @@
+name: Deploy Frontend to Azure Web App
+
+on:
+  workflow_dispatch:  # Manual trigger only
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Build Docker image
+        run: docker build -t frontend-app:latest ./frontend
+
+      - name: Azure Container Registry Login
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ secrets.ACR_LOGIN_SERVER }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Push Docker image to ACR
+        run: |
+          docker tag frontend-app:latest ${{ secrets.ACR_LOGIN_SERVER }}/frontend-app:latest
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/frontend-app:latest
+
+      - name: Deploy to Azure Web App (Linux)
+        run: |
+          az webapp create \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --plan ${{ secrets.AZURE_APP_SERVICE_PLAN }} \
+            --name frontend-app \
+            --deployment-container-image-name ${{ secrets.ACR_LOGIN_SERVER }}/frontend-app:latest
