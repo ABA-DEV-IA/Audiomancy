@@ -26,7 +26,7 @@ def get_jamendo_tracks(request: JamendoTrackRequest):
             - tags: search keywords joined by '+' (e.g., "magic+fantasy+cinematic")
             - duration_min: minimum track duration in seconds
             - duration_max: maximum track duration in seconds
-            - limit: number of tracks to return
+            - limit: number of tracks to return (10,25, or 50)
 
     Returns:
         List[JamendoTrackResponse]: A list of formatted tracks including:

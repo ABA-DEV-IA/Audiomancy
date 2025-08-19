@@ -14,12 +14,19 @@ These models ensure request validation, type safety, and structured responses
 across the API.
 """
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, field_validator
 from typing import List, Optional
 
 class PromptRequest(BaseModel):
     prompt: str
     limit: int
+
+    @field_validator("limit")
+    def validate_limit(cls, v: int) -> int:
+        """Ensure that limit is restricted to 10, 25, or 50."""
+        if v not in (10, 25, 50):
+            raise ValueError("limit must be one of 10, 25, or 50")
+        return v
 
     model_config = ConfigDict(
         json_schema_extra={

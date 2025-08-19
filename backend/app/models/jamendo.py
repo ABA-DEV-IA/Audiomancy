@@ -9,18 +9,8 @@ Classes:
     JamendoTrackResponse: Model representing the formatted track returned to the client.
 """
 
-from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional
-from enum import IntEnum
-
-
-class LimitEnum(IntEnum):
-    """
-    Enum representing allowed limits for the number of tracks returned by the API.
-    """
-    ten = 10
-    twenty_five = 25
-    fifty = 50
+from pydantic import BaseModel, Field, ConfigDict, field_validator
 
 
 class JamendoTrackRequest(BaseModel):
@@ -31,12 +21,23 @@ class JamendoTrackRequest(BaseModel):
         tags (str): List of keywords joined by '+' (e.g., "magic+fantasy+cinematic").
         duration_min (int): Minimum track duration in seconds.
         duration_max (int): Maximum track duration in seconds.
-        limit (LimitEnum): Number of tracks to return (10, 25, or 50).
+        limit (int): Number of tracks to return (must be one of 10, 25, or 50).
     """
+
     tags: str = Field(..., description="Tags for the track search")
     duration_min: int = Field(180, ge=0, description="Minimum duration in seconds")
     duration_max: int = Field(480, ge=0, description="Maximum duration in seconds")
-    limit: int= Field(10, description="Number of tracks to return (10, 25, or 50)")
+    limit: int = Field(
+        10,
+        description="Number of tracks to return (allowed values: 10, 25, 50)",
+    )
+
+    @field_validator("limit")
+    def validate_limit(cls, v: int) -> int:
+        """Ensure that limit is restricted to 10, 25, or 50."""
+        if v not in (10, 25, 50):
+            raise ValueError("limit must be one of 10, 25, or 50")
+        return v
 
     model_config = ConfigDict(
         json_schema_extra={
@@ -44,7 +45,7 @@ class JamendoTrackRequest(BaseModel):
                 "tags": "magic+fantasy+cinematic",
                 "duration_min": 180,
                 "duration_max": 480,
-                "limit": 10
+                "limit": 10,
             }
         }
     )
@@ -65,6 +66,7 @@ class JamendoTrackResponse(BaseModel):
         tags (List[str]): List of track tags.
         image (Optional[str]): URL of the album or track image.
     """
+
     id: str
     title: str
     artist: str
