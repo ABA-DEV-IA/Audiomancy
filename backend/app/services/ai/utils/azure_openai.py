@@ -3,7 +3,7 @@
 import os
 from langchain_openai import AzureChatOpenAI
 from dotenv import load_dotenv
-
+from app.core.config import settings
 
 def get_llm():
     """
@@ -17,11 +17,9 @@ def get_llm():
         AzureChatOpenAI: the LLM instance
     """
 
-    load_dotenv(override=True)
-
-    endpoint = os.getenv("ENDPOINT_URL")
-    deployment = os.getenv("DEPLOYMENT_NAME")
-    subscription_key = os.getenv("AZURE_OPENAI_API_KEY")
+    endpoint = settings.endpoint_url
+    deployment = settings.deployment_name
+    subscription_key = settings.azure_openai_api_key
 
     return AzureChatOpenAI(
         azure_endpoint=endpoint,
