@@ -1,27 +1,35 @@
-# Étape 1 : Build React
-FROM node:22.17.0-alpine AS build
+# Étape 1 : Builder l'application
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-# Copier uniquement package.json et package-lock.json
-COPY package.json package-lock.json ./
+# Copier les fichiers package.json et package-lock.json pour installer les dépendances
+COPY package*.json ./
+
 RUN npm install
 
-# Copier le reste du code du frontend
-COPY . ./
+# Copier le reste du code
+COPY . .
+
+# Builder l'application (Next/Vue)
 RUN npm run build
 
-# Étape 2 : Serve via nginx
-FROM nginx:alpine
+# Étape 2 : Image finale légère pour production
+FROM node:22-alpine
 
-# Copier le build React vers nginx
-COPY --from=build /app/build /usr/share/nginx/html
+WORKDIR /app
 
-# Copier configuration nginx si nécessaire (optionnel)
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copier les dépendances du builder
+COPY package*.json ./
+RUN npm install --production \
+    && npm install -g cross-env
 
-# Exposer le port 80
-EXPOSE 80
+# Copier le build
+COPY --from=builder /app/.next ./.next
 
-# Lancer nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Exposer le port sur lequel Azure Web App va faire le ping
+ENV PORT=8080
+EXPOSE 8080
+
+# Commande de démarrage
+CMD ["npm", "start"]
