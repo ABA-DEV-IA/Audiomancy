@@ -1,39 +1,38 @@
-name: Deploy Backend to Azure Container Apps
+name: Build and Push Backend Docker Image to Azure Container Registry
 
 on:
-  workflow_dispatch:  # Manual trigger only
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+  build-and-push:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      # Récupération du code
+      - uses: actions/checkout@v4
 
-      - name: Azure Login
-        uses: azure/login@v1
+      # Setup Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # Connexion à Azure Container Registry
+      - name: Log in to Azure Container Registry
+        uses: docker/login-action@v2
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Build Docker image
-        run: docker build -t backend-app:latest ./backend
-
-      - name: Azure Container Registry Login
-        uses: azure/docker-login@v1
-        with:
-          login-server: ${{ secrets.ACR_LOGIN_SERVER }}
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
+          registry: ${{ secrets.AZURE_ACR_NAME }}.azurecr.io
 
-      - name: Push Docker image to ACR
+      # Build et push de l'image Docker avec un tag basé sur la date/heure
+      - name: Build and push Docker image
         run: |
-          docker tag backend-app:latest ${{ secrets.ACR_LOGIN_SERVER }}/backend-app:latest
-          docker push ${{ secrets.ACR_LOGIN_SERVER }}/backend-app:latest
+          TAG=$(date +'%Y-%m-%d_%H-%M-%S')
+          echo "Using tag: $TAG"
 
-      - name: Deploy to Azure Container Apps
-        run: |
-          az containerapp update \
-            --name backend-app \
-            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-            --image ${{ secrets.ACR_LOGIN_SERVER }}/backend-app:latest
+          # Build avec le tag horodaté
+          docker build -f backend/Dockerfile -t ${{ secrets.AZURE_ACR_NAME }}.azurecr.io/audiomancy-back:$TAG backend/
+
+          # Push du tag horodaté
+          docker push ${{ secrets.AZURE_ACR_NAME }}.azurecr.io/audiomancy-back:$TAG
