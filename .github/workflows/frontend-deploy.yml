@@ -21,10 +21,13 @@ jobs:
           cd frontend
           npm install
           npm run build
+      
+      - name: Debug - List build folder
+        run: ls -R frontend/build || echo "⚠️ Build folder not found!"
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: ./frontend/build
+          package: frontend/build
