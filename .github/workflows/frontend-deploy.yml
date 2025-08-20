@@ -1,7 +1,7 @@
 name: Deploy Frontend to Azure Web App
 
 on:
-  workflow_dispatch:  # Manual trigger only
+  workflow_dispatch: # Trigger manuel
 
 jobs:
   build-and-deploy:
@@ -11,30 +11,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Azure Login
-        uses: azure/login@v1
+      - name: Setup Node
+        uses: actions/setup-node@v3
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          node-version: '22.17.0'
 
-      - name: Build Docker image
-        run: docker build -t frontend-app:latest ./frontend
+      - name: Install dependencies and build
+        run: |
+          cd frontend
+          npm install
+          npm run build
 
-      - name: Azure Container Registry Login
-        uses: azure/docker-login@v1
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
         with:
-          login-server: ${{ secrets.ACR_LOGIN_SERVER }}
-          username: ${{ secrets.ACR_USERNAME }}
-          password: ${{ secrets.ACR_PASSWORD }}
-
-      - name: Push Docker image to ACR
-        run: |
-          docker tag frontend-app:latest ${{ secrets.ACR_LOGIN_SERVER }}/frontend-app:latest
-          docker push ${{ secrets.ACR_LOGIN_SERVER }}/frontend-app:latest
-
-      - name: Deploy to Azure Web App (Linux)
-        run: |
-          az webapp create \
-            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-            --plan ${{ secrets.AZURE_APP_SERVICE_PLAN }} \
-            --name frontend-app \
-            --deployment-container-image-name ${{ secrets.ACR_LOGIN_SERVER }}/frontend-app:latest
+          app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: ./frontend/build
