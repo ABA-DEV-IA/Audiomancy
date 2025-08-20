@@ -1,33 +1,44 @@
 name: Deploy Frontend to Azure Web App
 
 on:
-  workflow_dispatch: # Trigger manuel
+  push:
+    branches:
+      - main   # branche que tu veux déployer
+  workflow_dispatch: # pour déclencher manuellement
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      # 1. Récupère le code
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v3
+      # 2. Configure Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: '22.17.0'
+          node-version: 22.x
+          cache: 'npm'
 
-      - name: Install dependencies and build
+      # 3. Installer les dépendances
+      - name: Install dependencies
         run: |
           cd frontend
           npm install
-          npm run build
-      
-      - name: Debug - List build folder
-        run: ls -R frontend/build || echo "⚠️ Build folder not found!"
 
+      # 4. Build Next.js
+      - name: Build project
+        run: |
+          cd frontend
+          npm run build
+
+      # 5. Déploiement sur Azure Web App
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
+          slot-name: production
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: frontend/build
+          package: frontend
