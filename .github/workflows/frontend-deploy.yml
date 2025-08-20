@@ -28,7 +28,7 @@ jobs:
       # Build et push de l'image Docker avec un tag basé sur la date/heure
       - name: Build and push Docker image
         run: |
-          TAG=$(date +'%Y%m%d-%H%M%S')
+          TAG=$(date +'%Y/%m-%d_%H-%M-%S')
           echo "Using tag: $TAG"
 
           # Build avec le tag horodaté
