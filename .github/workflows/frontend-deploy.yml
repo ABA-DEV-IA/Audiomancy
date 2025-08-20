@@ -32,7 +32,7 @@ jobs:
           echo "Using tag: $TAG"
 
           # Build avec le tag horodaté
-          docker build -t ${{ secrets.AZURE_ACR_NAME }}.azurecr.io/audiomancy-front:$TAG .
+          docker build -f frontend/Dockerfile -t ${{ secrets.AZURE_ACR_NAME }}.azurecr.io/audiomancy-front:$TAG frontend/
 
           # Push du tag horodaté
           docker push ${{ secrets.AZURE_ACR_NAME }}.azurecr.io/audiomancy-front:$TAG
