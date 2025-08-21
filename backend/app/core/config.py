@@ -13,6 +13,7 @@ from typing import Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
+from azure.core.exceptions import AzureError
 
 def to_snake_case(name: str) -> str:
     """
@@ -26,8 +27,16 @@ def to_snake_case(name: str) -> str:
 
 class Settings(BaseSettings):
     """
-    Application settings loaded from .env and optionally from Azure Key Vault.
+    Application settings loaded from .env , Cors and optionally from Azure Key Vault.
     """
+
+    # CORS configuration
+    allowed_origins : list[str] = [
+        "http://localhost:3000",  # Default React local address
+        "http://127.0.0.1:3000",  # Alternate localhost
+        "audiomancy.azurewebsites.net",
+        # Add other allowed URLs here (e.g. production URLs)
+    ]
 
     # Example fields
     jamendo_client_id: Optional[str] = None
@@ -65,7 +74,7 @@ class Settings(BaseSettings):
 
             print("[INFO] Configuration successfully loaded from Azure Key Vault.")
 
-        except Exception as error:
+        except AzureError as error:
             print(f"[WARNING] Could not load secrets from Key Vault: {error}")
 
 

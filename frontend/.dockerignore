@@ -7,3 +7,4 @@ Dockerfile
 .env
 dist
 .next
+.env.local
