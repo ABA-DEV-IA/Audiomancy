@@ -1,22 +1,24 @@
-import type { Metadata } from 'next';
-import { GeistSans } from 'geist/font/sans';
-import { GeistMono } from 'geist/font/mono';
-import { GenerationProvider } from '@/context/generation_context';
-import './globals.css';
+// app/layout.tsx
+import type { Metadata } from "next";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
+import { GenerationProvider } from "@/context/generation_context";
+import { Providers } from "./providers";
+import "./globals.css";
 
 export const metadata: Metadata = {
-  title: 'Audiomancy',
-  description: 'application de génération de playlist via intelligence artificielle',
+  title: "Audiomancy",
+  description: "application de génération de playlist via intelligence artificielle",
   icons: {
-    icon: 'images/favicon.png',
+    icon: "images/favicon.png",
   },
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
       <head>
@@ -31,7 +33,9 @@ html {
         </style>
       </head>
       <body>
-        <GenerationProvider>{children}</GenerationProvider>
+        <GenerationProvider>
+          <Providers>{children}</Providers>
+        </GenerationProvider>
       </body>
     </html>
   );
