@@ -13,6 +13,27 @@ jobs:
       # Récupération du code
       - uses: actions/checkout@v4
 
+      # Setup Node.js pour cacher les dépendances
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+
+      # Cache npm pour accélérer le build
+      - name: Cache npm
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      # Installer les dépendances avant Docker pour profiter du cache
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm ci
+
       # Setup Docker Buildx
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -31,8 +52,10 @@ jobs:
           TAG=$(date +'%Y-%m-%d_%H-%M-%S')
           echo "Using tag: $TAG"
 
-          # Build avec le tag horodaté
-          docker build -f frontend/Dockerfile -t ${{ secrets.AZURE_ACR_NAME }}.azurecr.io/audiomancy-front:$TAG frontend/
+          docker build \
+            --build-arg NODE_ENV=production \
+            -f frontend/Dockerfile \
+            -t ${{ secrets.AZURE_ACR_NAME }}.azurecr.io/audiomancy-front:$TAG \
+            frontend/
 
-          # Push du tag horodaté
           docker push ${{ secrets.AZURE_ACR_NAME }}.azurecr.io/audiomancy-front:$TAG
