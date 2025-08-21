@@ -16,7 +16,6 @@ from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
 from azure.core.exceptions import AzureError
 
-
 def to_snake_case(name: str) -> str:
     """
     Convert a Key Vault secret name to a Python-friendly snake_case attribute name.
