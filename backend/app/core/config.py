@@ -13,6 +13,7 @@ from typing import Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
+from azure.core.exceptions import AzureError
 
 def to_snake_case(name: str) -> str:
     """
@@ -73,7 +74,7 @@ class Settings(BaseSettings):
 
             print("[INFO] Configuration successfully loaded from Azure Key Vault.")
 
-        except Exception as error:
+        except AzureError as error:
             print(f"[WARNING] Could not load secrets from Key Vault: {error}")
 
 
