@@ -26,8 +26,16 @@ def to_snake_case(name: str) -> str:
 
 class Settings(BaseSettings):
     """
-    Application settings loaded from .env and optionally from Azure Key Vault.
+    Application settings loaded from .env , Cors and optionally from Azure Key Vault.
     """
+
+    # CORS configuration
+    allowed_origins : list[str] = [
+        "http://localhost:3000",  # Default React local address
+        "http://127.0.0.1:3000",  # Alternate localhost
+        "audiomancy.azurewebsites.net",
+        # Add other allowed URLs here (e.g. production URLs)
+    ]
 
     # Example fields
     jamendo_client_id: Optional[str] = None
