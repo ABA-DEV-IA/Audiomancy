@@ -3,7 +3,7 @@
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-import Categories from '@/config/categories.json';
+import Categories from '@/config/categories/categories.json';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 

@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { aboutConfig } from '@/config/about.config';
+import { aboutConfig } from '@/config/site/about.config';
 
 export function AboutPage() {
   const {

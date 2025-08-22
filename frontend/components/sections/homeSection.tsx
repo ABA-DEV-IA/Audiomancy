@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
-import categoriesList from '@/config/categories_du_jour.json';
-import { homeConfig } from '@/config/home.config';
+import categoriesList from '@/config/categories/categories_du_jour.json';
+import { homeConfig } from '@/config/site/home.config';
 import { CategoryCard } from '@/components/category-card';
 import { formatId } from '@/utils/formatId';
 
