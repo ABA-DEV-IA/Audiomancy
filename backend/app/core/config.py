@@ -1,15 +1,16 @@
 """
 Application configuration module.
 
-Uses Pydantic Settings to load environment variables, such as the Jamendo 
-API client ID,from a `.env` file. Optionally, it can override them with 
-values from Azure Key Vault, if AZURE_KEY_VAULT_URL is provided.
+Loads application settings from environment variables via `.env` file for development
+and optionally overrides them with secrets from Azure Key Vault in production.
+
+This includes API keys, endpoints, and CORS configuration.
 
 Attributes:
     settings (Settings): Singleton instance containing all loaded configuration values.
 """
 
-from typing import Optional
+from typing import Optional, List
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
@@ -17,28 +18,30 @@ from azure.core.exceptions import AzureError
 
 def to_snake_case(name: str) -> str:
     """
-    Convert a Key Vault secret name to snake_case for Python attributes.
-    Examples:
-        "AZURE-OPENAI-API-KEY" -> "azure_openai_api_key"
-        "jamendo-client-id" -> "jamendo_client_id"
+    Convert a Key Vault secret name to a Python-friendly snake_case attribute name.
+
+    Args:
+        name (str): The secret name in Key Vault, e.g., "AZURE-OPENAI-API-KEY"
+
+    Returns:
+        str: The converted snake_case string, e.g., "azure_openai_api_key"
     """
     return name.lower().replace("-", "_")
 
 
 class Settings(BaseSettings):
     """
-    Application settings loaded from .env , Cors and optionally from Azure Key Vault.
+    Application settings class using Pydantic BaseSettings.
+
+    Loads values from `.env` for local development and can override with Azure Key Vault
+    secrets when `azure_key_vault_url` is provided. Provides a property to get CORS origins
+    as a list for FastAPI middleware.
     """
 
-    # CORS configuration
-    allowed_origins : list[str] = [
-        "http://localhost:3000",  # Default React local address
-        "http://127.0.0.1:3000",  # Alternate localhost
-        "audiomancy.azurewebsites.net",
-        # Add other allowed URLs here (e.g. production URLs)
-    ]
+    # Comma-separated string for allowed CORS origins
+    allowed_origins: Optional[str] = None
 
-    # Example fields
+    # Example secrets and configuration values
     jamendo_client_id: Optional[str] = None
     azure_openai_api_key: Optional[str] = None
     azure_key_vault_url: Optional[str] = None
@@ -46,11 +49,18 @@ class Settings(BaseSettings):
     endpoint_url: Optional[str] = None
     jamendo_url: Optional[str] = None
 
+    # Pydantic settings configuration: read from .env, ignore extra keys
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     def load_from_key_vault(self) -> None:
         """
-        Override settings with values from Azure Key Vault if available.
+        Override settings with secrets from Azure Key Vault if available.
+
+        Uses DefaultAzureCredential to authenticate with Managed Identity (in production)
+        or developer credentials (if running locally with Azure CLI). Each secret in Key Vault
+        is injected into the settings if the attribute exists.
+
+        If no Key Vault URL is provided, falls back to .env values.
         """
         if not self.azure_key_vault_url:
             print("[INFO] No Key Vault URL provided. Using .env only.")
@@ -63,12 +73,9 @@ class Settings(BaseSettings):
                 credential=credential
             )
 
-            # Loop through all secrets in the vault
             for secret_props in client.list_properties_of_secrets():
                 key = to_snake_case(secret_props.name)
                 value = client.get_secret(secret_props.name).value
-
-                # Dynamically inject into settings if field exists
                 if hasattr(self, key):
                     setattr(self, key, value)
 
@@ -77,7 +84,24 @@ class Settings(BaseSettings):
         except AzureError as error:
             print(f"[WARNING] Could not load secrets from Key Vault: {error}")
 
+    @property
+    def cors_origins(self) -> List[str]:
+        """
+        Return allowed_origins as a list for CORSMiddleware.
 
-# Singleton instance
+        Handles dev/prod logic:
+        - Dev: defaults to localhost if allowed_origins not set
+        - Prod: must come from Key Vault or environment variable
+
+        Returns:
+            List[str]: List of allowed CORS origins
+        """
+        if self.allowed_origins:
+            return [origin.strip() for origin in self.allowed_origins.split(",")]
+
+        return ["http://localhost:3000", "http://127.0.0.1:3000"]
+
+
+# Singleton instance to use throughout the application
 settings = Settings()
 settings.load_from_key_vault()
