@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import LecturePage from "@/components/sections/lecture/lecture-page";
+import LecturePage from "@/components/sections/lecture/LectureSection";
 
 export default function Page() {
   const params = useParams();

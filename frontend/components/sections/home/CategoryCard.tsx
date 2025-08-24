@@ -2,43 +2,33 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { useState, useEffect } from 'react';
+import { Category } from '@/types/category';
 
 const DEFAULT_CATEGORY_BG = '/images/default-category.png';
 
-interface CategoryProps {
-  category: {
-    title: string;
-    subtitle: string;
-    color: string;
-    image?: string;
-    description: string;
-  };
+interface CategoryCardProps {
+  category: Category;
   onClick?: () => void;
 }
 
-export function CategoryCard({ category, onClick }: CategoryProps) {
+export function CategoryCard({ category, onClick }: CategoryCardProps) {
   const [bgImage, setBgImage] = useState(DEFAULT_CATEGORY_BG);
 
   useEffect(() => {
-    if (category.image) {
-      fetch(category.image, { method: 'HEAD' })
-        .then((res) => {
-          if (res.ok) {
-            setBgImage(category.image);
-          } else {
-            setBgImage(DEFAULT_CATEGORY_BG);
-          }
-        })
-        .catch(() => setBgImage(DEFAULT_CATEGORY_BG));
-    }
+    if (!category.image) return;
+
+    fetch(category.image, { method: 'HEAD' })
+      .then((res) => setBgImage(res.ok ? category.image! : DEFAULT_CATEGORY_BG))
+      .catch(() => setBgImage(DEFAULT_CATEGORY_BG));
   }, [category.image]);
 
   return (
     <Card
-      className="bg-white hover:shadow-[#A45EE5]/20 transition-all duration-300 cursor-pointer hover:scale-105 overflow-hidden group"
+      className="bg-white hover:shadow-accent/20 transition-all duration-300 cursor-pointer hover:scale-105 overflow-hidden group"
       onClick={onClick}
     >
       <CardContent className="p-0 relative h-48">
+        {/* Background */}
         <div
           className="absolute inset-0 bg-cover bg-center transition-all duration-300 group-hover:scale-110"
           style={{
@@ -47,6 +37,8 @@ export function CategoryCard({ category, onClick }: CategoryProps) {
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-black/40" />
+
+        {/* Content */}
         <div className="relative z-10 p-6 h-full flex flex-col justify-between text-center">
           <div className="flex-1 flex items-center justify-center">
             <div>
@@ -58,12 +50,14 @@ export function CategoryCard({ category, onClick }: CategoryProps) {
               </p>
             </div>
           </div>
-          <p
-            className="text-sm text-[#FF934F] italic font-medium drop-shadow-md"
-          >
-            {category.subtitle}
-          </p>
+          {category.description && (
+            <p className="text-sm text-[#FF934F] italic font-medium drop-shadow-md">
+              {category.description}
+            </p>
+          )}
         </div>
+
+        {/* Hover effect */}
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
       </CardContent>
     </Card>
