@@ -49,6 +49,9 @@ class Settings(BaseSettings):
     endpoint_url: Optional[str] = None
     jamendo_url: Optional[str] = None
 
+    api_key: Optional[str] = None
+    swagger_on: bool = False
+
     # Pydantic settings configuration: read from .env, ignore extra keys
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

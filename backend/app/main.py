@@ -9,22 +9,33 @@ Attributes:
     app (FastAPI): The FastAPI application instance.
     allowed_origins (List[str]): List of origins allowed to make cross-origin requests.
 """
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.routes.jamendo_routes import router as jamendo_router
 from app.routes.ai_routes import router as ai_router
+from app.core.security import get_api_key
 
-app = FastAPI(title="Audiomancy API")
+# Activer Swagger seulement si swagger_on=True
+docs_url = "/docs" if settings.swagger_on else None
+redoc_url = "/redoc" if settings.swagger_on else None
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=settings.allowed_origins,    # Allowed origins to make requests
-    allow_credentials=True,
-    allow_methods=["*"],       # Allow all HTTP methods (GET, POST, etc.)
-    allow_headers=["*"],       # Allow all headers
+# Créer l'app FastAPI
+app = FastAPI(
+    title="Audiomancy API",
+    docs_url=docs_url,
+    redoc_url=redoc_url
 )
 
-# Include API routes
-app.include_router(jamendo_router)
-app.include_router(ai_router)
+# Middleware CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.cors_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Inclure les routes avec dépendance globale API Key
+app.include_router(jamendo_router, dependencies=[Depends(get_api_key)])
+app.include_router(ai_router, dependencies=[Depends(get_api_key)])
