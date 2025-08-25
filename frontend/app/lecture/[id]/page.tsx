@@ -17,5 +17,5 @@ export default function Page() {
 
   if (!tags) return <p>Chargement...</p>;
 
-  return <LecturePage params={{ id: params.id as string, tags }} />;
+  return <LecturePage trackId={params.id as string} tags={tags} />;
 }
