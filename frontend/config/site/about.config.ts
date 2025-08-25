@@ -14,7 +14,7 @@ export const aboutConfig = {
     ],
   },
   github: {
-    url: 'https://github.com/aruide/Audiomancy',
+    url: 'https://github.com/ABA-DEV-IA/Audiomancy',
     label: 'Voir sur GitHub',
   },
   creators: [

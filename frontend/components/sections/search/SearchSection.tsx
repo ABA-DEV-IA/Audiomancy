@@ -1,20 +1,13 @@
 'use client';
 
-import { Search } from 'lucide-react';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-import Categories from '@/config/categories.json';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { Category } from '@/types/category';
+import CategoriesJSON from '@/config/categories/categories.json';
 
-function formatId(str: string | undefined): string {
-  if (!str) return '';
-  return str
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/\s+/g, '_');
-}
+const Categories: Category[] = CategoriesJSON; // JSON est déjà un tableau
 
 export function SearchPage() {
   const router = useRouter();
@@ -24,9 +17,11 @@ export function SearchPage() {
     router.push(`/lecture/${id}`);
   };
 
-  // Filtre les catégories selon le texte saisi
-  const filteredCategories = Categories.filter((category) => category.title.toLowerCase().includes(searchTerm.toLowerCase())
-    || category.description.toLowerCase().includes(searchTerm.toLowerCase()));
+  const filteredCategories = Categories.filter(
+    (category) =>
+      category.title.toLowerCase().includes(searchTerm.toLowerCase())
+      || category.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="h-full flex flex-col">
@@ -40,7 +35,6 @@ export function SearchPage() {
         <h1>Recherche</h1>
         {/* Search Bar */}
         <div className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
           <Input
             placeholder="Recherche de la médiathèque - contenu thématique"
             className="pl-10 bg-white text-[#2B2B2B]"
@@ -54,9 +48,9 @@ export function SearchPage() {
       <div className="flex-1 bg-[#2B2B2B] p-6">
         <div className="max-w-2xl mx-auto space-y-3">
           {filteredCategories.length > 0 ? (
-            filteredCategories.map((result, index) => (
+            filteredCategories.map((result) => (
               <Card
-                key={index}
+                key={result.id}
                 className="bg-[#301934] border-[#A45EE5] hover:bg-[#A45EE5] hover:bg-opacity-20 transition-colors cursor-pointer"
                 onClick={() => handleClick(result.id)}
               >
