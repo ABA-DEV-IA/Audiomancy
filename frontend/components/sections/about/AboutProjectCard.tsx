@@ -35,19 +35,20 @@ export function AboutProjectCard({ project }: Props) {
           ))}
         </div>
 
-        <div className="flex justify-center mt-6 space-x-6 text-[#FF934F]">
-          {project.features.map((feature, i) => {
-            const Icons = { Star, Heart, Code };
-            const IconComponent = Icons[feature.icon];
-            return (
-              <div key={i} className="flex items-center">
-                {IconComponent && <IconComponent className="h-5 w-5 mr-2" />}
-                <span>{feature.label}</span>
-              </div>
-            );
-          })}
-        </div>
-      </CardContent>
+
+    <div className="flex flex-wrap justify-center mt-6 gap-6 text-[#FF934F]">
+      {project.features.map((feature, i) => {
+        const Icons = { Star, Heart, Code };
+        const IconComponent = Icons[feature.icon];
+        return (
+          <div key={i} className="flex items-center flex-none">
+            {IconComponent && <IconComponent className="h-5 w-5 mr-2" />}
+            <span>{feature.label}</span>
+          </div>
+        );
+      })}
+    </div>    
+    </CardContent>
     </Card>
   );
 }

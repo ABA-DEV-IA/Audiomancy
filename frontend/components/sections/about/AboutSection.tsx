@@ -10,21 +10,20 @@ export function AboutPage() {
   const { project, creators, github, technologies } = aboutConfig;
 
   return (
-    <div className="h-full flex flex-col bg-[#2B2B2B] text-white ">
+    <div className="min-h-screen flex flex-col bg-[#2B2B2B] text-white overflow-x-hidden overflow-y-auto">
       {/* Header */}
-      <div
-        className="bg-[#6A0DAD] text-white p-8 text-center">
-        <h1 className="text-4xl font-bold mb-2 tracking-wider">À PROPOS</h1>
-        <p style={{ color: 'hsl(var(--accent))' }} className="italic">
+      <div className="sticky top-0 z-50 bg-[#6A0DAD] text-white p-4 sm:p-8 text-center">
+        <h1 className="text-2xl sm:text-4xl font-bold mb-2 tracking-wider">
+          À PROPOS
+        </h1>
+        <p className="italic text-sm sm:text-base" style={{ color: 'hsl(var(--accent))' }}>
           ~ Découvrez l&apos;univers de {project.name} ~
         </p>
       </div>
 
       {/* Content */}
-      <div
-        className="flex-1 p-8 overflow-y-auto"
-      >
-        <div className="max-w-4xl mx-auto space-y-12">
+      <div className="flex-1 w-full px-4 sm:px-8 py-6">
+        <div className="max-w-4xl w-full mx-auto flex flex-col gap-12">
           <AboutProjectCard project={project} />
           <AboutCreators creators={creators} />
           <AboutGitHubCard projectName={project.name} github={github} />
