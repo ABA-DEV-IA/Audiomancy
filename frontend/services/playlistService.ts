@@ -1,41 +1,33 @@
-// src/services/playlistService.ts
-import { initApiUrls, API_PLAYLIST_URL, API_PLAYLIST_GENERATE_URL } from "@/config/api";
-import { Track } from "@/types/track";
+import { API_PLAYLIST_URL, API_PLAYLIST_GENERATE_URL } from '@/config/variables/api';
+import { Track } from '@/types/track';
 
-// 🔹 Récupérer une playlist à partir des tags
-export async function fetchPlaylistTracks(playlistTags: string): Promise<Track[]> {
-  await initApiUrls(); // s'assurer que l'URL est définie
-
-  const response = await fetch(API_PLAYLIST_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      tags: playlistTags.replace(/\s+/g, "+"),
-    }),
+/**
+ * Helper pour effectuer une requête POST et retourner du JSON typé.
+ */
+async function fetchJson<T>(url: string, body: Record<string, unknown>): Promise<T> {
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
   });
 
   if (!response.ok) {
-    throw new Error("Erreur lors de la récupération des pistes");
+    throw new Error(`Erreur API (${response.status}) lors de la récupération des pistes`);
   }
 
-  return response.json();
+  return response.json() as Promise<T>;
 }
 
+/**
+ * Récupérer une playlist à partir des tags.
+ */
+export async function fetchPlaylistTracks(tags: string): Promise<Track[]> {
+  return fetchJson<Track[]>(API_PLAYLIST_URL, { tags });
+}
+
+/**
+ * Générer une playlist en fonction d'un prompt et d'une limite.
+ */
 export async function fetchPlaylistTracksGenerate(limit: number, prompt: string): Promise<Track[]> {
-  await initApiUrls(); // s'assurer que l'URL est définie
-
-  const response = await fetch(API_PLAYLIST_GENERATE_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      limit,
-      prompt,
-    }),
-  });
-
-  if (!response.ok) {
-    throw new Error("Erreur lors de la récupération des pistes");
-  }
-
-  return response.json();
+  return fetchJson<Track[]>(API_PLAYLIST_GENERATE_URL, { limit, prompt });
 }

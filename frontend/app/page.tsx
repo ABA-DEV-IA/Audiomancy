@@ -1,28 +1,28 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, ReactNode } from 'react';
+
 import { Sidebar } from '@/components/layout/sidebar';
-import { TopNavbar } from '@/components/top-navbar';
-import { HomePage } from '@/components/sections/homeSection';
-import { SearchPage } from '@/components/sections/searchSection';
-import { AboutPage } from '@/components/sections/aboutSection';
-import { GenerationPage } from '@/components/sections/generationSection';
+import { TopNavbar } from '@/components/layout/top-navbar';
+import { HomePage } from '@/components/sections/home/HomeSection';
+import { SearchPage } from '@/components/sections/search/SearchSection';
+import { AboutPage } from '@/components/sections/about/AboutSection';
+import { GenerationPage } from '@/components/sections/generation/GenerationSection';
 import { Footer } from '@/components/layout/footer';
 
-export default function App() {
-  const [currentPage, setCurrentPage] = useState('categories');
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+type PageKey = 'categories' | 'generation' | 'recherches' | 'about' | 'lecture';
 
-  // Nouvel état pour l'id du morceau sélectionné
+export default function Page() {
+  const [currentPage, setCurrentPage] = useState<PageKey>('categories');
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [currentTrackId, setCurrentTrackId] = useState<string | null>(null);
 
-  // Aller sur la page lecture avec un morceau spécifique
   const goToLecture = (id: string) => {
     setCurrentTrackId(id);
     setCurrentPage('lecture');
   };
 
-  const handlePageChange = (page: string) => {
+  const handlePageChange = (page: PageKey) => {
     setCurrentPage(page);
     if (page !== 'lecture') {
       setCurrentTrackId(null);
@@ -37,36 +37,33 @@ export default function App() {
     setCurrentPage('categories');
   };
 
-  const renderPage = () => {
-    switch (currentPage) {
-      case 'categories':
-        return <HomePage onCategoryClick={() => goToLecture('default')} />;
-      case 'generation':
-        return (
-          <GenerationPage
-            onBack={handleGenerationBack}
-            onComplete={handleGenerationComplete}
-          />
-        );
-      case 'recherches':
-        return <SearchPage onTrackClick={goToLecture} />;
-      case 'about':
-        return <AboutPage />;
-      default:
-        return <HomePage onCategoryClick={() => goToLecture('default')} />;
-    }
+  const renderPage = (): ReactNode => {
+    const pages: Record<PageKey, ReactNode> = {
+      categories: <HomePage onCategoryClick={() => goToLecture('default')} />,
+      generation: (
+        <GenerationPage
+          onBack={handleGenerationBack}
+          onComplete={handleGenerationComplete}
+        />
+      ),
+      recherches: <SearchPage onTrackClick={goToLecture} />,
+      about: <AboutPage />,
+      lecture: <HomePage onCategoryClick={() => goToLecture('default')} />,
+    };
+
+    return pages[currentPage];
   };
 
   return (
-    <div className="flex h-screen bg-[#F2E9E4]">
+    <div className="flex h-screen bg-background">
       <Sidebar
         isOpen={sidebarOpen}
-        onToggle={() => setSidebarOpen(!sidebarOpen)}
+        onToggle={() => setSidebarOpen((prev) => !prev)}
         currentPage={currentPage}
         onPageChange={handlePageChange}
       />
 
-      <div className="flex-1 flex flex-col">
+      <div className="flex flex-1 flex-col">
         <TopNavbar />
         <main className="flex-1 overflow-hidden">{renderPage()}</main>
         <Footer />
