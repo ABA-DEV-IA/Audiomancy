@@ -21,8 +21,7 @@ async function fetchJson<T>(url: string, body: Record<string, unknown>): Promise
 /**
  * Récupérer une playlist à partir des tags.
  */
-export async function fetchPlaylistTracks(playlistTags: string): Promise<Track[]> {
-  const tags = encodeURIComponent(playlistTags.trim().replace(/\s+/g, '+'));
+export async function fetchPlaylistTracks(tags: string): Promise<Track[]> {
   return fetchJson<Track[]>(API_PLAYLIST_URL, { tags });
 }
 

@@ -1,13 +1,15 @@
-/** @type {import('ts-jest').JestConfigWithTsJest} */
-module.exports = {
-  preset: 'ts-jest/presets/js-with-babel',
+const nextJest = require('next/jest');
+
+const createJestConfig = nextJest({
+  dir: './',
+});
+
+const customJestConfig = {
   testEnvironment: 'jsdom',
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
-moduleNameMapper: {
-  '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
-  '\\.(jpg|jpeg|png|gif|webp|svg)$': '<rootDir>/__mocks__/fileMock.js',
-},
-  transformIgnorePatterns: [
-  '/node_modules/(?!next|react|react-dom|@?testing-library)'
-],
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/frontend/$1',
+  },
 };
+
+module.exports = createJestConfig(customJestConfig);

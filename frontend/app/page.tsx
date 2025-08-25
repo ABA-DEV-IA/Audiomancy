@@ -3,7 +3,7 @@
 import { useState, ReactNode } from 'react';
 
 import { Sidebar } from '@/components/layout/sidebar';
-import { TopNavbar } from '@/components/top-navbar';
+import { TopNavbar } from '@/components/layout/top-navbar';
 import { HomePage } from '@/components/sections/home/HomeSection';
 import { SearchPage } from '@/components/sections/search/SearchSection';
 import { AboutPage } from '@/components/sections/about/AboutSection';
