@@ -28,14 +28,21 @@ export function StepWish({ wish, setWish, onNext }: StepWishProps) {
           rows={6}
           className="mb-8 bg-[#301934] border-2 border-[#A45EE5] text-white placeholder:text-[#D9B3FF] text-lg p-6 min-h-32 transition-all duration-300 focus:border-[#6A0DAD] focus:shadow-2xl focus:shadow-[#A45EE5]/30 focus:scale-105"
         />
-        <Button
-          onClick={onNext}
-          disabled={!wish.trim()}
-          className="bg-gradient-to-r from-[#6A0DAD] to-[#A45EE5] hover:from-[#A45EE5] hover:to-[#6A0DAD] px-12 py-4 text-lg font-bold transition-all duration-300 hover:scale-110 hover:shadow-2xl hover:shadow-[#6A0DAD]/50"
-        >
-          ✨ Valider mon Souhait ✨
-        </Button>
-      </div>
+<Button
+  onClick={onNext}
+  disabled={!wish.trim()}
+  className="w-full max-w-xs sm:max-w-md 
+             bg-gradient-to-r from-[#6A0DAD] to-[#A45EE5] 
+             hover:from-[#A45EE5] hover:to-[#6A0DAD] 
+             px-4 sm:px-12 py-4 
+             text-base sm:text-lg font-bold 
+             flex items-center justify-center text-center whitespace-normal
+             transition-all duration-300 
+             hover:scale-110 hover:shadow-2xl hover:shadow-[#6A0DAD]/50"
+>
+  ✨ Valider mon Souhait ✨
+</Button>      
+</div>
     </div>
   );
 }

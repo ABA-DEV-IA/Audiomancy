@@ -55,7 +55,8 @@ export default function Page() {
   };
 
   return (
-    <div className="flex h-screen bg-background">
+    <div className="flex min-h-screen overflow-x-hidden bg-background">
+      {/* Sidebar toujours à gauche */}
       <Sidebar
         isOpen={sidebarOpen}
         onToggle={() => setSidebarOpen((prev) => !prev)}
@@ -63,9 +64,15 @@ export default function Page() {
         onPageChange={handlePageChange}
       />
 
-      <div className="flex flex-1 flex-col">
+      {/* Main content */}
+      <div className="flex flex-1 flex-col min-h-screen overflow-hidden">
         <TopNavbar />
-        <main className="flex-1 overflow-hidden">{renderPage()}</main>
+
+        {/* Scrollable content */}
+        <main className="flex-1 overflow-y-auto overflow-x-hidden">
+          {renderPage()}
+        </main>
+
         <Footer />
       </div>
     </div>
