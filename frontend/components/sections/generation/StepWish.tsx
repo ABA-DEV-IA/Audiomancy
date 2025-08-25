@@ -28,6 +28,7 @@ export function StepWish({ wish, setWish, onNext }: StepWishProps) {
           rows={6}
           className="mb-8 bg-[#301934] border-2 border-[#A45EE5] text-white placeholder:text-[#D9B3FF] text-lg p-6 min-h-32 transition-all duration-300 focus:border-[#6A0DAD] focus:shadow-2xl focus:shadow-[#A45EE5]/30 focus:scale-105"
         />
+
 <Button
   onClick={onNext}
   disabled={!wish.trim()}

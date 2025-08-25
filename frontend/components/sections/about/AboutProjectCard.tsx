@@ -35,6 +35,7 @@ export function AboutProjectCard({ project }: Props) {
           ))}
         </div>
 
+
     <div className="flex flex-wrap justify-center mt-6 gap-6 text-[#FF934F]">
       {project.features.map((feature, i) => {
         const Icons = { Star, Heart, Code };
