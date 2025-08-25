@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const FASTAPI_URL = process.env.FASTAPI_URL; // ex: https://mon-backend.azurewebsites.net
+const FASTAPI_URL = process.env.FASTAPI_URL;
 const FASTAPI_KEY = process.env.FASTAPI_KEY;
 
 export async function POST(request: Request) {

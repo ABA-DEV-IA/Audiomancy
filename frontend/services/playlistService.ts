@@ -18,29 +18,15 @@ async function fetchJson<T>(url: string, body: Record<string, unknown>): Promise
 }
 
 /**
- * Récupérer une playlist à partir des tags via le proxy.
- * Valeurs par défaut appliquées si non fournies.
+ * Récupérer une playlist à partir des tags.
  */
-export async function fetchPlaylistTracks(
-  tags: string,
-  limit = 10,
-  duration_min = 180,
-  duration_max = 480
-): Promise<Track[]> {
-  // Formatage des tags pour correspondre à ce que FastAPI attend
-  const formattedTags = tags.trim().replace(/\s+/g, '+');
-
-  return fetchJson<Track[]>('/api/proxyPlaylist', {
-    tags: formattedTags,
-    limit,
-    duration_min,
-    duration_max,
-  });
+export async function fetchPlaylistTracks(tags: string): Promise<Track[]> {
+  return fetchJson<Track[]>('/api/proxyPlaylist', { tags });
 }
 
 /**
- * Générer une playlist via le proxy à partir d'un prompt et d'une limite
+ * Générer une playlist en fonction d'un prompt et d'une limite.
  */
-export async function fetchPlaylistTracksGenerate(limit = 10, prompt: string): Promise<Track[]> {
+export async function fetchPlaylistTracksGenerate(limit: number, prompt: string): Promise<Track[]> {
   return fetchJson<Track[]>('/api/proxyPlaylistGenerate', { limit, prompt });
 }
