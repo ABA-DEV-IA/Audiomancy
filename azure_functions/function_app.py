@@ -10,7 +10,7 @@ app = func.FunctionApp()
 # "*/5 * * * * *" pour tester toutes les 5 secondes
 # "0 */5 * * * *" pour tester toutes les 5 minutes
 # "0 0 0 * * *" pour tous les jours à minuit
-@app.timer_trigger(schedule="*0 0 0 * * *", arg_name="myTimer", run_on_startup=False,
+@app.timer_trigger(schedule="0 0 0 * * *", arg_name="myTimer", run_on_startup=False,
               use_monitor=False) 
 def RandomPlaylist(myTimer: func.TimerRequest) -> None:
     
