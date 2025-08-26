@@ -15,11 +15,18 @@ function shuffleArray<T>(array: T[]): T[] {
 
 export async function GET(req: Request) {
 
-  const apiKey = req.headers.get("x-api-key");
-  const expectedKey = process.env.CRON_SECRET_KEY;
-  if (!expectedKey || apiKey !== expectedKey) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  // TO DO : SECURITE A CORRIGER SI POSSIBLE
+
+  // const apiKey = req.headers.get("x-api-key")?.trim();
+  // const expectedKey = process.env.CRON_SECRET_KEY?.trim();
+
+  // console.log("expectedKey =", expectedKey, typeof expectedKey, expectedKey?.length);
+  // console.log("apiKey =", apiKey, typeof apiKey, apiKey?.length);
+
+  // if (apiKey !== expectedKey) {
+  //   console.log("Unauthorized");
+  //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  // }
 
   try {
     // Lire categories.json
