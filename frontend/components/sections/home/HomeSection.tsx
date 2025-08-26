@@ -49,10 +49,10 @@ export function HomePage({ onCategoryClick }: HomePageProps = {}) {
     <div className="mb-12">
       <div className="flex items-center justify-center mb-8">
         <div className="flex-1 h-px bg-white max-w-32" />
-        <span className="text-white italic mx-8 text-xl">{title}</span>
+        <span className="text-white italic mx-4 sm:mx-8 text-lg sm:text-xl">{title}</span>
         <div className="flex-1 h-px bg-white max-w-32" />
       </div>
-      <div className="grid grid-cols-3 gap-8 max-w-4xl mx-auto">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-8 max-w-4xl mx-auto">
         {items.map((category) => (
           <CategoryCard
             key={category.id}
@@ -65,18 +65,18 @@ export function HomePage({ onCategoryClick }: HomePageProps = {}) {
   );
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="min-h-screen flex flex-col bg-[#2B2B2B] text-white overflow-y-auto">
       {/* Header */}
       <div
-        className="text-white p-8 text-center transition-all duration-500"
+        className="sticky top-0 z-50 text-white p-4 sm:p-8 text-center transition-all duration-500"
         style={headerStyle}
       >
-        <h1 className="text-4xl font-bold mb-2 tracking-wider">{header.title}</h1>
-        <p className="text-[#D9B3FF] italic">{header.subtitle}</p>
+        <h1 className="text-2xl sm:text-4xl font-bold mb-2 tracking-wider">{header.title}</h1>
+        <p className="text-[#D9B3FF] italic text-sm sm:text-base">{header.subtitle}</p>
       </div>
 
       {/* Main content */}
-      <div className="flex-1 bg-[#2B2B2B] p-8 overflow-y-auto">
+      <div className="flex-1 p-4 sm:p-8">
         {renderCategorySection('Mood', categories.mood)}
         {renderCategorySection('Activités', categories.activity)}
 
