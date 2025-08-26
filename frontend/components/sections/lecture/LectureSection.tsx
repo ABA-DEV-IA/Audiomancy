@@ -11,7 +11,7 @@ import { Track } from '@/types/track';
 
 interface LecturePageProps {
   trackId: string;
-  tags: string;
+  tags?: string;
 }
 
 export default function LecturePage({ trackId, tags }: LecturePageProps) {
@@ -22,13 +22,13 @@ export default function LecturePage({ trackId, tags }: LecturePageProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
-    if (!tags) return;
 
     const loadTracks = async () => {
       setLoading(true);
       setError(null);
       try {
-        const fetchedTracks = await fetchPlaylistTracks(tags);
+        const fetchedTracks = await fetchPlaylistTracks(tags as string);
+
         setTracks(fetchedTracks);
       } catch (err: any) {
         setError(err.message || 'Erreur lors du chargement des pistes.');
@@ -47,12 +47,12 @@ export default function LecturePage({ trackId, tags }: LecturePageProps) {
   if (tracks.length === 0) return <NoTracksPage />;
 
   return (
-      <PlayerPage
-        playlistId={trackId}
-        tracks={tracks}
-        currentTrackIndex={currentTrackIndex}
-        onSelectTrack={setCurrentTrackIndex}
-        audioRef={audioRef}
-      />
+    <PlayerPage
+      playlistId={trackId}
+      tracks={tracks}
+      currentTrackIndex={currentTrackIndex}
+      onSelectTrack={setCurrentTrackIndex}
+      audioRef={audioRef}
+    />
   );
 }

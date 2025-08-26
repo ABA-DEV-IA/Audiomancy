@@ -21,12 +21,17 @@ export function StepWelcome({ onNext }: StepWelcomeProps) {
       <p className="text-[#D9B3FF] italic text-lg max-w-lg mx-auto">
         Laisse la magie du hasard et de l'intelligence artificielle créer une playlist parfaitement adaptée à ton âme.
       </p>
-      <Button
-        onClick={onNext}
-        className="bg-gradient-to-r from-[#6A0DAD] to-[#A45EE5] hover:from-[#A45EE5] hover:to-[#6A0DAD] px-12 py-4 text-lg font-bold transition-all duration-300 hover:scale-110 hover:shadow-2xl hover:shadow-[#6A0DAD]/50"
-      >
-        🌟 Commencer l'Incantation 🌟
-      </Button>
-    </div>
+<Button
+  onClick={onNext}
+  className="w-full max-w-xs sm:max-w-md bg-gradient-to-r from-[#6A0DAD] to-[#A45EE5] 
+             hover:from-[#A45EE5] hover:to-[#6A0DAD] 
+             px-4 sm:px-6 py-4 text-base sm:text-lg font-bold 
+             flex items-center justify-center text-center whitespace-normal
+             transition-all duration-300 
+             hover:scale-105 hover:shadow-2xl hover:shadow-[#6A0DAD]/50"
+>
+  🌟 Commencer l'Incantation 🌟
+</Button>    
+</div>
   );
 }
