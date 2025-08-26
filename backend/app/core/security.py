@@ -4,7 +4,7 @@ Security utilities for API key authentication.
 Validates that requests contain the correct API key from settings.
 """
 
-from fastapi import Request, HTTPException, Security
+from fastapi import HTTPException, Security
 from fastapi.security.api_key import APIKeyHeader
 from app.core.config import settings
 

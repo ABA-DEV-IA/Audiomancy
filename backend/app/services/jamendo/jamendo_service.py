@@ -10,11 +10,13 @@ Functions:
 
 from app.services.jamendo.jamendo_client import fetch_tracks
 from app.utils.formatter import format_jamendo_tracks
+from app.utils.randomizer import choose_random_tags, sample_tracks
 from typing import List
 from app.models.jamendo import JamendoTrackResponse
 
 
 def get_tracks_for_reader(tags: str, duration_min: int = 180, duration_max: int = 480, limit: int = 10) -> List[JamendoTrackResponse]:
+    tags = choose_random_tags(tags)
     """
     Fetches and formats tracks from Jamendo based on provided filters.
 
@@ -29,7 +31,7 @@ def get_tracks_for_reader(tags: str, duration_min: int = 180, duration_max: int 
     """
 
     params = {
-        "limit": limit,
+        "limit": 100,
         "fuzzytags": tags,
         "speed": "low+medium",
         "vocalinstrumental": "instrumental",
@@ -39,8 +41,10 @@ def get_tracks_for_reader(tags: str, duration_min: int = 180, duration_max: int 
     }
 
     data = fetch_tracks(params)
-
     if "results" not in data:
         return []
 
-    return format_jamendo_tracks(data["results"])
+    all_tracks = data["results"]
+    selected_tracks = sample_tracks(all_tracks, limit)
+
+    return format_jamendo_tracks(selected_tracks)
