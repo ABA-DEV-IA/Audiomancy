@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, ReactNode } from 'react';
+import { useState, useEffect, ReactNode } from 'react';
 
 import { Sidebar } from '@/components/layout/sidebar';
 import { TopNavbar } from '@/components/layout/top-navbar';
@@ -16,6 +16,27 @@ export default function Page() {
   const [currentPage, setCurrentPage] = useState<PageKey>('categories');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [currentTrackId, setCurrentTrackId] = useState<string | null>(null);
+
+  // 🔥 Détection device au montage
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        // Mobile → sidebar fermée
+        setSidebarOpen(false);
+      } else if (window.innerWidth < 1024) {
+        // Tablette → sidebar réduite
+        setSidebarOpen(false); // réduite (donc juste l’icône)
+      } else {
+        // Desktop → sidebar ouverte
+        setSidebarOpen(true);
+      }
+    };
+
+    handleResize(); // appel initial
+    window.addEventListener('resize', handleResize);
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const goToLecture = (id: string) => {
     setCurrentTrackId(id);
@@ -55,8 +76,8 @@ export default function Page() {
   };
 
   return (
-    <div className="flex min-h-screen overflow-x-hidden bg-background">
-      {/* Sidebar toujours à gauche */}
+    <div className="relative flex min-h-screen overflow-x-hidden bg-background">
+      {/* Sidebar en overlay */}
       <Sidebar
         isOpen={sidebarOpen}
         onToggle={() => setSidebarOpen((prev) => !prev)}
@@ -64,8 +85,8 @@ export default function Page() {
         onPageChange={handlePageChange}
       />
 
-      {/* Main content */}
-      <div className="flex flex-1 flex-col min-h-screen overflow-hidden">
+      {/* Main content, décalé de la sidebar réduite */}
+      <div className="flex flex-1 flex-col min-h-screen overflow-hidden pl-16 transition-all duration-300">
         <TopNavbar />
 
         {/* Scrollable content */}
