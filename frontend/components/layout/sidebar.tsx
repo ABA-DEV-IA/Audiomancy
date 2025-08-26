@@ -24,7 +24,8 @@ export function Sidebar({
 
   return (
     <div
-      className={`bg-[#F2E9E4] border-r border-gray-300 transition-all duration-300 ${isOpen ? 'w-64' : 'w-16'} flex flex-col`}
+      className={`fixed top-0 left-0 h-full bg-[#F2E9E4] border-r border-gray-300 transition-all duration-300
+        ${isOpen ? 'w-64' : 'w-16'} flex flex-col z-[9999]`}
     >
       <div className="p-4">
         <Button variant="ghost" size="icon" onClick={onToggle} className="mb-4">
@@ -45,9 +46,9 @@ export function Sidebar({
             <Button
               key={item.id}
               variant={currentPage === item.id ? 'secondary' : 'ghost'}
-              className={`w-full justify-start mb-2 text-[#2B2B2B] hover:bg-[#D9B3FF] hover:text-[#6A0DAD] ${!isOpen ? 'px-2' : ''} ${
-                currentPage === item.id ? 'bg-[#D9B3FF] text-[#6A0DAD]' : ''
-              }`}
+              className={`w-full justify-start mb-2 text-[#2B2B2B] hover:bg-[#D9B3FF] hover:text-[#6A0DAD] ${
+                !isOpen ? 'px-2' : ''
+              } ${currentPage === item.id ? 'bg-[#D9B3FF] text-[#6A0DAD]' : ''}`}
               onClick={() => onPageChange(item.id)}
             >
               <Icon className="h-5 w-5" />
