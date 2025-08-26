@@ -23,6 +23,7 @@ export async function POST(request: Request) {
     const data = await res.json();
     return NextResponse.json(data, { status: res.status });
   } catch (err) {
-    return NextResponse.json({ error: "Failed to fetch FastAPI /jamendo/tracks" }, { status: 500 });
+    console.error("Proxy error (proxyPlaylist):", err);
+    return NextResponse.json({ error: "Failed to reach FastAPI /jamendo/tracks" }, { status: 500 });
   }
 }

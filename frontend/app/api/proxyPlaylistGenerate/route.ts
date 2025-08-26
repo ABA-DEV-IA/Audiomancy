@@ -23,6 +23,7 @@ export async function POST(request: Request) {
     const data = await res.json();
     return NextResponse.json(data, { status: res.status });
   } catch (err) {
-    return NextResponse.json({ error: "Failed to fetch FastAPI /generate/playlist" }, { status: 500 });
+    console.error("Proxy error (proxyPlaylistGenerate):", err);
+    return NextResponse.json({ error: "Failed to reach FastAPI /generate/playlist" }, { status: 500 });
   }
 }
