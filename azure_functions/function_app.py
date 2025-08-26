@@ -43,7 +43,7 @@ def RandomPlaylist(myTimer: func.TimerRequest) -> None:
 
 
     try:
-        response = requests.get(url)
+        response = requests.get(url, headers=headers)
         if response.status_code == 200:
             logging.info("Mise à jour réussie : %s", response.json())
         else:

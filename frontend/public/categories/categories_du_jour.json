@@ -2,20 +2,12 @@
   "categories": {
     "mood": [
       {
-        "title": "Sortez les mouchoirs",
+        "title": "Collé-serré",
         "subtitle": "(musique de fond)",
-        "image": "/images/mouchoirs-bg.png",
-        "description": "Émotion et mélancolie",
-        "id": "melancholy",
-        "tags": "magic+fantasy+cinematic"
-      },
-      {
-        "title": "Peps",
-        "subtitle": "(musique de fond)",
-        "image": "/images/peps-bg.png",
-        "description": "Énergie et dynamisme",
-        "id": "peps",
-        "tags": "magic+fantasy+cinematic"
+        "image": "/images/colle-serre-bg.png",
+        "description": "Romance et intimité",
+        "id": "close_dance",
+        "tags": "romantic love soul jazz singersongwriter smooth rnb crooner poprock intimate"
       },
       {
         "title": "Défouloir",
@@ -23,33 +15,41 @@
         "image": "/images/defouloir-bg.png",
         "description": "Puissance et intensité",
         "id": "let_off_steam",
-        "tags": "magic+fantasy+cinematic"
+        "tags": "hardcore hardcorepunk deathmetal thrashmetal industrialmetal metal grindcore punk aggressive industrialrock"
+      },
+      {
+        "title": "Sortez les mouchoirs",
+        "subtitle": "(musique de fond)",
+        "image": "/images/mouchoirs-bg.png",
+        "description": "Émotion et mélancolie",
+        "id": "melancholy",
+        "tags": "melancholic sad sentimental introspective ballad douxamer emotional tender calm nostalgie"
       }
     ],
     "activity": [
-      {
-        "title": "Fête",
-        "subtitle": "(ambiance festive)",
-        "image": "/images/party-bg.png",
-        "description": "Boostez vos soirées avec du bon son",
-        "id": "party",
-        "tags": "magic+fantasy+cinematic"
-      },
-      {
-        "title": "Travail",
-        "subtitle": "(concentration)",
-        "image": "/images/bulby.jpg",
-        "description": "Musique pour rester productif",
-        "id": "work",
-        "tags": "magic+fantasy+cinematic"
-      },
       {
         "title": "Lecture",
         "subtitle": "(calme et sérénité)",
         "image": "/images/reading-bg.png",
         "description": "Accompagnement sonore pour vos livres",
         "id": "reading",
-        "tags": "magic+fantasy+cinematic"
+        "tags": "ambient classical contemporarypiano lofi relaxing instru neoclassical newage peaceful calm"
+      },
+      {
+        "title": "Sport",
+        "subtitle": "(rythme et énergie)",
+        "image": "/images/sport-bg.png",
+        "description": "Musique pour se dépasser",
+        "id": "sport",
+        "tags": "techno house hiphop rap drumnbass energetic upbeat motivational trance electropop"
+      },
+      {
+        "title": "Marche en ville",
+        "subtitle": "(rythme urbain)",
+        "image": "/images/marche-ville-bg.png",
+        "description": "Bande-son pour vos explorations urbaines",
+        "id": "city_walk",
+        "tags": "lofi chillout indiepop nujazz soul electropop funk downtempo lounge"
       }
     ]
   }
