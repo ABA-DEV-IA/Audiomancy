@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { CategoryCard } from '@/components/sections/home/CategoryCard';
-import categoriesList from '@/config/categories/categories_du_jour.json';
+import categoriesList from '@/public/categories/categories_du_jour.json';
 import { homeConfig } from '@/config/site/home.config';
 import { Category } from '@/types/category';
 

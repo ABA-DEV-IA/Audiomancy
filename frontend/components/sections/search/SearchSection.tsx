@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Category } from '@/types/category';
-import CategoriesJSON from '@/config/categories/categories.json';
+import CategoriesJSON from '@/public/categories/categories.json';
 
 const Categories: Category[] = CategoriesJSON;
 
