@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { CategoryCard } from '@/components/sections/home/CategoryCard';
-import categoriesList from '@/public/categories/categories_du_jour.json';
 import { homeConfig } from '@/config/site/home.config';
 import { Category } from '@/types/category';
 
@@ -15,12 +14,23 @@ const DEFAULT_HEADER_COLOR = '#6A0DAD';
 
 export function HomePage({ onCategoryClick }: HomePageProps = {}) {
   const { header } = homeConfig;
-  const { categories } = categoriesList;
   const router = useRouter();
 
+  const [categories, setCategories] = useState<{ mood: Category[], activity: Category[] } | null>(null);
   const [headerStyle, setHeaderStyle] = useState<React.CSSProperties>({
     backgroundColor: DEFAULT_HEADER_COLOR,
   });
+
+  useEffect(() => {
+    // fetch JSON dynamique pour éviter le cache
+    const fetchCategories = async () => {
+      const timestamp = new Date().getTime(); // pour forcer le refresh
+      const res = await fetch(`/categories/categories_du_jour.json?t=${timestamp}`);
+      const data = await res.json();
+      setCategories(data.categories);
+    };
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     if (!header.background) return;
@@ -64,9 +74,10 @@ export function HomePage({ onCategoryClick }: HomePageProps = {}) {
     </div>
   );
 
+  if (!categories) return <div>Chargement...</div>;
+
   return (
     <div className="min-h-screen flex flex-col bg-[#2B2B2B] text-white overflow-y-auto">
-      {/* Header */}
       <div
         className="sticky top-0 z-50 text-white p-4 sm:p-8 text-center transition-all duration-500"
         style={headerStyle}
@@ -75,12 +86,10 @@ export function HomePage({ onCategoryClick }: HomePageProps = {}) {
         <p className="text-[#D9B3FF] italic text-sm sm:text-base">{header.subtitle}</p>
       </div>
 
-      {/* Main content */}
       <div className="flex-1 p-4 sm:p-8">
         {renderCategorySection('Mood', categories.mood)}
         {renderCategorySection('Activités', categories.activity)}
 
-        {/* Footer note */}
         <div className="text-center mt-8">
           <p className="text-[#FF934F] italic text-sm">
             (utilise chacun avec la rubrique Activités en dessous)
