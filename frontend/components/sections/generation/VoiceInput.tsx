@@ -15,15 +15,13 @@ const startRecognition = async () => {
   try {
     setIsRecording(true);
 
-    // 1️⃣ Récupérer la clé + région depuis backend
-    const response = await fetch("http://localhost:8000/speech-token", {
+    const response = await fetch("https://audiomancy-backend.politeground-f860a254.francecentral.azurecontainerapps.io/speech-token", {
       method: "POST",
     });
     if (!response.ok) throw new Error("Impossible d'obtenir la clé Azure");
 
     const { key, region } = await response.json();
 
-    // 2️⃣ Configurer Azure Speech SDK directement
     const speechConfig = SpeechSDK.SpeechConfig.fromSubscription(key, region);
     speechConfig.speechRecognitionLanguage = "fr-FR";
 
