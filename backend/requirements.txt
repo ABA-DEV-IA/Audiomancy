@@ -21,3 +21,4 @@ dotenv
 ddgs #duckduckgo-search
 langchain
 langchain-openai
+azure-cognitiveservices-speech
