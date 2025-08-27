@@ -51,5 +51,6 @@ def get_jamendo_tracks(request: JamendoTrackRequest):
         tags=request.tags,
         duration_min=request.duration_min,
         duration_max=request.duration_max,
-        limit=request.limit
+        limit=request.limit,
+        track_id=request.track_id
     )

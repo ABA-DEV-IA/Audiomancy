@@ -19,10 +19,10 @@ async function fetchJson<T>(url: string, body: Record<string, unknown>): Promise
 }
 
 /**
- * Récupérer une playlist à partir des tags.
+ * Récupérer une playlist à partir des tags et d’un trackId (catégorie).
  */
-export async function fetchPlaylistTracks(tags: string): Promise<Track[]> {
-  return fetchJson<Track[]>("/api/proxyPlaylist", { tags });
+export async function fetchPlaylistTracks(trackId: string, tags: string): Promise<Track[]> {
+  return fetchJson<Track[]>("/api/proxyPlaylist", { trackId, tags });
 }
 
 /**

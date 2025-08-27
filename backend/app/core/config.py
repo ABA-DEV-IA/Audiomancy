@@ -48,6 +48,7 @@ class Settings(BaseSettings):
     deployment_name: Optional[str] = None
     endpoint_url: Optional[str] = None
     jamendo_url: Optional[str] = None
+    azure_storage_connection_string: Optional[str] = None
 
     api_key: Optional[str] = None
     swagger_on: bool = False

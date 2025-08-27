@@ -18,10 +18,12 @@ class JamendoTrackRequest(BaseModel):
     Request schema for retrieving music tracks from Jamendo.
 
     Attributes:
-        tags (str): List of keywords joined by '+' (e.g., "magic+fantasy+cinematic").
+        tags (str): List of keywords joined by ' ' (e.g., "magic fantasy cinematic").
         duration_min (int): Minimum track duration in seconds.
         duration_max (int): Maximum track duration in seconds.
         limit (int): Number of tracks to return (must be one of 10, 25, or 50).
+        track_id (Optional[str]): Optional identifier used to cache/retrieve playlists.
+                                  Not required for the API call itself.
     """
 
     tags: str = Field(..., description="Tags for the track search")
@@ -30,6 +32,10 @@ class JamendoTrackRequest(BaseModel):
     limit: int = Field(
         10,
         description="Number of tracks to return (allowed values: 10, 25, 50)",
+    )
+    track_id: Optional[str] = Field(
+        None,
+        description="Optional ID to cache/retrieve the playlist; does not affect the API request"
     )
 
     @field_validator("limit")
@@ -46,6 +52,7 @@ class JamendoTrackRequest(BaseModel):
                 "duration_min": 180,
                 "duration_max": 480,
                 "limit": 10,
+                "track_id": "harry_potter_reading_1"
             }
         }
     )
