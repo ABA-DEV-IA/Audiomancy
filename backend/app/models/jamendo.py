@@ -35,6 +35,7 @@ class JamendoTrackRequest(BaseModel):
     )
     track_id: Optional[str] = Field(
         None,
+        alias="trackId",  # <-- frontend envoie camelCase, backend reçoit snake_case
         description="Optional ID to cache/retrieve the playlist; does not affect the API request"
     )
 
@@ -46,6 +47,7 @@ class JamendoTrackRequest(BaseModel):
         return v
 
     model_config = ConfigDict(
+        populate_by_name=True,  # <-- permet d'accéder aussi à track_id côté backend
         json_schema_extra={
             "example": {
                 "tags": "magic+fantasy+cinematic",

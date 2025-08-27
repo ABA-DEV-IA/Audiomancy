@@ -28,9 +28,10 @@ export default function LecturePage({ trackId, tags }: LecturePageProps) {
       try {
         if (!tags) throw new Error("Tags are required to fetch tracks");
 
-        // 🔑 On passe maintenant aussi trackId au service
-        const fetchedTracks = await fetchPlaylistTracks(trackId, tags);
+        console.log("[LecturePage] trackId:", trackId);
+        console.log("[LecturePage] tags:", tags);
 
+        const fetchedTracks = await fetchPlaylistTracks(trackId, tags);
         setTracks(fetchedTracks);
       } catch (err: any) {
         setError(err.message || 'Erreur lors du chargement des pistes.');
@@ -43,7 +44,6 @@ export default function LecturePage({ trackId, tags }: LecturePageProps) {
     loadTracks();
   }, [trackId, tags]);
 
-  // Affichage conditionnel
   if (loading) return <LoadingPage progress={0} />;
   if (error) return <ErrorPage error={error} />;
   if (tracks.length === 0) return <NoTracksPage />;
