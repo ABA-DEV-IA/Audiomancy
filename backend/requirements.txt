@@ -21,3 +21,6 @@ dotenv
 ddgs #duckduckgo-search
 langchain
 langchain-openai
+motor
+pydantic[email]
+passlib[bcrypt]

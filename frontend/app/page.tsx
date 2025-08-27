@@ -9,8 +9,10 @@ import { SearchPage } from '@/components/sections/search/SearchSection';
 import { AboutPage } from '@/components/sections/about/AboutSection';
 import { GenerationPage } from '@/components/sections/generation/GenerationSection';
 import { Footer } from '@/components/layout/footer';
+import { LoginPage } from '@/components/sections/user/ConnexionSection';
+import { RegisterPage } from '@/components/sections/user/RegisterSection';
 
-type PageKey = 'categories' | 'generation' | 'recherches' | 'about' | 'lecture';
+type PageKey = 'categories' | 'generation' | 'recherches' | 'about' | 'lecture' | 'login' | 'register';
 
 export default function Page() {
   const [currentPage, setCurrentPage] = useState<PageKey>('categories');
@@ -61,15 +63,12 @@ export default function Page() {
   const renderPage = (): ReactNode => {
     const pages: Record<PageKey, ReactNode> = {
       categories: <HomePage onCategoryClick={() => goToLecture('default')} />,
-      generation: (
-        <GenerationPage
-          onBack={handleGenerationBack}
-          onComplete={handleGenerationComplete}
-        />
-      ),
+      generation: <GenerationPage onBack={handleGenerationBack} onComplete={handleGenerationComplete} />,
       recherches: <SearchPage onTrackClick={goToLecture} />,
       about: <AboutPage />,
       lecture: <HomePage onCategoryClick={() => goToLecture('default')} />,
+      login: <LoginPage />,
+      register: <RegisterPage />,
     };
 
     return pages[currentPage];

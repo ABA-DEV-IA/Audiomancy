@@ -4,17 +4,23 @@ import {
   Home, Sparkles, Search, Info, Menu,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/context/auth_context';
 
 interface SidebarProps {
-  isOpen: boolean
-  onToggle: () => void
-  currentPage: string
-  onPageChange: (page: string) => void
+  isOpen: boolean;
+  onToggle: () => void;
+  currentPage: string;
+  onPageChange: (page: string) => void;
 }
 
 export function Sidebar({
-  isOpen, onToggle, currentPage, onPageChange,
+  isOpen,
+  onToggle,
+  currentPage,
+  onPageChange,
 }: SidebarProps) {
+  const { isAuthenticated, user, logout } = useAuth();
+
   const menuItems = [
     { id: 'categories', label: 'Catégories', icon: Home },
     { id: 'generation', label: 'Génération', icon: Sparkles },
@@ -34,7 +40,13 @@ export function Sidebar({
 
         {isOpen && (
           <div className="mb-8">
-            <h1 className="text-xl font-bold text-[#2B2B2B] mb-2">Bonjour !</h1>
+            {isAuthenticated ? (
+              <h1 className="text-xl font-bold text-[#2B2B2B] mb-2">
+                Bonjour {user?.username} 👋
+              </h1>
+            ) : (
+              <h1 className="text-xl font-bold text-[#2B2B2B] mb-2">Bonjour !</h1>
+            )}
           </div>
         )}
       </div>
@@ -57,6 +69,33 @@ export function Sidebar({
           );
         })}
       </nav>
+
+      <div className="p-4 border-t border-gray-300">
+        {isAuthenticated ? (
+          <Button
+            variant="destructive"
+            className="w-full"
+            onClick={logout}
+          >
+            Déconnexion
+          </Button>
+        ) : (
+          <div className="flex flex-col gap-2">
+            <Button
+              variant="outline"
+              onClick={() => onPageChange('login')}
+            >
+              Connexion
+            </Button>
+            <Button
+              variant="default"
+              onClick={() => onPageChange('register')}
+            >
+              Inscription
+            </Button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
