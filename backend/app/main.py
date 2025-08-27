@@ -15,6 +15,7 @@ from app.core.config import settings
 from app.routes.jamendo_routes import router as jamendo_router
 from app.routes.ai_routes import router as ai_router
 from app.core.security import get_api_key
+from app.routes.speech_token_routes import router as speech_router
 
 # Activer Swagger seulement si swagger_on=True
 docs_url = "/docs" if settings.swagger_on else None
@@ -39,3 +40,4 @@ app.add_middleware(
 # Inclure les routes avec dépendance globale API Key
 app.include_router(jamendo_router, dependencies=[Depends(get_api_key)])
 app.include_router(ai_router, dependencies=[Depends(get_api_key)])
+app.include_router(speech_router)
