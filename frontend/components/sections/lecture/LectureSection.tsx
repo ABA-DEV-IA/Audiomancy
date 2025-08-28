@@ -22,13 +22,16 @@ export default function LecturePage({ trackId, tags }: LecturePageProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
-
     const loadTracks = async () => {
       setLoading(true);
       setError(null);
       try {
-        const fetchedTracks = await fetchPlaylistTracks(tags as string);
+        if (!tags) throw new Error("Tags are required to fetch tracks");
 
+        console.log("[LecturePage] trackId:", trackId);
+        console.log("[LecturePage] tags:", tags);
+
+        const fetchedTracks = await fetchPlaylistTracks(trackId, tags);
         setTracks(fetchedTracks);
       } catch (err: any) {
         setError(err.message || 'Erreur lors du chargement des pistes.');
@@ -39,9 +42,8 @@ export default function LecturePage({ trackId, tags }: LecturePageProps) {
     };
 
     loadTracks();
-  }, [tags]);
+  }, [trackId, tags]);
 
-  // Affichage conditionnel
   if (loading) return <LoadingPage progress={0} />;
   if (error) return <ErrorPage error={error} />;
   if (tracks.length === 0) return <NoTracksPage />;
