@@ -40,4 +40,4 @@ app.add_middleware(
 # Inclure les routes avec dépendance globale API Key
 app.include_router(jamendo_router, dependencies=[Depends(get_api_key)])
 app.include_router(ai_router, dependencies=[Depends(get_api_key)])
-app.include_router(speech_router)
+app.include_router(speech_router, dependencies=[Depends(get_api_key)])
