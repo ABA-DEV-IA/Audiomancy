@@ -24,3 +24,4 @@ langchain-openai
 motor
 pydantic[email]
 passlib[bcrypt]
+azure-cognitiveservices-speech
