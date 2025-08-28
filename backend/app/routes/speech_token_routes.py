@@ -14,7 +14,7 @@ router = APIRouter()
 speech_key = settings.speech_key
 speech_region = settings.speech_region
 
-@router.post("/speech-token")
+@router.post("/speech-token", tags=["Speech"])
 def get_speech_token():
 
     """
