@@ -19,25 +19,34 @@ const baseConfig: Config = {
 let loadedConfig: Config | null = null;
 
 export async function getConfig(): Promise<Config> {
-  if (loadedConfig) return loadedConfig; // cache si déjà chargé
+  if (loadedConfig) return loadedConfig;
 
   const config: Config = { ...baseConfig };
   const keyVaultUrl = process.env.AZURE_KEY_VAULT_URL;
+
   if (keyVaultUrl) {
     try {
       const credential = new DefaultAzureCredential();
       const client = new SecretClient(keyVaultUrl, credential);
 
-      for await (const secretProperties of client.listPropertiesOfSecrets()) {
-        const secretName = secretProperties.name.toLowerCase().replace(/-/g, "_");
-        const secretValue = (await client.getSecret(secretProperties.name)).value;
+      const secretMap: Record<string, keyof Config> = {
+        "api-key": "fastApiKey",
+        "fastapi-url": "fastApiUrl",
+        "speech-key": "speechKey",
+        "speech-region": "speechRegion",
+      };
 
-        if (secretValue && secretName in config) {
-          (config as any)[secretName] = secretValue;
+      for await (const secretProperties of client.listPropertiesOfSecrets()) {
+        const rawName = secretProperties.name.toLowerCase();
+        const targetKey = secretMap[rawName];
+
+        if (targetKey) {
+          const secretValue = (await client.getSecret(secretProperties.name)).value;
+          if (secretValue) {
+            config[targetKey] = secretValue;
+          }
         }
       }
-
-      console.log("[INFO] Config loaded from Azure Key Vault");
     } catch (err) {
       console.warn("[WARNING] Could not load secrets from Key Vault:", err);
     }
