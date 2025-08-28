@@ -19,6 +19,21 @@ async function fetchJson<T>(url: string, body: Record<string, unknown>): Promise
 }
 
 
+async function fetchJsonPUT<T>(url: string, body: Record<string, unknown>): Promise<T> {
+  const response = await fetch(url, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`API error ${response.status}: ${errorText}`);
+  }
+
+  return response.json() as Promise<T>;
+}
+
 interface UserResponse {
   success: boolean;
   message: string;
@@ -32,5 +47,11 @@ export async function login(email: string, password: string): Promise<User> {
 
 export async function register(email: string, username: string, password: string): Promise<User> {
   const data = await fetchJson<UserResponse>("/api/user/proxyCreate", { email, username, password });
+  return data.user; // 🔹 On retourne seulement l'objet User
+}
+
+export async function modify(id: string, username: string, password: string): Promise<User> {
+  console.log(id, username, password );
+  const data = await fetchJsonPUT<UserResponse>("/api/user/proxyModify", { id, username, password });
   return data.user; // 🔹 On retourne seulement l'objet User
 }

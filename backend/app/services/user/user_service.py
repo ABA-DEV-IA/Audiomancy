@@ -9,8 +9,6 @@ from typing import List, Optional
 from datetime import datetime
 from bson import ObjectId
 
-
-
 # contexte pour le hash
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -55,47 +53,45 @@ async def connexion_user_service(request: UserConnexionRequest) -> UserResponse:
     return UserResponse(
             success = True,
             message = "Connexion réussie",
-            user = User(**doc).model_dump(by_alias=True)
+            user = User(**doc)
     )
 
 
 async def update_user_service(request: UserUpdateRequest) -> UserResponse:
+
+    existing = await users_collection.find_one({"_id": ObjectId(request.id)})
     
-    existing = await users_collection.find_one({"_id": request.id })
     if not existing:
         raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
 
     update_data = {}
-
-    for k, v in request.dict().items():
-        if v is not None:
-            if k == "password":  
-                update_data["password_hash"] = hash_password(v)  # on hash avant d’enregistrer
+    for key, value in request.model_dump().items():
+        if value is not None and key != "id":  # on ignore l'id
+            if key == "password":
+                update_data["password_hash"] = hash_password(value)
             else:
-                update_data[k] = v    
-    
+                update_data[key] = value
+
     if not update_data:
         raise HTTPException(status_code=400, detail="Aucune donnée à mettre à jour")
 
     result = await users_collection.update_one(
-        {"_id": ObjectId(user_id)},
+        {"_id": ObjectId(request.id)},
         {"$set": update_data}
     )
 
     if result.modified_count == 0:
-        return {"success": False, "message": "Aucune modification effectuée"}
+        return UserResponse(success=False, message="Aucune modification effectuée", user=None)
 
-    updated_user = await users_collection.find_one({"_id": ObjectId(user_id)})
+    updated_user = await users_collection.find_one({"_id": ObjectId(request.id)})
+    doc = {**updated_user, "id": str(updated_user["_id"])}
 
-    updated_user_data = dict(updated_user)
-    updated_user_data["id"] = str(updated_user_data["_id"])
-    del updated_user_data["_id"]
-    user_obj = User(**updated_user_data)
-
-    return {"success": True, "message": "Utilisateur mis à jour", "user": user_obj}
-
-
-
+    return UserResponse(
+        success=True,
+        message="Utilisateur mis à jour",
+        user=User(**doc)
+    )
+    
 def hash_password(password: str) -> str:
     """Hash un mot de passe en clair"""
     return pwd_context.hash(password)

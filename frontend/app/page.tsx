@@ -11,15 +11,15 @@ import { GenerationPage } from '@/components/sections/generation/GenerationSecti
 import { Footer } from '@/components/layout/footer';
 import { LoginPage } from '@/components/sections/user/ConnexionSection';
 import { RegisterPage } from '@/components/sections/user/RegisterSection';
+import { AcountPage } from '@/components/sections/user/AcountSection'
 
-type PageKey = 'categories' | 'generation' | 'recherches' | 'about' | 'lecture' | 'login' | 'register';
+type PageKey = 'categories' | 'generation' | 'recherches' | 'about' | 'lecture' | 'login' | 'register' | 'acount';
 
 export default function Page() {
   const [currentPage, setCurrentPage] = useState<PageKey>('categories');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [currentTrackId, setCurrentTrackId] = useState<string | null>(null);
 
-  // 🔥 Détection device au montage
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 768) {
@@ -67,8 +67,9 @@ export default function Page() {
       recherches: <SearchPage onTrackClick={goToLecture} />,
       about: <AboutPage />,
       lecture: <HomePage onCategoryClick={() => goToLecture('default')} />,
-      login: <LoginPage />,
-      register: <RegisterPage />,
+      login: <LoginPage onLoginSuccess={() => setCurrentPage('categories')} onSwitchToRegister={() => setCurrentPage('register')} />,
+      register: <RegisterPage onRegisterSuccess={() => setCurrentPage('categories')} onSwitchToLogin={() => setCurrentPage('login')} />,
+      acount: <AcountPage />
     };
 
     return pages[currentPage];

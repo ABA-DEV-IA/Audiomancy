@@ -31,8 +31,8 @@ class UserConnexionRequest(BaseModel):
 
 class UserUpdateRequest(BaseModel):
     id: str
-    username: Optional[str]
-    password: Optional[str]
+    username: Optional[str] = None
+    password: Optional[str] = None
     
 class UserResponse(BaseModel):
     success: bool
