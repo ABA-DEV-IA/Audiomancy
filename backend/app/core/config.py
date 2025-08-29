@@ -55,6 +55,9 @@ class Settings(BaseSettings):
     api_key: Optional[str] = None
     swagger_on: bool = False
 
+    mongo_url: Optional[str] = None
+    db_name: Optional[str] = None
+
     # Pydantic settings configuration: read from .env, ignore extra keys
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
