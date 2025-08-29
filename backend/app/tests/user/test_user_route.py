@@ -9,6 +9,10 @@ import pytest
 from fastapi.testclient import TestClient
 from app.main import app  # ton FastAPI instance
 from app.models.user import UserCreateRequest, UserLoginRequest, UserUpdateRequest, UserResponse
+from app.core.config import settings
+
+# Headers with valid API key for all requests
+HEADERS = {"X-API-KEY": settings.api_key}
 
 client = TestClient(app)
 
@@ -17,13 +21,13 @@ client = TestClient(app)
 def mock_user_services(monkeypatch):
     """Mock the user services to avoid real DB calls."""
 
-    def fake_create_user(request):
+    async def fake_create_user(request):
         return UserResponse(success=True, message="User created", user=None)
 
-    def fake_login_user(request):
+    async def fake_login_user(request):
         return UserResponse(success=True, message="Login successful", user=None)
 
-    def fake_update_user(request):
+    async def fake_update_user(request):
         return UserResponse(success=True, message="User updated", user=None)
 
     # Patch services
@@ -38,7 +42,7 @@ def test_create_user():
         "username": "testuser",
         "password": "password123"
     }
-    response = client.post("/user/create", json=payload)
+    response = client.post("/user/create", json=payload, headers=HEADERS)
     assert response.status_code == 201
     data = response.json()
     assert data["success"] is True
@@ -50,7 +54,7 @@ def test_login_user():
         "email": "test@example.com",
         "password": "password123"
     }
-    response = client.post("/user/login", json=payload)
+    response = client.post("/user/login", json=payload, headers=HEADERS)
     assert response.status_code == 200
     data = response.json()
     assert data["success"] is True
@@ -63,7 +67,7 @@ def test_update_user():
         "username": "updateduser",
         "password": "newpassword"
     }
-    response = client.put("/user/update", json=payload)
+    response = client.put("/user/update", json=payload, headers=HEADERS)
     assert response.status_code == 200
     data = response.json()
     assert data["success"] is True
