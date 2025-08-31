@@ -12,7 +12,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const res = await fetch(`${FASTAPI_URL}/user/connexion`, {
+    const res = await fetch(`${FASTAPI_URL}/user/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

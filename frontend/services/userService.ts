@@ -41,7 +41,7 @@ interface UserResponse {
 }
 
 export async function login(email: string, password: string): Promise<User> {
-  const data = await fetchJson<UserResponse>("/api/user/proxyConnexion", { email, password });
+  const data = await fetchJson<UserResponse>("/api/user/proxyLogin", { email, password });
   return data.user; // 🔹 On retourne seulement l'objet User
 }
 

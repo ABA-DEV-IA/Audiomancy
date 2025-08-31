@@ -49,7 +49,7 @@ async def login_user(request: UserLoginRequest) -> UserResponse:
     return await login_user_service(request)
 
 
-@router.put("/update", status_code=status.HTTP_200_OK, response_model=UserResponse)
+@router.put("/modify", status_code=status.HTTP_200_OK, response_model=UserResponse)
 async def update_user(request: UserUpdateRequest) -> UserResponse:
     """
     Update an existing user's information.
