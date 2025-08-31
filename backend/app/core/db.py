@@ -7,11 +7,11 @@ from pymongo.errors import PyMongoError
 from app.core.config import settings
 
 # MongoDB configuration
-MONGO_URI = settings.mongo_url
+MONGO_URL = settings.mongo_url
 DB_NAME = settings.db_name
 
 # Initialize client and database
-client = AsyncIOMotorClient(MONGO_URI)
+client = AsyncIOMotorClient(MONGO_URL)
 db = client[DB_NAME]
 
 # Collections
