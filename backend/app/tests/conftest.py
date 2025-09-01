@@ -31,4 +31,3 @@ def api_client():
             return client.delete(url, params=params, headers=HEADERS)
 
     return AuthenticatedClient()
-

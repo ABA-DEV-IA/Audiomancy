@@ -6,6 +6,11 @@ def test_choose_random_tags_empty():
     assert choose_random_tags("") == ""
 
 
+def test_choose_random_tags_none():
+    # Handle None input gracefully
+    assert choose_random_tags(None) == ""
+
+
 def test_choose_random_tags_single():
     assert choose_random_tags("magic") == "magic"
 
@@ -27,6 +32,12 @@ def test_sample_tracks_empty():
 def test_sample_tracks_less_than_limit():
     tracks = [{"id": 1}, {"id": 2}]
     assert sample_tracks(tracks, 5) == tracks
+
+
+def test_sample_tracks_equal_to_limit():
+    tracks = [{"id": i} for i in range(5)]
+    result = sample_tracks(tracks, 5)
+    assert result == tracks
 
 
 def test_sample_tracks_more_than_limit(monkeypatch):
