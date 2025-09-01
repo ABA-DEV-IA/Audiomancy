@@ -4,6 +4,10 @@ import { RefObject } from 'react';
 import { formatDuration } from '@/utils/formatDuration';
 import { Track } from '@/types/track';
 import { PlayerPageProps } from '@/types/playerPageProps';
+import { useAuth } from "@/context/auth_context";
+import { useState } from "react";
+import { CreatePlaylistModal } from "@/components/sections/lecture/create-playlist-modal";
+
 
 export default function PlayerPage({
   playlistId,
@@ -13,7 +17,59 @@ export default function PlayerPage({
   audioRef,
 }: PlayerPageProps) {
   const router = useRouter();
+
+  const { isAuthenticated, user } = useAuth();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const currentTrack = tracks[currentTrackIndex];
+
+  const openModal = () => {
+    if (!isAuthenticated) {
+      alert("Tu dois être connecté pour ajouter une playlist aux favoris.");
+      return;
+    }
+    setIsModalOpen(true);
+  };
+
+
+  const handleSaveFavorite = async (data: { name: string }) => {
+    try {
+      const response = await fetch("/api/favorite/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_id: user?.id,
+          name: data.name,
+          track_list: tracks.map(track => ({
+            id: track.id,
+            title: track.title,
+            artist: track.artist,
+            audio_url: track.audio_url,
+            image: track.image,
+            tags: track.tags,
+            license_name: track.license_name,
+            license_url: track.license_url
+          }))
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        alert("Erreur : " + errorData.detail || "Impossible de créer le favori");
+        return;
+      }
+
+      const result = await response.json();
+      console.log("Favori créé :", result);
+      alert(`Playlist "${data.name}" ajoutée aux favoris !`);
+    } catch (err) {
+      console.error(err);
+      alert("Une erreur est survenue lors de la création du favori.");
+    }
+  };
+
 
   return (
     <div className="flex min-h-screen flex-col justify-between bg-[#2B2B2B] text-white">
@@ -22,6 +78,16 @@ export default function PlayerPage({
         <div className="mb-6 rounded bg-[#6A0DAD] p-6 text-white">
           <h1 className="text-2xl font-bold">Lecture</h1>
           <p className="mt-2">Playlist : {playlistId}</p>
+          
+          {/* BOUTON AJOUT FAVORI */}
+          <button
+            type="button"
+            onClick={openModal}
+            className="mt-3 mr-3 rounded bg-gradient-to-r from-[#4CE0B3] to-[#3AB68B] px-4 py-2 font-semibold text-black hover:scale-105"
+          >
+            Ajouter aux favoris
+          </button>
+
           <button
             type="button"
             onClick={() => router.push('/')}
@@ -109,6 +175,13 @@ export default function PlayerPage({
           </ul>
         </div>
       </div>
+
+      <CreatePlaylistModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSaveFavorite}
+        tracks={tracks}
+      />
 
       <Footer />
     </div>

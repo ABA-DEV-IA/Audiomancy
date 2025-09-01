@@ -1,7 +1,7 @@
 'use client';
 
 import {
-  Home, Sparkles, Search, Info, Menu,
+  Home, Sparkles, Search, Info, Menu, Heart
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth_context';
@@ -24,6 +24,7 @@ export function Sidebar({
   const menuItems = [
     { id: 'categories', label: 'Catégories', icon: Home },
     { id: 'generation', label: 'Génération', icon: Sparkles },
+    { id: "favorites", label: "Mes Favoris", icon: Heart },
     { id: 'recherches', label: 'Recherche', icon: Search },
     { id: 'about', label: 'À propos', icon: Info },
   ];

@@ -11,7 +11,7 @@ db = client[DB_NAME]
 
 # Collections
 users_collection = db["users"]
-playlists_collection = db["playlists"]
+favorite_collection = db["favorite"]
 
 async def check_connection():
     try:

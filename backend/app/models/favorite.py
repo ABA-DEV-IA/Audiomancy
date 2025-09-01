@@ -1,14 +1,27 @@
-from typing import List, Optional
-from pydantic import BaseModel, Field, ConfigDict, field_validator
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, Field
 from typing import List, Optional
 from datetime import datetime
-from bson import ObjectId
 from .jamendo import JamendoTrackResponse
 
 
 class Favorite(BaseModel):
+    id: Optional[str] = Field(default=None, alias="_id") 
+    user_id: str
     name: str
     track_list: List[JamendoTrackResponse] = []
+    saved_at: datetime = Field(default_factory=datetime.utcnow)
+
+    class Config:
+        populate_by_name = True
+
     
-    model_config = ConfigDict()
+class FavoriteResponse(BaseModel):
+    success: bool
+    message: str
+    favorite: Favorite | None = None
+
+
+class FavoriteRenameRequest(BaseModel):
+    user_id: str
+    favorite_id: str
+    new_name: str

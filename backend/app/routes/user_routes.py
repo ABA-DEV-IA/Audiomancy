@@ -1,6 +1,5 @@
 from typing import List
 from fastapi import APIRouter
-from app.db import users_collection, playlists_collection, check_connection
 from app.models.user import UserCreateRequest, UserConnexionRequest, UserUpdateRequest, User, UserResponse
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, EmailStr

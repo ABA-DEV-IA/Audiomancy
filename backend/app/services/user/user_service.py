@@ -1,5 +1,5 @@
 from passlib.context import CryptContext
-from app.db import users_collection, playlists_collection, check_connection
+from app.db import users_collection, check_connection
 from typing import List
 from fastapi import APIRouter
 from app.models.user import UserCreateRequest, UserConnexionRequest, UserUpdateRequest, UserCreate, User, UserResponse
