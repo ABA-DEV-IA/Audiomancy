@@ -4,8 +4,7 @@ import Config from "@/lib/config";
 export async function POST(request: Request) {
   const body = await request.json();
   const { fastApiUrl, fastApiKey } = Config;
-  console.log(fastApiKey);
-  console.log(fastApiUrl);
+  
   if (!fastApiUrl || !fastApiKey) {
     return NextResponse.json({ error: "Server misconfiguration" }, { status: 500 });
   }
