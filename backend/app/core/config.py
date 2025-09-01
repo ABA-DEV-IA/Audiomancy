@@ -57,6 +57,12 @@ class Settings(BaseSettings):
     api_key: Optional[str] = None
     swagger_on: bool = False
 
+    mongo_host: Optional[str] = None
+    mongo_port: Optional[str] = None
+    mongo_username: Optional[str] = None
+    mongo_password: Optional[str] = None
+    mongo_db_name: Optional[str] = None
+
     # Internal cache for Key Vault secrets
     _secrets_cache: dict = {}
 

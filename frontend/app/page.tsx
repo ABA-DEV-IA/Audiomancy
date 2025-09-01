@@ -9,15 +9,17 @@ import { SearchPage } from '@/components/sections/search/SearchSection';
 import { AboutPage } from '@/components/sections/about/AboutSection';
 import { GenerationPage } from '@/components/sections/generation/GenerationSection';
 import { Footer } from '@/components/layout/footer';
+import { AuthPage } from '@/components/sections/user/AuthSection';
+import { RegisterPage } from '@/components/sections/user/RegisterSection';
+import { AccountPage } from '@/components/sections/user/AccountSection'
 
-type PageKey = 'categories' | 'generation' | 'recherches' | 'about' | 'lecture';
+type PageKey = 'categories' | 'generation' | 'recherches' | 'about' | 'lecture' | 'login' | 'register' | 'acount';
 
 export default function Page() {
   const [currentPage, setCurrentPage] = useState<PageKey>('categories');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [currentTrackId, setCurrentTrackId] = useState<string | null>(null);
 
-  // 🔥 Détection device au montage
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 768) {
@@ -61,15 +63,13 @@ export default function Page() {
   const renderPage = (): ReactNode => {
     const pages: Record<PageKey, ReactNode> = {
       categories: <HomePage onCategoryClick={() => goToLecture('default')} />,
-      generation: (
-        <GenerationPage
-          onBack={handleGenerationBack}
-          onComplete={handleGenerationComplete}
-        />
-      ),
+      generation: <GenerationPage onBack={handleGenerationBack} onComplete={handleGenerationComplete} />,
       recherches: <SearchPage onTrackClick={goToLecture} />,
       about: <AboutPage />,
       lecture: <HomePage onCategoryClick={() => goToLecture('default')} />,
+      login: <AuthPage onLoginSuccess={() => setCurrentPage('categories')} onSwitchToRegister={() => setCurrentPage('register')} />,
+      register: <RegisterPage onRegisterSuccess={() => setCurrentPage('categories')} onSwitchToLogin={() => setCurrentPage('login')} />,
+      acount: <AccountPage />
     };
 
     return pages[currentPage];
