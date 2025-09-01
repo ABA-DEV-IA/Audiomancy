@@ -5,36 +5,16 @@ Tests the POST /generate/playlist endpoint with different scenarios:
 - ✅ Normal case: agent generates tags and Jamendo returns a valid playlist.
 - ⚠️ Edge case: Jamendo returns no tracks for the given tags.
 - ❌ Failure case: the AI agent crashes, and the API responds with a 500 error.
-
-These tests use unittest.mock to patch the ai_executor (tag generation)
-and get_tracks_for_reader (Jamendo service) functions, ensuring that
-no real AI or external API calls are made during testing.
+- 🚫 Validation case: invalid limit triggers 422 Unprocessable Entity.
 """
 
 import pytest
-from fastapi.testclient import TestClient
 from unittest.mock import patch
-from app.main import app
 
-client = TestClient(app)
 
 @pytest.fixture
 def fake_tracks():
-    """
-    Returns a list of dictionaries representing fake tracks.
-    
-    Each dictionary represents a track and contains the following fields:
-    - id: str
-    - title: str
-    - artist: str
-    - audio_url: str
-    - duration: int
-    - license_name: str
-    - license_url: str
-    - tags: List[str]
-    - image: str
-    """
-
+    """Returns a list of dictionaries representing fake tracks."""
     return [
         {
             "id": "1",
@@ -50,14 +30,14 @@ def fake_tracks():
     ]
 
 
-def test_generate_playlist_success(fake_tracks):
+def test_generate_playlist_success(api_client, fake_tracks):
     """✅ Normal case : agent generates tags and Jamendo returns a playlist"""
     with patch("app.routes.ai_routes.ai_executor", return_value="calm,study"), \
          patch("app.routes.ai_routes.get_tracks_for_reader", return_value=fake_tracks):
 
-        response = client.post(
+        response = api_client.post(
             "/generate/playlist",
-            json={"prompt": "Je veux une playlist calme", "limit": 1}
+            json={"prompt": "Je veux une playlist calme", "limit": 10}
         )
 
         assert response.status_code == 200
@@ -67,14 +47,14 @@ def test_generate_playlist_success(fake_tracks):
         assert "study" in data[0]["tags"]
 
 
-def test_generate_playlist_empty():
+def test_generate_playlist_empty(api_client):
     """⚠️ Cases where Jamendo does not return any tracks"""
     with patch("app.routes.ai_routes.ai_executor", return_value="calm,study"), \
          patch("app.routes.ai_routes.get_tracks_for_reader", return_value=[]):
 
-        response = client.post(
+        response = api_client.post(
             "/generate/playlist",
-            json={"prompt": "Je veux une playlist calme", "limit": 1}
+            json={"prompt": "Je veux une playlist calme", "limit": 10}
         )
 
         assert response.status_code == 200
@@ -82,12 +62,26 @@ def test_generate_playlist_empty():
         assert isinstance(data, list)
         assert data == []
 
-def test_generate_playlist_agent_failure():
+
+def test_generate_playlist_agent_failure(api_client):
     """❌ Case where the agent crashes"""
     with patch("app.routes.ai_routes.ai_executor", side_effect=Exception("Agent crashed")):
-        response = client.post(
+        response = api_client.post(
             "/generate/playlist",
-            json={"prompt": "Je veux une playlist calme", "limit": 1}
+            json={"prompt": "Je veux une playlist calme", "limit": 10}
         )
 
         assert response.status_code == 500
+
+
+def test_generate_playlist_invalid_limit(api_client):
+    """🚫 Case where 'limit' is invalid -> FastAPI/Pydantic should return 422"""
+    response = api_client.post(
+        "/generate/playlist",
+        json={"prompt": "Une playlist impossible", "limit": 1}  # ❌ not in {10, 25, 50}
+    )
+
+    assert response.status_code == 422
+    data = response.json()
+    assert data["detail"][0]["msg"] == "Value error, limit must be one of 10, 25, or 50"
+    assert data["detail"][0]["loc"][-1] == "limit"

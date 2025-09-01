@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 export function Footer() {
   const socialLinks = [
     {
-      name: 'GitHub', icon: Github, href: 'https://github.com/aruide/Audiomancy', color: '#4CE0B3',
+      name: 'GitHub', icon: Github, href: 'https://github.com/ABA-DEV-IA/Audiomancy', color: '#4CE0B3',
     },
     {
       name: 'Twitter', icon: Twitter, href: '#', color: '#A3D5FF',
