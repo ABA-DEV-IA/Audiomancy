@@ -1,7 +1,6 @@
 import pytest
 from unittest.mock import patch, MagicMock
 from azure.core.exceptions import AzureError
-
 from app.core.config import Settings, to_snake_case
 
 
@@ -45,8 +44,11 @@ def test_load_from_key_vault_with_cache():
 @patch("app.core.config.DefaultAzureCredential")
 def test_load_from_key_vault_success(mock_credential, mock_secret_client):
     """Should load secrets from Key Vault when available."""
-    # Fake secret properties
-    fake_secret_props = [MagicMock(name="AZURE-OPENAI-API-KEY")]
+    # Create a mock secret with a real .name attribute
+    secret_mock = MagicMock()
+    secret_mock.name = "AZURE-OPENAI-API-KEY"
+    fake_secret_props = [secret_mock]
+
     fake_client = MagicMock()
     fake_client.list_properties_of_secrets.return_value = fake_secret_props
     fake_client.get_secret.return_value.value = "supersecret"

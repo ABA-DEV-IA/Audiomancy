@@ -1,6 +1,6 @@
-# tests/test_blob_tools.py
 import pytest
 from unittest.mock import patch, MagicMock
+from azure.core.exceptions import ResourceNotFoundError, ResourceExistsError
 from app.utils import blob_tools
 
 
@@ -18,7 +18,8 @@ class TestBlobOperations:
     def test_create_container_if_not_exists(self, mock_blob_service):
         mock_container_client = MagicMock()
         mock_blob_service.get_container_client.return_value = mock_container_client
-        mock_container_client.get_container_properties.side_effect = Exception("Not found")
+        # Simulate container does not exist
+        mock_container_client.get_container_properties.side_effect = ResourceNotFoundError("Not found")
         blob_tools.create_container_if_not_exists("test-container")
         mock_container_client.create_container.assert_called_once()
 
@@ -27,8 +28,8 @@ class TestBlobOperations:
         mock_blob_service.get_container_client.return_value = mock_container_client
         mock_blob_client = MagicMock()
         mock_container_client.get_blob_client.return_value = mock_blob_client
-        mock_blob_client.upload_blob.side_effect = Exception("Already exists")
-        
+        # Simulate blob already exists
+        mock_blob_client.upload_blob.side_effect = ResourceExistsError("Already exists")
         # Should not raise when overwrite=False
         blob_tools.upload_blob("cache/test.json", "data", overwrite=False)
 
