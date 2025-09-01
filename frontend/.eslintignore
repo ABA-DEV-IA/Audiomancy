@@ -1,0 +1,9 @@
+# Ignorer un fichier précis
+src/pages/secret.tsx
+
+# Ignorer un dossier entier
+components/ui/
+
+# Ignorer tous les fichiers générés
+.next/
+dist/

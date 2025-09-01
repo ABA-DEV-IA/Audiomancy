@@ -14,6 +14,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.routes.jamendo_routes import router as jamendo_router
 from app.routes.ai_routes import router as ai_router
+from app.routes.user_routes import router as user_router
+from app.routes.favorite_routes import router as favorite_router
 from app.core.security import get_api_key
 from app.routes.speech_token_routes import router as speech_router
 
@@ -40,4 +42,6 @@ app.add_middleware(
 # Inclure les routes avec dépendance globale API Key
 app.include_router(jamendo_router, dependencies=[Depends(get_api_key)])
 app.include_router(ai_router, dependencies=[Depends(get_api_key)])
+app.include_router(user_router, dependencies=[Depends(get_api_key)])
+app.include_router(favorite_router, dependencies=[Depends(get_api_key)])
 app.include_router(speech_router, dependencies=[Depends(get_api_key)])
