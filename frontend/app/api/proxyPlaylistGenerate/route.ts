@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import config from "@/lib/config";
+import { getConfig } from "@/lib/config";
 
 export async function POST(request: Request) {
-  const { fastApiUrl, fastApiKey } = config;
+  const { fastApiUrl, fastApiKey } = getConfig();
 
   const body = await request.json();
 

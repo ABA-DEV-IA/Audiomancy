@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import Config from "@/lib/config";
+import { getConfig } from "@/lib/config";
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const { fastApiUrl, fastApiKey } = Config;
+  const { fastApiUrl, fastApiKey } = getConfig();
 
   if (!fastApiUrl || !fastApiKey) {
     return NextResponse.json({ error: "Server misconfiguration" }, { status: 500 });

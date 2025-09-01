@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import config from "@/lib/config";
+import { getConfig } from "@/lib/config";
 
 export async function POST(request: Request) {
-  const { speechKey, speechRegion, fastApiUrl, fastApiKey } = config;
+  const { speechKey, speechRegion, fastApiUrl, fastApiKey } = getConfig();
 
   if (!speechKey || !speechRegion) {
     return NextResponse.json(
