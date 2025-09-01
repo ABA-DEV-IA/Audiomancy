@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
+import { getConfig } from "@/lib/config";
 
-const FASTAPI_URL = process.env.FASTAPI_URL;
-const FASTAPI_KEY = process.env.FASTAPI_KEY;
 
 export async function GET(request: Request) {
-  if (!FASTAPI_URL || !FASTAPI_KEY) {
+  const { fastApiUrl, fastApiKey } = getConfig();
+  if (!fastApiUrl || !fastApiKey) {
     return NextResponse.json({ error: "Server misconfiguration" }, { status: 500 });
   }
 
@@ -17,11 +17,11 @@ export async function GET(request: Request) {
     }
 
     // Appel FastAPI
-    const res = await fetch(`${FASTAPI_URL}/favorite/list/${user_id}`, {
+    const res = await fetch(`${fastApiUrl}/favorite/list/${user_id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "X-API-KEY": FASTAPI_KEY,
+        "X-API-KEY": fastApiKey,
       },
     });
 

@@ -1,11 +1,10 @@
 import { NextResponse } from "next/server";
-
-const FASTAPI_URL = process.env.FASTAPI_URL;
-const FASTAPI_KEY = process.env.FASTAPI_KEY;
+import { getConfig } from "@/lib/config";
 
 
 export async function DELETE(request: Request, { params }: { params: { favorite_id: string }}) {
-  if (!FASTAPI_URL || !FASTAPI_KEY) {
+  const { fastApiUrl, fastApiKey } = getConfig();
+  if (!fastApiUrl || !fastApiKey) {
     return NextResponse.json({ error: "Server misconfiguration" }, { status: 500 });
   }
 
@@ -14,11 +13,11 @@ export async function DELETE(request: Request, { params }: { params: { favorite_
   if (!user_id) return NextResponse.json({ error: "user_id manquant" }, { status: 400 });
 
   try {
-    const res = await fetch(`${FASTAPI_URL}/favorite/delete/${params.favorite_id}?user_id=${user_id}`, {
+    const res = await fetch(`${fastApiUrl}/favorite/delete/${params.favorite_id}?user_id=${user_id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        "X-API-KEY": FASTAPI_KEY,
+        "X-API-KEY": fastApiKey,
       },
     });
 
