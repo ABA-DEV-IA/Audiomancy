@@ -3,8 +3,7 @@ Application configuration module.
 
 Loads application settings from environment variables via `.env` file for development
 and optionally overrides them with secrets from Azure Key Vault in production.
-
-This includes API keys, endpoints, and CORS configuration.
+Supports caching secrets in memory to avoid repeated Key Vault calls.
 
 Attributes:
     settings (Settings): Singleton instance containing all loaded configuration values.
@@ -36,6 +35,8 @@ class Settings(BaseSettings):
     Loads values from `.env` for local development and can override with Azure Key Vault
     secrets when `azure_key_vault_url` is provided. Provides a property to get CORS origins
     as a list for FastAPI middleware.
+
+    Secrets from Key Vault are cached in-memory per container instance to avoid multiple requests.
     """
 
     # Comma-separated string for allowed CORS origins
@@ -50,15 +51,25 @@ class Settings(BaseSettings):
     jamendo_url: Optional[str] = None
     speech_key: Optional[str] = None
     speech_region: Optional[str] = None
+    cache_blob_name: Optional[str] = None
     azure_storage_connection_string: Optional[str] = None
 
     api_key: Optional[str] = None
     swagger_on: bool = False
 
+    mongo_host: Optional[str] = None
+    mongo_port: Optional[str] = None
+    mongo_username: Optional[str] = None
+    mongo_password: Optional[str] = None
+    mongo_db_name: Optional[str] = None
+
+    # Internal cache for Key Vault secrets
+    _secrets_cache: dict = {}
+
     # Pydantic settings configuration: read from .env, ignore extra keys
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
-    def load_from_key_vault(self) -> None:
+    def load_from_key_vault(self, force_reload: bool = False) -> None:
         """
         Override settings with secrets from Azure Key Vault if available.
 
@@ -66,10 +77,22 @@ class Settings(BaseSettings):
         or developer credentials (if running locally with Azure CLI). Each secret in Key Vault
         is injected into the settings if the attribute exists.
 
-        If no Key Vault URL is provided, falls back to .env values.
+        Args:
+            force_reload (bool): If True, reload secrets from Key Vault even if cached.
+
+        Notes:
+            Secrets are cached in `_secrets_cache` to avoid multiple Key Vault calls
+            per container runtime. Cache persists as long as the container is running.
         """
         if not self.azure_key_vault_url:
             print("[INFO] No Key Vault URL provided. Using .env only.")
+            return
+
+        if self._secrets_cache and not force_reload:
+            # Load from cache
+            for key, value in self._secrets_cache.items():
+                setattr(self, key, value)
+            print("[INFO] Configuration loaded from cache.")
             return
 
         try:
@@ -79,12 +102,15 @@ class Settings(BaseSettings):
                 credential=credential
             )
 
+            new_cache = {}
             for secret_props in client.list_properties_of_secrets():
                 key = to_snake_case(secret_props.name)
                 value = client.get_secret(secret_props.name).value
                 if hasattr(self, key):
                     setattr(self, key, value)
+                    new_cache[key] = value
 
+            self._secrets_cache = new_cache
             print("[INFO] Configuration successfully loaded from Azure Key Vault.")
 
         except AzureError as error:

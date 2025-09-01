@@ -1,21 +1,20 @@
 import { NextResponse } from "next/server";
-
-const FASTAPI_URL = process.env.FASTAPI_URL;
-const FASTAPI_KEY = process.env.FASTAPI_KEY;
+import { getConfig } from "@/lib/config";
 
 export async function POST(request: Request) {
   const body = await request.json();
-  console.log(JSON.stringify(body));
-  if (!FASTAPI_URL || !FASTAPI_KEY) {
+  const { fastApiUrl, fastApiKey } = getConfig();
+  
+  if (!fastApiUrl || !fastApiKey) {
     return NextResponse.json({ error: "Server misconfiguration" }, { status: 500 });
   }
 
   try {
-    const res = await fetch(`${FASTAPI_URL}/jamendo/tracks`, {
+    const res = await fetch(`${fastApiUrl}/jamendo/tracks`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-API-KEY": FASTAPI_KEY,
+        "X-API-KEY": fastApiKey,
       },
       body: JSON.stringify(body),
     });
