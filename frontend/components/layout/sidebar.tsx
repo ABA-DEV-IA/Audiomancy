@@ -37,6 +37,11 @@ export function Sidebar({
     { id: "acount", label: "Mon profil", icon: User }
   ]
 
+  const handleLogout = () => {
+    logout() 
+    onPageChange("login")
+  }
+
   return (
     <div
       className={`fixed top-0 left-0 h-full bg-[#F2E9E4] border-r border-gray-300 transition-all duration-300
@@ -103,7 +108,7 @@ export function Sidebar({
           <Button
             variant="destructive"
             className="w-full"
-            onClick={logout}
+            onClick={handleLogout}
           >
             Déconnexion
           </Button>
