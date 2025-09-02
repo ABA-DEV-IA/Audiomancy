@@ -7,4 +7,5 @@ export interface PlayerPageProps {
   currentTrackIndex: number;
   onSelectTrack: (index: number) => void;
   audioRef: RefObject<HTMLAudioElement>;
+  isFavorite?: Boolean;
 }
