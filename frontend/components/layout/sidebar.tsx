@@ -1,7 +1,7 @@
 'use client';
 
 import {
-  Home, Sparkles, Search, Info, Menu, LogIn, UserPlus, User
+  Home, Sparkles, Search, Info, Menu, LogIn, UserPlus, User, LogOut 
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth_context';
@@ -38,7 +38,7 @@ export function Sidebar({
   ]
 
   const handleLogout = () => {
-    logout() 
+    logout()
     onPageChange("login")
   }
 
@@ -72,9 +72,8 @@ export function Sidebar({
             <Button
               key={item.id}
               variant={currentPage === item.id ? 'secondary' : 'ghost'}
-              className={`w-full justify-start mb-2 text-[#2B2B2B] hover:bg-[#D9B3FF] hover:text-[#6A0DAD] ${
-                !isOpen ? 'px-2' : ''
-              } ${currentPage === item.id ? 'bg-[#D9B3FF] text-[#6A0DAD]' : ''}`}
+              className={`w-full justify-start mb-2 text-[#2B2B2B] hover:bg-[#D9B3FF] hover:text-[#6A0DAD] ${!isOpen ? 'px-2' : ''
+                } ${currentPage === item.id ? 'bg-[#D9B3FF] text-[#6A0DAD]' : ''}`}
               onClick={() => onPageChange(item.id)}
             >
               <Icon className="h-5 w-5" />
@@ -84,58 +83,59 @@ export function Sidebar({
         })}
       </nav>
 
-      <div className="p-4 border-t border-gray-300">
+      <span className="p-2 border-t border-gray-300"></span>
+
+        {isOpen && (
           <h3 className="text-sm font-medium text-[#6A0DAD] px-3 mb-2">Compte</h3>
+        )}
 
         {isAuthenticated ? (
-        <nav className="px-2 flex-1">
-        {userItems.map((item) => {
-          const Icon = item.icon;
-          return (
+          <nav className="px-2">
+            {userItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Button
+                  key={item.id}
+                  variant={currentPage === item.id ? 'secondary' : 'ghost'}
+                  className={`w-full justify-start mb-2 text-[#2B2B2B] hover:bg-[#D9B3FF] hover:text-[#6A0DAD] ${!isOpen ? 'px-2' : ''
+                    } ${currentPage === item.id ? 'bg-[#D9B3FF] text-[#6A0DAD]' : ''}`}
+                  onClick={() => onPageChange(item.id)}
+                >
+                  <Icon className="h-5 w-5" />
+                  {isOpen && <span className="ml-3">{item.label}</span>}
+                </Button>
+              );
+            })}
             <Button
-              key={item.id}
-              variant={currentPage === item.id ? 'secondary' : 'ghost'}
-              className={`w-full justify-start mb-2 text-[#2B2B2B] hover:bg-[#D9B3FF] hover:text-[#6A0DAD] ${
-                !isOpen ? 'px-2' : ''
-              } ${currentPage === item.id ? 'bg-[#D9B3FF] text-[#6A0DAD]' : ''}`}
-              onClick={() => onPageChange(item.id)}
+              variant="destructive"
+              className="w-full justify-start"
+              onClick={handleLogout}
             >
-              <Icon className="h-5 w-5" />
-              {isOpen && <span className="ml-3">{item.label}</span>}
+              <LogOut  className="h-5 w-5" />
+              {isOpen && <span className="ml-3">Déconnexion</span>}
             </Button>
-          );
-        })}
-          <Button
-            variant="destructive"
-            className="w-full"
-            onClick={handleLogout}
-          >
-            Déconnexion
-          </Button>
-      </nav>
-            
+          </nav>
 
         ) : (
-        <nav className="px-2 flex-1">
-        {authItems.map((item) => {
-          const Icon = item.icon;
-          return (
-            <Button
-              key={item.id}
-              variant={currentPage === item.id ? 'secondary' : 'ghost'}
-              className={`w-full justify-start mb-2 text-[#2B2B2B] hover:bg-[#D9B3FF] hover:text-[#6A0DAD] ${
-                !isOpen ? 'px-2' : ''
-              } ${currentPage === item.id ? 'bg-[#D9B3FF] text-[#6A0DAD]' : ''}`}
-              onClick={() => onPageChange(item.id)}
-            >
-              <Icon className="h-5 w-5" />
-              {isOpen && <span className="ml-3">{item.label}</span>}
-            </Button>
-          );
-        })}
-      </nav>
+          <nav className="px-2">
+            {authItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Button
+                  key={item.id}
+                  variant={currentPage === item.id ? 'secondary' : 'ghost'}
+                  className={`w-full justify-start mb-2 text-[#2B2B2B] hover:bg-[#D9B3FF] hover:text-[#6A0DAD] ${!isOpen ? 'px-2' : ''
+                    } ${currentPage === item.id ? 'bg-[#D9B3FF] text-[#6A0DAD]' : ''}`}
+                  onClick={() => onPageChange(item.id)}
+                >
+                  <Icon className="h-5 w-5" />
+                  {isOpen && <span className="ml-3">{item.label}</span>}
+                </Button>
+              );
+            })}
+          </nav>
         )}
-      </div>
+      
     </div>
   );
 }
