@@ -6,10 +6,6 @@ the returned data is correctly structured and complete.
 """
 
 import pytest
-from fastapi.testclient import TestClient
-from app.main import app
-
-client = TestClient(app)
 
 
 @pytest.fixture(autouse=True)
@@ -34,14 +30,14 @@ def mock_fetch_tracks(monkeypatch):
     monkeypatch.setattr("app.services.jamendo.jamendo_service.fetch_tracks", fake_fetch_tracks)
 
 
-def test_generate_tracks_success():
+def test_generate_tracks_success(api_client):
     payload = {
         "tags": "magic fantasy cinematic",
         "duration_min": 180,
         "duration_max": 480,
         "limit": 10
     }
-    response = client.post("/jamendo/tracks", json=payload)
+    response = api_client.post("/jamendo/tracks", json=payload)
     assert response.status_code == 200
     data = response.json()
     assert isinstance(data, list)

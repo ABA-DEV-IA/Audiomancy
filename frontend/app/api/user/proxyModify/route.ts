@@ -1,22 +1,20 @@
 import { NextResponse } from "next/server";
-
-const FASTAPI_URL = process.env.FASTAPI_URL;
-const FASTAPI_KEY = process.env.FASTAPI_KEY;
-
+import { getConfig } from "@/lib/config";
 
 export async function PUT(request: Request) {
   const body = await request.json();
+  const { fastApiUrl, fastApiKey } = getConfig();
 
-  if (!FASTAPI_URL || !FASTAPI_KEY) {
+  if (!fastApiUrl || !fastApiKey) {
     return NextResponse.json({ error: "Server misconfiguration" }, { status: 500 });
   }
 
   try {
-    const res = await fetch(`${FASTAPI_URL}/user/modify`, {
+    const res = await fetch(`${fastApiUrl}/user/modify`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        "X-API-KEY": FASTAPI_KEY,
+        "X-API-KEY": fastApiKey,
       },
       body: JSON.stringify(body),
     });

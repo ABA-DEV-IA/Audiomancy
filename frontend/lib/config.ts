@@ -1,6 +1,13 @@
-// lib/config.ts
-import { SecretClient } from "@azure/keyvault-secrets";
-import { DefaultAzureCredential } from "@azure/identity";
+/**
+ * Application configuration management.
+ *
+ * This module provides a helper function to safely retrieve environment
+ * variables and a `getConfig` function that loads them lazily at runtime.
+ *
+ * Benefits:
+ * - Prevents Next.js build from failing when env vars are missing.
+ * - Still enforces strict validation at runtime in production.
+ */
 
 type Config = {
   speechKey: string;
@@ -9,49 +16,36 @@ type Config = {
   fastApiKey: string;
 };
 
-const baseConfig: Config = {
-  speechKey: process.env.SPEECH_KEY || "",
-  speechRegion: process.env.SPEECH_REGION || "",
-  fastApiUrl: process.env.FASTAPI_URL || "",
-  fastApiKey: process.env.API_KEY || "",
-};
-
-let loadedConfig: Config | null = null;
-
-export async function getConfig(): Promise<Config> {
-  if (loadedConfig) return loadedConfig;
-
-  const config: Config = { ...baseConfig };
-  const keyVaultUrl = process.env.AZURE_KEY_VAULT_URL;
-
-  if (keyVaultUrl) {
-    try {
-      const credential = new DefaultAzureCredential();
-      const client = new SecretClient(keyVaultUrl, credential);
-
-      const secretMap: Record<string, keyof Config> = {
-        "api-key": "fastApiKey",
-        "fastapi-url": "fastApiUrl",
-        "speech-key": "speechKey",
-        "speech-region": "speechRegion",
-      };
-
-      for await (const secretProperties of client.listPropertiesOfSecrets()) {
-        const rawName = secretProperties.name.toLowerCase();
-        const targetKey = secretMap[rawName];
-
-        if (targetKey) {
-          const secretValue = (await client.getSecret(secretProperties.name)).value;
-          if (secretValue) {
-            config[targetKey] = secretValue;
-          }
-        }
-      }
-    } catch (err) {
-      console.warn("[WARNING] Could not load secrets from Key Vault:", err);
+/**
+ * Retrieve an environment variable safely.
+ *
+ * @param name - The name of the environment variable.
+ * @param required - Whether the variable must be present.
+ * @returns The variable value or a dummy value in non-production builds.
+ * @throws Error if the variable is missing in production and marked as required.
+ */
+function getEnvVar(name: string, required = true): string {
+  const value = process.env[name];
+  if (!value) {
+    if (required && process.env.NODE_ENV === "production") {
+      throw new Error(`[CONFIG ERROR] Missing required environment variable: ${name}`);
     }
+    // Provide a fallback during build or development
+    return "dummy";
   }
+  return value;
+}
 
-  loadedConfig = config;
-  return config;
+/**
+ * Load application configuration lazily at runtime.
+ *
+ * @returns Config object containing required environment variables.
+ */
+export function getConfig(): Config {
+  return {
+    speechKey: getEnvVar("SPEECH_KEY"),
+    speechRegion: getEnvVar("SPEECH_REGION"),
+    fastApiUrl: getEnvVar("FASTAPI_URL"),
+    fastApiKey: getEnvVar("API_KEY"),
+  };
 }

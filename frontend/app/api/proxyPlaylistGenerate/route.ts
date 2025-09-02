@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getConfig } from "@/lib/config";
 
 export async function POST(request: Request) {
-  const { speechKey, speechRegion, fastApiUrl, fastApiKey } = await getConfig();
+  const { fastApiUrl, fastApiKey } = getConfig();
 
   const body = await request.json();
 

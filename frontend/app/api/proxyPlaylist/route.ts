@@ -3,9 +3,8 @@ import { getConfig } from "@/lib/config";
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const { speechKey, speechRegion, fastApiUrl, fastApiKey } = await getConfig();
-  console.log(fastApiKey);
-  console.log(fastApiUrl);
+  const { fastApiUrl, fastApiKey } = getConfig();
+  
   if (!fastApiUrl || !fastApiKey) {
     return NextResponse.json({ error: "Server misconfiguration" }, { status: 500 });
   }

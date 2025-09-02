@@ -32,7 +32,8 @@ jobs:
       - name: Install dependencies
         run: |
           cd frontend
-          npm ci
+          echo "Trying npm ci..."
+          npm ci || (echo "npm ci failed, running npm install instead" && npm install)
 
       # Setup Docker Buildx
       - name: Set up Docker Buildx

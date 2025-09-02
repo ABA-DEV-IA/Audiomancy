@@ -12,7 +12,10 @@ MONGO_USERNAME = settings.mongo_username
 MONGO_PASSWORD = settings.mongo_password
 MONGO_DBNAME = settings.mongo_db_name
 
-MONGO_URL = f"mongodb://{MONGO_USERNAME}:{MONGO_PASSWORD}@{MONGO_HOST}:{MONGO_PORT}/?ssl=true&replicaSet=globaldb&retrywrites=false"
+if MONGO_USERNAME and MONGO_PASSWORD:
+    MONGO_URL = f"mongodb://{MONGO_USERNAME}:{MONGO_PASSWORD}@{MONGO_HOST}:{MONGO_PORT}/?ssl=true&replicaSet=globaldb&retrywrites=false"
+else:
+    MONGO_URL = f"mongodb://{MONGO_HOST}:{MONGO_PORT}"
 
 # Initialize client and database
 client = AsyncIOMotorClient(MONGO_URL)
