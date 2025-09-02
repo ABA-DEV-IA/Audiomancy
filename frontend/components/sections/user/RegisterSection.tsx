@@ -43,7 +43,8 @@ export function RegisterPage({ onRegisterSuccess, onSwitchToLogin }: RegisterPag
       login(user);
       onRegisterSuccess();
     } catch (err: any) {
-      setError(err.message || "Échec de l'inscription");
+      console.log(err);
+      setError("Erreur: " + err.detail || "Échec de l'inscription");
     } finally {
       setIsLoading(false);
     }

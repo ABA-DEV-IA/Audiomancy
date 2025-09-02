@@ -11,8 +11,8 @@ async function fetchJson<T>(url: string, body: Record<string, unknown>): Promise
   });
 
   if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`API error ${response.status}: ${errorText}`);
+    const data = await response.json();
+    throw data;
   }
 
   return response.json() as Promise<T>;
@@ -27,8 +27,8 @@ async function fetchJsonPUT<T>(url: string, body: Record<string, unknown>): Prom
   });
 
   if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`API error ${response.status}: ${errorText}`);
+    const data = await response.json();
+    throw data;
   }
 
   return response.json() as Promise<T>;
