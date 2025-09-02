@@ -11,6 +11,10 @@ interface CategoryCardProps {
   onClick?: () => void;
 }
 
+/**
+ * CategoryCard component displays a category with a background image,
+ * title, description, and optional subtitle.
+ */
 export function CategoryCard({ category, onClick }: CategoryCardProps) {
   const [bgImage, setBgImage] = useState(DEFAULT_CATEGORY_BG);
 
@@ -28,7 +32,7 @@ export function CategoryCard({ category, onClick }: CategoryCardProps) {
       onClick={onClick}
     >
       <CardContent className="p-0 relative h-48">
-        {/* Background */}
+        {/* Background image */}
         <div
           className="absolute inset-0 bg-cover bg-center transition-all duration-300 group-hover:scale-110"
           style={{
@@ -45,19 +49,21 @@ export function CategoryCard({ category, onClick }: CategoryCardProps) {
               <h3 className="font-bold text-2xl text-white mb-2 drop-shadow-lg">
                 {category.title}
               </h3>
-              <p className="text-[#D9B3FF] text-sm font-medium drop-shadow-md">
-                {category.description}
-              </p>
+              {category.description && (
+                <p className="text-[#D9B3FF] text-sm font-medium drop-shadow-md">
+                  {category.description}
+                </p>
+              )}
             </div>
           </div>
-          {category.description && (
+          {category.subtitle && (
             <p className="text-sm text-[#FF934F] italic font-medium drop-shadow-md">
-              {category.description}
+              {category.subtitle}
             </p>
           )}
         </div>
 
-        {/* Hover effect */}
+        {/* Hover shine effect */}
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
       </CardContent>
     </Card>

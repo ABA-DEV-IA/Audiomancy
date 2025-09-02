@@ -3,48 +3,48 @@
     "mood": [
       {
         "title": "Peps",
-        "subtitle": "(musique de fond)",
-        "image": "/images/peps-bg.png",
+        "subtitle": "(énergie et bonne humeur)",
+        "image": "/images/icon/peps-bg.png",
         "description": "Énergie et dynamisme",
         "id": "peps",
         "tags": "dance disco funk happy upbeat uplifting electrofunk house pop party"
       },
       {
         "title": "Défouloir",
-        "subtitle": "(musique de fond)",
-        "image": "/images/defouloir-bg.png",
+        "subtitle": "(intensité brute)",
+        "image": "/images/icon/defouloir-bg.png",
         "description": "Puissance et intensité",
         "id": "let_off_steam",
         "tags": "hardcore hardcorepunk deathmetal thrashmetal industrialmetal metal grindcore punk aggressive industrialrock"
       },
       {
         "title": "Sortez les mouchoirs",
-        "subtitle": "(musique de fond)",
-        "image": "/images/mouchoirs-bg.png",
+        "subtitle": "(émotion à fleur de peau)",
+        "image": "/images/icon/mouchoirs-bg.png",
         "description": "Émotion et mélancolie",
         "id": "melancholy",
         "tags": "melancholic sad sentimental introspective ballad douxamer emotional tender calm nostalgie"
       },
       {
         "title": "Collé-serré",
-        "subtitle": "(musique de fond)",
-        "image": "/images/colle-serre-bg.png",
+        "subtitle": "(romance et proximité)",
+        "image": "/images/icon/colle-serre-bg.png",
         "description": "Romance et intimité",
         "id": "close_dance",
         "tags": "romantic love soul jazz singersongwriter smooth rnb crooner poprock intimate"
       },
       {
         "title": "Just do it !",
-        "subtitle": "(musique de fond)",
-        "image": "/images/justdoit-bg.png",
+        "subtitle": "(boost et motivation)",
+        "image": "/images/icon/justdoit-bg.png",
         "description": "Motivation et inspiration",
         "id": "just_do_it",
         "tags": "motivational energetic powerful uplifting inspirational upbeat progressiverock symphonic epic corporate"
       },
       {
         "title": "Pour se faire peur",
-        "subtitle": "(musique de fond)",
-        "image": "/images/horror-bg.png",
+        "subtitle": "(frissons garantis)",
+        "image": "/images/icon/horror-bg.png",
         "description": "Frissons et suspense",
         "id": "scary",
         "tags": "horror darkambient darkwave scary thriller gothic mystery suspense cinematic soundtrack"
@@ -53,8 +53,8 @@
     "activity": [
       {
         "title": "Travail",
-        "subtitle": "(concentration)",
-        "image": "/images/bulby.jpg",
+        "subtitle": "(focus et concentration)",
+        "image": "/images/icon/productivity-bg.png",
         "description": "Musique pour rester productif",
         "id": "work",
         "tags": "ambient classical contemporarypiano lofi relaxing instru neoclassical newage peaceful calm"
@@ -62,7 +62,7 @@
       {
         "title": "Lecture",
         "subtitle": "(calme et sérénité)",
-        "image": "/images/reading-bg.png",
+        "image": "/images/icon/reading-bg.png",
         "description": "Accompagnement sonore pour vos livres",
         "id": "reading",
         "tags": "ambient classical contemporarypiano lofi relaxing instru neoclassical newage peaceful calm"
@@ -70,7 +70,7 @@
       {
         "title": "Cuisine",
         "subtitle": "(ambiance culinaire)",
-        "image": "/images/cuisine-bg.png",
+        "image": "/images/icon/cuisine-bg.png",
         "description": "Rythmes pour accompagner vos plats",
         "id": "cooking",
         "tags": "jazz bossa nova latin jazzycool groovy swing funk easylistening upbeat vibes"
@@ -78,15 +78,15 @@
       {
         "title": "Faire la fête",
         "subtitle": "(ambiance festive)",
-        "image": "/images/party-bg.png",
+        "image": "/images/icon/party-bg.png",
         "description": "Boostez vos soirées avec du bon son",
         "id": "party",
         "tags": "dance house electrofunk disco techno reggaeton party clubbing eurodance"
       },
       {
         "title": "Gaming",
-        "subtitle": "(musique de jeu)",
-        "image": "/images/gaming-bg.png",
+        "subtitle": "(adrénaline et immersion)",
+        "image": "/images/icon/gaming-bg.png",
         "description": "Énergie et immersion pour vos sessions de jeu",
         "id": "gaming",
         "tags": "8bit videogame synthwave industrial drumnbass trance dub idm electronic"
@@ -94,15 +94,15 @@
       {
         "title": "Sport",
         "subtitle": "(rythme et énergie)",
-        "image": "/images/sport-bg.png",
+        "image": "/images/icon/sport-bg.png",
         "description": "Musique pour se dépasser",
         "id": "sport",
         "tags": "techno house hiphop rap drumnbass energetic upbeat motivational trance electropop"
       },
       {
         "title": "Méditation",
-        "subtitle": "(zen et sérénité)",
-        "image": "/images/meditation-bg.png",
+        "subtitle": "(zen et détente)",
+        "image": "/images/icon/meditation-bg.png",
         "description": "Sonorités pour apaiser l'esprit",
         "id": "meditation",
         "tags": "ambient drone world meditative relaxing peaceful newage ethnique soundscape"
@@ -110,7 +110,7 @@
       {
         "title": "Randonnée",
         "subtitle": "(nature et évasion)",
-        "image": "/images/randonnee-bg.png",
+        "image": "/images/icon/randonnee-bg.png",
         "description": "Ambiance musicale pour vos balades",
         "id": "hiking",
         "tags": "folk acoustic singersongwriter americana country nature indie relaxing world acoustic indiepop"
@@ -118,7 +118,7 @@
       {
         "title": "Marche en ville",
         "subtitle": "(rythme urbain)",
-        "image": "/images/marche-ville-bg.png",
+        "image": "/images/icon/marche-ville-bg.png",
         "description": "Bande-son pour vos explorations urbaines",
         "id": "city_walk",
         "tags": "lofi chillout indiepop nujazz soul electropop funk downtempo lounge"
@@ -126,7 +126,7 @@
       {
         "title": "Activités manuelles",
         "subtitle": "(créativité et calme)",
-        "image": "/images/activites-manuelles-bg.png",
+        "image": "/images/icon/activites-manuelles-bg.png",
         "description": "Musique pour vos moments créatifs",
         "id": "crafts",
         "tags": "easylistening ambient chillout contemporarypiano relaxing instru folk lofi peaceful"

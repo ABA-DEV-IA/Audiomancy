@@ -89,12 +89,6 @@ export function HomePage({ onCategoryClick }: HomePageProps = {}) {
       <div className="flex-1 p-4 sm:p-8">
         {renderCategorySection('Mood', categories.mood)}
         {renderCategorySection('Activités', categories.activity)}
-
-        <div className="text-center mt-8">
-          <p className="text-[#FF934F] italic text-sm">
-            (utilise chacun avec la rubrique Activités en dessous)
-          </p>
-        </div>
       </div>
     </div>
   );

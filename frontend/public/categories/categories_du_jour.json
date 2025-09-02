@@ -3,24 +3,24 @@
     "mood": [
       {
         "title": "Collé-serré",
-        "subtitle": "(musique de fond)",
-        "image": "/images/colle-serre-bg.png",
+        "subtitle": "(romance et proximité)",
+        "image": "/images/icon/colle-serre-bg.png",
         "description": "Romance et intimité",
         "id": "close_dance",
         "tags": "romantic love soul jazz singersongwriter smooth rnb crooner poprock intimate"
       },
       {
         "title": "Défouloir",
-        "subtitle": "(musique de fond)",
-        "image": "/images/defouloir-bg.png",
+        "subtitle": "(intensité brute)",
+        "image": "/images/icon/defouloir-bg.png",
         "description": "Puissance et intensité",
         "id": "let_off_steam",
         "tags": "hardcore hardcorepunk deathmetal thrashmetal industrialmetal metal grindcore punk aggressive industrialrock"
       },
       {
         "title": "Sortez les mouchoirs",
-        "subtitle": "(musique de fond)",
-        "image": "/images/mouchoirs-bg.png",
+        "subtitle": "(émotion à fleur de peau)",
+        "image": "/images/icon/mouchoirs-bg.png",
         "description": "Émotion et mélancolie",
         "id": "melancholy",
         "tags": "melancholic sad sentimental introspective ballad douxamer emotional tender calm nostalgie"
@@ -30,7 +30,7 @@
       {
         "title": "Lecture",
         "subtitle": "(calme et sérénité)",
-        "image": "/images/reading-bg.png",
+        "image": "/images/icon/reading-bg.png",
         "description": "Accompagnement sonore pour vos livres",
         "id": "reading",
         "tags": "ambient classical contemporarypiano lofi relaxing instru neoclassical newage peaceful calm"
@@ -38,7 +38,7 @@
       {
         "title": "Sport",
         "subtitle": "(rythme et énergie)",
-        "image": "/images/sport-bg.png",
+        "image": "/images/icon/sport-bg.png",
         "description": "Musique pour se dépasser",
         "id": "sport",
         "tags": "techno house hiphop rap drumnbass energetic upbeat motivational trance electropop"
@@ -46,7 +46,7 @@
       {
         "title": "Marche en ville",
         "subtitle": "(rythme urbain)",
-        "image": "/images/marche-ville-bg.png",
+        "image": "/images/icon/marche-ville-bg.png",
         "description": "Bande-son pour vos explorations urbaines",
         "id": "city_walk",
         "tags": "lofi chillout indiepop nujazz soul electropop funk downtempo lounge"
