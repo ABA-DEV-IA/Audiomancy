@@ -7,6 +7,5 @@ export const homeConfig = {
   categoriesSection: {
     title: 'CATÉGORIES',
     subtitle: 'mood',
-    note: '(utilise chacun avec la rubrique Activités en dessous)',
   },
 };
