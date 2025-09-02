@@ -79,7 +79,6 @@ export function FavoritesContainer() {
 
   // Open delete modal
   const handleDelete = (playlist: Playlist) => {
-    console.log("Sélection playlist pour suppression : ", playlist)
     setSelected(playlist);
     setDeleteModalOpen(true);
   };

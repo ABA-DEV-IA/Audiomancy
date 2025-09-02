@@ -75,7 +75,6 @@ export async function deleteFavorite(favorite_id: string, user_id: string): Prom
   });
   if (!response.ok) {
     const text = await response.text();
-    console.log("erreur ici")
     throw new Error(text || `Erreur HTTP ${response.status}`);
   }
 }

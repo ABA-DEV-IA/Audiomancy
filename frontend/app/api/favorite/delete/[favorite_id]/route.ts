@@ -13,7 +13,7 @@ export async function DELETE(request: Request, { params }: { params: { favorite_
   if (!user_id) return NextResponse.json({ error: "user_id manquant" }, { status: 400 });
 
   try {
-    const res = await fetch(`${fastApiUrl}/favorite/delete/${params.favorite_id}`, {
+    const res = await fetch(`${fastApiUrl}/favorite/delete/${params.favorite_id}?user_id=${user_id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",

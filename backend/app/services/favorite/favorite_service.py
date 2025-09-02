@@ -24,11 +24,8 @@ async def create_favorite_service(request: Favorite) -> FavoriteResponse:
         saved_at = datetime.utcnow()
     )
 
-    favorite_dict = favorite.model_dump(by_alias=True)
-    if favorite_dict.get("_id") is None:
-        favorite_dict.pop("_id")
 
-    result = await favorite_collection.insert_one(favorite_dict)
+    result = await favorite_collection.insert_one(favorite.model_dump())
     favorite.id = str(result.inserted_id)
 
 
