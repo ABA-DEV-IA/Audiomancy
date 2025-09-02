@@ -5,8 +5,9 @@ import { formatDuration } from '@/utils/formatDuration';
 import { Track } from '@/types/track';
 import { PlayerPageProps } from '@/types/playerPageProps';
 import { useAuth } from "@/context/auth_context";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CreatePlaylistModal } from "@/components/sections/lecture/create-playlist-modal";
+
 
 
 export default function PlayerPage({
@@ -22,13 +23,32 @@ export default function PlayerPage({
   const { isAuthenticated, user } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const [message, setMessage] = useState<string | null>(null);
+  const [messageType, setMessageType] = useState<'success' | 'error' | null>(null);
+  const [showMessage, setShowMessage] = useState(false);
+
+
   const currentTrack = tracks[currentTrackIndex];
 
+
+  useEffect(() => {
+    if (!message) return;
+
+    setShowMessage(true); // rend visible immédiatement
+
+    const timer = setTimeout(() => {
+      setShowMessage(false); // déclenche le fondu
+      setTimeout(() => {
+        setMessage(null);
+        setMessageType(null);
+      }, 500); // attend la fin de la transition (500ms)
+    }, 5000); // le message reste affiché 5s
+
+    return () => clearTimeout(timer);
+  }, [message]);
+
+
   const openModal = () => {
-    if (!isAuthenticated) {
-      alert("Tu dois être connecté pour ajouter une playlist aux favoris.");
-      return;
-    }
     setIsModalOpen(true);
   };
 
@@ -58,16 +78,19 @@ export default function PlayerPage({
 
       if (!response.ok) {
         const errorData = await response.json();
-        alert("Erreur : " + errorData.detail || "Impossible de créer le favori");
+        setMessage(errorData.detail || "Impossible de créer le favori");
+        setMessageType("error");
         return;
       }
 
       const result = await response.json();
       console.log("Favori créé :", result);
-      alert(`Playlist "${data.name}" ajoutée aux favoris !`);
+      setMessage(`Playlist "${data.name}" ajoutée aux favoris !`);
+      setMessageType("success");
     } catch (err) {
       console.error(err);
-      alert("Une erreur est survenue lors de la création du favori.");
+      setMessage("Une erreur est survenue lors de la création du favori.");
+      setMessageType("error");
     }
   };
 
@@ -81,21 +104,40 @@ export default function PlayerPage({
           <p className="mt-2">Playlist : {playlistId}</p>
           
           {/* BOUTON AJOUT FAVORI */}
-          {!isFavorite && (<button
-            type="button"
-            onClick={openModal}
-            className="mt-3 mr-3 rounded bg-gradient-to-r from-[#4CE0B3] to-[#3AB68B] px-4 py-2 font-semibold text-black hover:scale-105"
-          >
-            Ajouter aux favoris
-          </button>)}
+          <div className="mt-3 flex flex-col sm:flex-row gap-3">
+            {isAuthenticated && !isFavorite && (
+              <button
+                type="button"
+                onClick={openModal}
+                className="rounded bg-gradient-to-r from-[#4CE0B3] to-[#3AB68B] px-4 py-2 font-semibold text-black hover:scale-105"
+              >
+                Ajouter aux favoris
+              </button>
+            )}
 
-          <button
-            type="button"
-            onClick={() => router.push('/')}
-            className="mt-3 rounded bg-gradient-to-r from-[#6A0DAD] to-[#A45EE5] px-4 py-2 font-semibold text-white hover:scale-105"
-          >
-            ← Retour
-          </button>
+            <button
+              type="button"
+              onClick={() => router.push('/')}
+              className="rounded bg-gradient-to-r from-[#6A0DAD] to-[#A45EE5] px-4 py-2 font-semibold text-white hover:scale-105"
+            >
+              ← Retour
+            </button>
+          </div>
+
+          {/* MESSAGE */}
+          {message && (
+            <div
+              className={`mt-2 p-2 rounded text-black transition-opacity duration-500 ${
+                showMessage ? "opacity-100" : "opacity-0"
+              } ${
+                messageType === "success"
+                  ? "bg-gradient-to-r from-[#4CE0B3] to-[#3AB68B]"
+                  : "bg-red-700 text-red-100"
+              }`}
+            >
+              {message}
+            </div>
+          )}
         </div>
 
         {/* PLAYER */}
@@ -180,8 +222,11 @@ export default function PlayerPage({
       <CreatePlaylistModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSave={handleSaveFavorite}
         tracks={tracks}
+        onFavoriteCreated={(favoriteName: string) => {
+        setMessage(`Playlist "${favoriteName}" ajoutée aux favoris !`);
+        setMessageType("success");
+  }}
       />
 
       <Footer />

@@ -1,8 +1,8 @@
 from datetime import datetime, timezone
-from typing import Optional, Dict, Any
+from typing import Dict, Any
 
 from bson import ObjectId
-from fastapi import HTTPException, status
+from fastapi import HTTPException
 from passlib.context import CryptContext
 
 from app.core.db import users_collection, check_connection
