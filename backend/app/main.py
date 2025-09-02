@@ -38,7 +38,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# handler personnalisé
+# personalized handler
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
 
 app.include_router(jamendo_router, dependencies=[Depends(get_api_key)])
