@@ -1,7 +1,7 @@
 'use client';
 
 import {
-  Home, Sparkles, Search, Info, Menu, LogIn, UserPlus, User
+  Home, Sparkles, Search, Info, Menu, LogIn, UserPlus, User, LogOut 
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth_context';
@@ -108,10 +108,11 @@ export function Sidebar({
             })}
             <Button
               variant="destructive"
-              className="w-full"
+              className="w-full justify-start"
               onClick={handleLogout}
             >
-              Déconnexion
+              <LogOut  className="h-5 w-5" />
+              {isOpen && <span className="ml-3">Déconnexion</span>}
             </Button>
           </nav>
 
