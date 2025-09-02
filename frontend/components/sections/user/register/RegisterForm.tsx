@@ -159,14 +159,8 @@ export function RegisterForm({
           {acceptTerms && <Check className="h-3 w-3" />}
         </Button>
         <div className="text-sm text-[#D9B3FF]">
-          J'accepte les{" "}
-          <Button variant="link" className="text-[#A3D5FF] p-0 h-auto text-sm">
-            conditions d'utilisation
-          </Button>{" "}
-          et la{" "}
-          <Button variant="link" className="text-[#A3D5FF] p-0 h-auto text-sm">
-            politique de confidentialité
-          </Button>
+          J'accepte les politique de confidentialité
+          et la politique de confidentialité
         </div>
       </div>
 
