@@ -31,12 +31,14 @@ export function EditPlaylistModal({ isOpen, playlist, onClose, onSave }: EditPla
 
     setIsLoading(true)
 
-    // Simulation de sauvegarde
-    setTimeout(() => {
-      setIsLoading(false)
-      onSave(playlist.id, playlistName)
+    try {
+      await onSave(playlist.id, playlistName) // <-- délègue au parent (FavoritesContainer)
       onClose()
-    }, 1000)
+    } catch (err) {
+      console.error("Erreur renommage:", err)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleClose = () => {

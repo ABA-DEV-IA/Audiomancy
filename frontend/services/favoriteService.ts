@@ -79,8 +79,20 @@ export async function deleteFavorite(favorite_id: string, user_id: string): Prom
   }
 }
 
-export async function renameFavorite(favorite_id: string, user_id: string, new_name: string): Promise<Favorite> {
-  const response = await fetchJson<FavoriteResponse>("/api/favorite/rename", { favorite_id, user_id, new_name });
-  if (!response.favorite) throw new Error(response.message);
-  return response.favorite;
+export async function renameFavorite(favoriteId: string, userId: string, newName: string) {
+  const res = await fetch("/api/favorite/rename", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      user_id: userId,
+      favorite_id: favoriteId,
+      new_name: newName,
+    }),
+  });
+
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error || "Erreur lors du renommage");
+  }
+  return data;
 }
