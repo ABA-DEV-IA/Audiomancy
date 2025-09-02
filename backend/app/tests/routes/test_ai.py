@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import patch
+from unittest.mock import patch, AsyncMock
 
 @pytest.fixture
 def fake_tracks():
@@ -19,7 +19,8 @@ def fake_tracks():
 
 def test_generate_playlist_success(api_client, fake_tracks):
     with patch("app.routes.ai_routes.ai_executor", return_value="calm study"), \
-         patch("app.routes.ai_routes.get_tracks_for_reader", return_value=fake_tracks):
+         patch("app.routes.ai_routes.get_tracks_for_reader", new_callable=AsyncMock) as mock_get_tracks:
+        mock_get_tracks.return_value = fake_tracks
         response = api_client.post("/generate/playlist", json={"prompt": "Je veux une playlist calme", "limit": 10})
         assert response.status_code == 200
         data = response.json()
@@ -27,7 +28,8 @@ def test_generate_playlist_success(api_client, fake_tracks):
 
 def test_generate_playlist_empty(api_client):
     with patch("app.routes.ai_routes.ai_executor", return_value="calm study"), \
-         patch("app.routes.ai_routes.get_tracks_for_reader", return_value=[]):
+         patch("app.routes.ai_routes.get_tracks_for_reader", new_callable=AsyncMock) as mock_get_tracks:
+        mock_get_tracks.return_value = []
         response = api_client.post("/generate/playlist", json={"prompt": "Je veux une playlist calme", "limit": 10})
         assert response.status_code == 200
         assert response.json() == []

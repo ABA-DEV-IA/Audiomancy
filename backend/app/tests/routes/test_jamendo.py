@@ -7,11 +7,11 @@ the returned data is correctly structured and complete.
 
 import pytest
 
-
 @pytest.fixture(autouse=True)
 def mock_fetch_tracks(monkeypatch):
     """Mock Jamendo API calls to avoid real HTTP requests during tests."""
-    def fake_fetch_tracks(params):
+
+    async def fake_fetch_tracks(params):
         return {
             "results": [
                 {
@@ -26,7 +26,8 @@ def mock_fetch_tracks(monkeypatch):
                 }
             ]
         }
-    # 👉 Patch l’import réellement utilisé par le service
+
+    # Patch l’import réellement utilisé par le service
     monkeypatch.setattr("app.services.jamendo.jamendo_service.fetch_tracks", fake_fetch_tracks)
 
 

@@ -17,7 +17,7 @@ router = APIRouter(prefix="/jamendo", tags=["Jamendo"])
 
 
 @router.post("/tracks", response_model=List[JamendoTrackResponse])
-def get_jamendo_tracks(request: JamendoTrackRequest):
+async def get_jamendo_tracks(request: JamendoTrackRequest):
     """
     Generate a music playlist based on the provided tags and duration range.
 
@@ -47,7 +47,7 @@ def get_jamendo_tracks(request: JamendoTrackRequest):
         This endpoint integrates with Jamendo API and formats the data
         according to the JamendoTrackResponse model for frontend consumption.
     """
-    return get_tracks_for_reader(
+    return await get_tracks_for_reader(
         tags=request.tags,
         duration_min=request.duration_min,
         duration_max=request.duration_max,

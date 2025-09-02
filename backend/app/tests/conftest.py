@@ -1,33 +1,64 @@
 import pytest
 from fastapi.testclient import TestClient
+from httpx import AsyncClient, ASGITransport
 from app.main import app
 from app.core.config import settings
 
-# Shared TestClient instance
-client = TestClient(app)
+# ---------- Synchronous TestClient ----------
+sync_client = TestClient(app)
 
-# Shared headers with valid API key
+# ---------- Shared headers ----------
 HEADERS = {"X-API-KEY": settings.api_key}
 
 
 @pytest.fixture
 def api_client():
     """
-    Fixture returning a wrapper around TestClient 
-    that automatically includes the API key in headers
-    for all HTTP methods.
+    Hybrid client fixture supporting both synchronous
+    and asynchronous requests with API key automatically included.
     """
-    class AuthenticatedClient:
-        def post(self, url: str, json: dict = None):
-            return client.post(url, json=json, headers=HEADERS)
 
+    class HybridClient:
+        # ---------- Synchronous methods ----------
         def get(self, url: str, params: dict = None):
-            return client.get(url, params=params, headers=HEADERS)
+            return sync_client.get(url, params=params, headers=HEADERS)
+
+        def post(self, url: str, json: dict = None):
+            return sync_client.post(url, json=json, headers=HEADERS)
 
         def put(self, url: str, json: dict = None):
-            return client.put(url, json=json, headers=HEADERS)
+            return sync_client.put(url, json=json, headers=HEADERS)
 
         def delete(self, url: str, params: dict = None):
-            return client.delete(url, params=params, headers=HEADERS)
+            return sync_client.delete(url, params=params, headers=HEADERS)
 
-    return AuthenticatedClient()
+        # ---------- Asynchronous methods ----------
+        async def get_async(self, url: str, params: dict = None):
+            async with AsyncClient(
+                transport=ASGITransport(app=app),
+                base_url="http://test"
+            ) as client:
+                return await client.get(url, params=params, headers=HEADERS)
+
+        async def post_async(self, url: str, json: dict = None):
+            async with AsyncClient(
+                transport=ASGITransport(app=app),
+                base_url="http://test"
+            ) as client:
+                return await client.post(url, json=json, headers=HEADERS)
+
+        async def put_async(self, url: str, json: dict = None):
+            async with AsyncClient(
+                transport=ASGITransport(app=app),
+                base_url="http://test"
+            ) as client:
+                return await client.put(url, json=json, headers=HEADERS)
+
+        async def delete_async(self, url: str, params: dict = None):
+            async with AsyncClient(
+                transport=ASGITransport(app=app),
+                base_url="http://test"
+            ) as client:
+                return await client.delete(url, params=params, headers=HEADERS)
+
+    return HybridClient()

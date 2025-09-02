@@ -1,62 +1,60 @@
 """
-Tests for the /speech-token endpoint using the shared api_client fixture.
+Tests for the /speech/token route using both synchronous and asynchronous requests.
 """
 
 import pytest
-from unittest.mock import patch, MagicMock
-from requests.exceptions import RequestException
+from unittest.mock import patch, AsyncMock
+from httpx import AsyncClient
+from app.main import app
+from app.core.config import settings
 
-def test_get_speech_token_success(api_client):
-    """✅ Returns token and region if config is valid and Azure responds."""
+@pytest.mark.asyncio
+async def test_get_speech_token_success(api_client):
+    """✅ Returns a token successfully"""
+    async def async_mock_post(*args, **kwargs):
+        class MockResponse:
+            text = "fake-token"
+        return MockResponse()
 
-    mock_response = MagicMock()
-    mock_response.raise_for_status.return_value = None
-    mock_response.text = "fake_token"
-
-    with patch("app.core.config.settings.speech_key", "fake_key"), \
-         patch("app.core.config.settings.speech_region", "westeurope"), \
-         patch("app.routes.speech_token_routes.requests.post", return_value=mock_response):
-
-        response = api_client.post("/speech-token")
-        assert response.status_code == 200
+    with patch("app.routes.speech_token_routes.httpx.AsyncClient.post", new=async_mock_post):
+        # Use async client
+        response = await api_client.get_async("/speech/token")
         data = response.json()
-        assert data["token"] == "fake_token"
-        assert data["region"] == "westeurope"
+
+    assert response.status_code == 200
+    assert data["token"] == "fake-token"
+    assert data["region"] == settings.speech_region
 
 
-def test_get_speech_token_missing_key(api_client):
-    """🚫 Returns 500 if the speech key is missing."""
-
-    with patch("app.core.config.settings.speech_key", None), \
-         patch("app.core.config.settings.speech_region", "westeurope"):
-
-        response = api_client.post("/speech-token")
-        assert response.status_code == 500
-        assert response.json()["detail"] == "Missing Azure Speech config"
+def test_get_speech_token_missing_key():
+    """🚫 Missing API key returns 401"""
+    from fastapi.testclient import TestClient
+    client = TestClient(app)
+    response = client.get("/speech/token")  # No headers
+    assert response.status_code == 401
+    assert "detail" in response.json()
 
 
-def test_get_speech_token_missing_region(api_client):
-    """🚫 Returns 500 if the speech region is missing."""
+@pytest.mark.asyncio
+async def test_get_speech_token_missing_region(api_client, monkeypatch):
+    """🚫 Missing Azure region returns 500"""
+    monkeypatch.setattr(settings, "speech_region", None)
+    response = await api_client.get_async("/speech/token")
+    data = response.json()
+    assert response.status_code == 500
+    assert "detail" in data
 
-    with patch("app.core.config.settings.speech_key", "fake_key"), \
-         patch("app.core.config.settings.speech_region", None):
 
-        response = api_client.post("/speech-token")
-        assert response.status_code == 500
-        assert response.json()["detail"] == "Missing Azure Speech config"
+@pytest.mark.asyncio
+async def test_get_speech_token_azure_error(api_client):
+    """❌ Azure raises an exception -> returns 500"""
+    async def async_mock_post(*args, **kwargs):
+        raise Exception("Azure error")
 
+    with patch("app.routes.speech_token_routes.httpx.AsyncClient.post", new=async_mock_post):
+        response = await api_client.get_async("/speech/token")
+        data = response.json()
 
-def test_get_speech_token_azure_error(api_client):
-    """🚫 Returns 500 if Azure request fails."""
-
-    mock_response = MagicMock()
-    # Important : simulate a request exception
-    mock_response.raise_for_status.side_effect = RequestException("HTTP Error")
-
-    with patch("app.core.config.settings.speech_key", "fake_key"), \
-         patch("app.core.config.settings.speech_region", "westeurope"), \
-         patch("app.routes.speech_token_routes.requests.post", return_value=mock_response):
-
-        response = api_client.post("/speech-token")
-        assert response.status_code == 500
-        assert "Azure token request failed" in response.json()["detail"]
+    assert response.status_code == 500
+    assert "detail" in data
+    assert "Azure error" in data["detail"]

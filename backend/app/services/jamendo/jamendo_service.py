@@ -3,10 +3,8 @@ Business logic layer for fetching and formatting music tracks from Jamendo.
 
 Handles the interaction between the raw Jamendo API and the application's formatting logic.
 Responsible for applying transformation and returning clean, structured data.
-
-Functions:
-    get_tracks_for_reader: Fetches and formats music tracks based on given parameters.
 """
+
 import json
 from typing import List, Optional
 from app.models.jamendo import JamendoTrackResponse
@@ -16,7 +14,7 @@ from app.utils.randomizer import choose_random_tags, sample_tracks
 from app.utils.blob_tools import download_blob, upload_blob, generate_cache_filename
 
 
-def get_tracks_for_reader(
+async def get_tracks_for_reader(
     tags: str,
     duration_min: int = 180,
     duration_max: int = 480,
@@ -48,7 +46,7 @@ def get_tracks_for_reader(
     if track_id:
         cache_filename = generate_cache_filename(track_id)
         print(f"[get_tracks_for_reader] Checking cache for {cache_filename}")
-        cached_data = download_blob(cache_filename)
+        cached_data = await download_blob(cache_filename)
         if cached_data:
             print(f"[get_tracks_for_reader] Cache HIT for {cache_filename}")
             return [JamendoTrackResponse(**t) for t in json.loads(cached_data)]
@@ -67,7 +65,7 @@ def get_tracks_for_reader(
     }
     print(f"[get_tracks_for_reader] Fetching from Jamendo with params: {params}")
 
-    data = fetch_tracks(params)
+    data = await fetch_tracks(params)
     if "results" not in data:
         print("[get_tracks_for_reader] No 'results' key in Jamendo response")
         return []
@@ -84,7 +82,7 @@ def get_tracks_for_reader(
     # --- Save to cache if track_id provided ---
     if track_id:
         print(f"[get_tracks_for_reader] Uploading playlist to cache as {cache_filename}")
-        upload_blob(cache_filename, json.dumps(formatted_tracks))
+        await upload_blob(cache_filename, json.dumps(formatted_tracks))
 
     print(f"[get_tracks_for_reader] Returning {len(formatted_tracks)} tracks")
     return formatted_tracks

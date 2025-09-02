@@ -17,12 +17,11 @@ from app.models.ai_models import PromptRequest, GeneratedTrack
 from app.services.ai.ai_executor import ai_executor
 from app.services.jamendo.jamendo_service import get_tracks_for_reader
 
-
 router = APIRouter(prefix="/generate", tags=["Generate"])
 
-@router.post("/playlist", response_model=List[GeneratedTrack])
-def generate_playlist(prompt: PromptRequest):
 
+@router.post("/playlist", response_model=List[GeneratedTrack])
+async def generate_playlist(prompt: PromptRequest):
     """
     Endpoint for generating a playlist based on a user prompt.
     
@@ -36,7 +35,7 @@ def generate_playlist(prompt: PromptRequest):
         HTTPException: If an error occurs during the execution of AI executor or Jamendo service.
     """
     try:
-        tags = ai_executor(prompt.prompt)
-        return get_tracks_for_reader(tags=tags, limit=prompt.limit)
+        tags = await ai_executor(prompt.prompt)
+        return await get_tracks_for_reader(tags=tags, limit=prompt.limit)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e

@@ -1,15 +1,11 @@
 """
-Integration tests for the AI-powered playlist generation route.
-
-Tests the POST /generate/playlist endpoint with different scenarios:
-- ✅ Normal case: agent generates tags and Jamendo returns a valid playlist.
-- ⚠️ Edge case: Jamendo returns no tracks for the given tags.
-- ❌ Failure case: the AI agent crashes, and the API responds with a 500 error.
-- 🚫 Validation case: invalid limit triggers 422 Unprocessable Entity.
+Integration tests for the AI-powered playlist generation route (async version).
 """
 
 import pytest
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
+from httpx import AsyncClient
+from app.main import app
 
 
 @pytest.fixture
@@ -30,58 +26,63 @@ def fake_tracks():
     ]
 
 
-def test_generate_playlist_success(api_client, fake_tracks):
+@pytest.mark.asyncio
+async def test_generate_playlist_success(fake_tracks):
     """✅ Normal case : agent generates tags and Jamendo returns a playlist"""
-    with patch("app.routes.ai_routes.ai_executor", return_value="calm,study"), \
-         patch("app.routes.ai_routes.get_tracks_for_reader", return_value=fake_tracks):
+    async with AsyncClient(app=app, base_url="http://test") as client:
+        with patch("app.routes.ai_routes.ai_executor", new_callable=AsyncMock, return_value="calm,study"), \
+             patch("app.routes.ai_routes.get_tracks_for_reader", new_callable=AsyncMock, return_value=fake_tracks):
 
-        response = api_client.post(
-            "/generate/playlist",
-            json={"prompt": "Je veux une playlist calme", "limit": 10}
-        )
+            response = await client.post(
+                "/generate/playlist",
+                json={"prompt": "Je veux une playlist calme", "limit": 10}
+            )
 
-        assert response.status_code == 200
-        data = response.json()
-        assert isinstance(data, list)
-        assert data[0]["title"] == "Fake Song"
-        assert "study" in data[0]["tags"]
+            assert response.status_code == 200
+            data = response.json()
+            assert isinstance(data, list)
+            assert data[0]["title"] == "Fake Song"
+            assert "study" in data[0]["tags"]
 
 
-def test_generate_playlist_empty(api_client):
+@pytest.mark.asyncio
+async def test_generate_playlist_empty():
     """⚠️ Cases where Jamendo does not return any tracks"""
-    with patch("app.routes.ai_routes.ai_executor", return_value="calm,study"), \
-         patch("app.routes.ai_routes.get_tracks_for_reader", return_value=[]):
+    async with AsyncClient(app=app, base_url="http://test") as client:
+        with patch("app.routes.ai_routes.ai_executor", new_callable=AsyncMock, return_value="calm,study"), \
+             patch("app.routes.ai_routes.get_tracks_for_reader", new_callable=AsyncMock, return_value=[]):
 
-        response = api_client.post(
-            "/generate/playlist",
-            json={"prompt": "Je veux une playlist calme", "limit": 10}
-        )
+            response = await client.post(
+                "/generate/playlist",
+                json={"prompt": "Je veux une playlist calme", "limit": 10}
+            )
 
-        assert response.status_code == 200
-        data = response.json()
-        assert isinstance(data, list)
-        assert data == []
+            assert response.status_code == 200
+            assert response.json() == []
 
 
-def test_generate_playlist_agent_failure(api_client):
+@pytest.mark.asyncio
+async def test_generate_playlist_agent_failure():
     """❌ Case where the agent crashes"""
-    with patch("app.routes.ai_routes.ai_executor", side_effect=Exception("Agent crashed")):
-        response = api_client.post(
+    async with AsyncClient(app=app, base_url="http://test") as client:
+        with patch("app.routes.ai_routes.ai_executor", new_callable=AsyncMock, side_effect=Exception("Agent crashed")):
+            response = await client.post(
+                "/generate/playlist",
+                json={"prompt": "Je veux une playlist calme", "limit": 10}
+            )
+            assert response.status_code == 500
+
+
+@pytest.mark.asyncio
+async def test_generate_playlist_invalid_limit():
+    """🚫 Case where 'limit' is invalid -> FastAPI/Pydantic should return 422"""
+    async with AsyncClient(app=app, base_url="http://test") as client:
+        response = await client.post(
             "/generate/playlist",
-            json={"prompt": "Je veux une playlist calme", "limit": 10}
+            json={"prompt": "Une playlist impossible", "limit": 1}  # ❌ not in {10, 25, 50}
         )
 
-        assert response.status_code == 500
-
-
-def test_generate_playlist_invalid_limit(api_client):
-    """🚫 Case where 'limit' is invalid -> FastAPI/Pydantic should return 422"""
-    response = api_client.post(
-        "/generate/playlist",
-        json={"prompt": "Une playlist impossible", "limit": 1}  # ❌ not in {10, 25, 50}
-    )
-
-    assert response.status_code == 422
-    data = response.json()
-    assert data["detail"][0]["msg"] == "Value error, limit must be one of 10, 25, or 50"
-    assert data["detail"][0]["loc"][-1] == "limit"
+        assert response.status_code == 422
+        data = response.json()
+        assert data["detail"][0]["msg"] == "Value error, limit must be one of 10, 25, or 50"
+        assert data["detail"][0]["loc"][-1] == "limit"
