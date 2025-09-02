@@ -14,7 +14,7 @@ interface CreatePlaylistModalProps {
   isOpen: boolean;
   onClose: () => void;
   tracks: Track[];
-  onFavoriteCreated?: (favoriteId: string) => void; // callback pour mettre à jour la liste
+  onFavoriteCreated?: (favoriteId: string) => void;
 }
 
 export function CreatePlaylistModal({ isOpen, onClose, tracks, onFavoriteCreated }: CreatePlaylistModalProps) {
@@ -38,11 +38,12 @@ export function CreatePlaylistModal({ isOpen, onClose, tracks, onFavoriteCreated
     try {
       const favorite = await createFavorite(user.id, playlistName, tracks)
 
-      alert(`Playlist "${favorite.name}" ajoutée aux favoris !`)
       setPlaylistName("")
       onClose()
 
       if (onFavoriteCreated) onFavoriteCreated(favorite.id)
+      if (onFavoriteCreated) onFavoriteCreated(favorite.name || playlistName);
+
 
     } catch (err: any) {
       console.error(err)
