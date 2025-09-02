@@ -1,4 +1,4 @@
-from app.db import favorite_collection, check_connection
+from app.core.db import favorite_collection, check_connection
 from app.models.favorite import Favorite, FavoriteResponse, FavoriteRenameRequest
 from app.utils.formatter import mongo_to_user_doc
 from fastapi import HTTPException

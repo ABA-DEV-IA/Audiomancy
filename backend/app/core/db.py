@@ -23,8 +23,7 @@ db = client[MONGO_DBNAME]
 
 # Collections
 users_collection = db["user"]
-playlists_collection = db["favorite"]
-
+favorite_collection = db["favorite"]
 
 async def check_connection() -> bool:
     """
