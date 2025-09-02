@@ -23,6 +23,6 @@ export async function PUT(request: Request) {
     return NextResponse.json(data, { status: res.status });
   } catch (err) {
     console.error("Proxy error (connexion):", err);
-    return NextResponse.json({ error: "Failed to reach FastAPI /connexion" }, { status: 500 });
+    return NextResponse.json({ detail: "impossible de se connecter au serveur" }, { status: 500 });
   }
 }

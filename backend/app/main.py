@@ -18,6 +18,8 @@ from app.routes.user_routes import router as user_router
 from app.routes.favorite_routes import router as favorite_router
 from app.core.security import get_api_key
 from app.routes.speech_token_routes import router as speech_router
+from app.errors.handlers import validation_exception_handler
+from fastapi.exceptions import RequestValidationError
 
 # Activer Swagger seulement si swagger_on=True
 docs_url = "/docs" if settings.swagger_on else None
@@ -38,6 +40,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# handler personnalisé
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
 
 # Inclure les routes avec dépendance globale API Key
 app.include_router(jamendo_router, dependencies=[Depends(get_api_key)])
