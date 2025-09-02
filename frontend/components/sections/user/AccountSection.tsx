@@ -3,9 +3,9 @@
 import { useState, useEffect } from "react"
 import { useAuth } from "@/context/auth_context"
 import { modify as modifyService } from "@/services/userService"
-import { User as UserType } from "@/types/user"
 import { AccountHeader } from "./account/AccountHeader"
 import { SuccessMessage } from "./account/SuccessMessage"
+import { ErrorMessage } from "./account/ErrorMessage"
 import { PersonalInfoForm } from "./account/PersonalInfoForm"
 import { PasswordForm } from "./account/PasswordForm"
 import { SaveButton } from "./account/SaveButton"
@@ -28,6 +28,7 @@ export function AccountPage({ onSave }: ProfilePageProps) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [isSaved, setIsSaved] = useState(false)
+  const [error, setError] = useState<string>("")
   const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number; delay: number }>>([])
 
   useEffect(() => {
@@ -39,17 +40,17 @@ export function AccountPage({ onSave }: ProfilePageProps) {
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
     if (isSaved) setIsSaved(false)
+    if (error) setError("")
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
     setIsSaved(false)
+    setError("")
     setParticles(generateParticles())
 
     try {
-      const payload: any = { id: user?.id, username: formData.username }
-
       if (formData.newPassword && formData.confirmPassword && doPasswordsMatch(formData.newPassword, formData.confirmPassword)) {
         await modifyService(user?.id, formData.username, formData.newPassword)
       } else {
@@ -62,11 +63,16 @@ export function AccountPage({ onSave }: ProfilePageProps) {
 
       setFormData((prev) => ({ ...prev, newPassword: "", confirmPassword: "" }))
       setTimeout(() => setIsSaved(false), 3000)
-    } catch (error) {
-      console.error("Erreur lors de la sauvegarde du profil :", error)
+    } catch (err: any) {
+      console.error("Erreur lors de la sauvegarde du profil :", err)
+
+
+      const apiMessage =
+        err?.response?.data?.message || err?.message || "Impossible de sauvegarder les modifications."
+
       setIsLoading(false)
-      setIsSaved(false)
-      alert("Impossible de sauvegarder les modifications. Merci de réessayer.")
+      setError(apiMessage)
+      setTimeout(() => setError(""), 4000)
     }
   }
 
@@ -109,6 +115,7 @@ export function AccountPage({ onSave }: ProfilePageProps) {
       <div className="max-w-2xl mx-auto space-y-6 relative z-20">
         <AccountHeader />
         {isSaved && <SuccessMessage />}
+        {error && <ErrorMessage message={error} />}
         <form onSubmit={handleSubmit} className="space-y-6">
           <PersonalInfoForm username={formData.username} onChange={(val) => handleInputChange("username", val)} />
           <PasswordForm

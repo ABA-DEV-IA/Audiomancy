@@ -36,31 +36,18 @@ export function LoginForm({ onLoginSuccess, onSwitchToRegister, onLoadingChange,
 } catch (err: any) {
   let message = "Erreur lors de la connexion"
 
-  if (err.response?.data?.detail) {
-    const detail = err.response.data.detail
-
-    if (Array.isArray(detail) && detail.length > 0) {
-      // Exemple : [{"loc":["body","email"],"msg":"value is not a valid email","input":"qsdsq@d"}]
-      const firstError = detail[0]
-      if (firstError.loc?.includes("email")) {
-        message = "L'adresse email n'est pas valide."
-      } else if (firstError.loc?.includes("password")) {
-        message = "Le mot de passe est invalide."
-      } else {
-        message = firstError.msg || message
-      }
-    }
-  } else if (err.message) {
-    // Sinon on prend le message générique
-    message = err.message
+  if(err.detail) {
+    message = "Erreur: " + err.detail;
   }
 
+  console.log("API error:", err)
   setError(message)
   onError?.(message)
 } finally {
   setIsLoading(false)
   onLoadingChange?.(false)
 }
+
   }
 
   return (

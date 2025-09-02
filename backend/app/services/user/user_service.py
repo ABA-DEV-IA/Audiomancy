@@ -1,8 +1,8 @@
 from datetime import datetime, timezone
-from typing import Optional, Dict, Any
+from typing import Dict, Any
 
 from bson import ObjectId
-from fastapi import HTTPException, status
+from fastapi import HTTPException
 from passlib.context import CryptContext
 
 from app.core.db import users_collection, check_connection
@@ -73,11 +73,11 @@ async def create_user_service(request: UserCreateRequest) -> UserResponse:
         UserResponse: Response with user data.
     """
     if not await check_connection():
-        raise HTTPException(status_code=503, detail="Database unavailable")
+        raise HTTPException(status_code=503, detail="impossible de se connecter au serveur")
     
     existing = await users_collection.find_one({"email": request.email})
     if existing:
-        raise HTTPException(status_code=400, detail="Email already registered")
+        raise HTTPException(status_code=400, detail="Email déjà enregistré")
 
     user = UserCreate(
         email=request.email,
@@ -110,14 +110,14 @@ async def login_user_service(request: UserLoginRequest) -> UserResponse:
         UserResponse: Response with authenticated user data.
     """
     if not await check_connection():
-        raise HTTPException(status_code=503, detail="Database unavailable")
+        raise HTTPException(status_code=503, detail="impossible de se connecter au serveur")
     
     existing = await users_collection.find_one({"email": request.email})
     if not existing:
-        raise HTTPException(status_code=400, detail="Unknown user")
+        raise HTTPException(status_code=400, detail="email inconnu")
 
     if not verify_password(request.password, existing["password_hash"]):
-        raise HTTPException(status_code=400, detail="Invalid password")
+        raise HTTPException(status_code=400, detail="mot de passe invalide")
 
     doc = mongo_to_user_doc(existing)
 
@@ -142,11 +142,11 @@ async def update_user_service(request: UserUpdateRequest) -> UserResponse:
         UserResponse: Response with updated user data.
     """
     if not await check_connection():
-        raise HTTPException(status_code=503, detail="Database unavailable")
+        raise HTTPException(status_code=503, detail="impossible de se connecter au serveur")
     
     existing = await users_collection.find_one({"_id": ObjectId(request.id)})
     if not existing:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail="Utilisateur introuvable")
 
     update_data = {}
     for key, value in request.model_dump().items():
@@ -157,7 +157,7 @@ async def update_user_service(request: UserUpdateRequest) -> UserResponse:
                 update_data[key] = value
 
     if not update_data:
-        raise HTTPException(status_code=400, detail="No valid fields to update")
+        raise HTTPException(status_code=400, detail="Aucun champ valide à mettre à jour")
 
     result = await users_collection.update_one(
         {"_id": ObjectId(request.id)}, {"$set": update_data}
@@ -166,7 +166,7 @@ async def update_user_service(request: UserUpdateRequest) -> UserResponse:
     if result.modified_count == 0:
         return UserResponse(
             success=False,
-            message="No changes applied",
+            message="Aucune modification appliquée",
             user=None,
         )
 
@@ -175,6 +175,6 @@ async def update_user_service(request: UserUpdateRequest) -> UserResponse:
 
     return UserResponse(
         success=True,
-        message="User successfully updated",
+        message="L'utilisateur a été mis à jour avec succès",
         user=User(**doc),
     )
