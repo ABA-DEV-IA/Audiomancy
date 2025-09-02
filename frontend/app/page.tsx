@@ -10,10 +10,12 @@ import { AboutPage } from '@/components/sections/about/AboutSection';
 import { GenerationPage } from '@/components/sections/generation/GenerationSection';
 import { Footer } from '@/components/layout/footer';
 import { AuthPage } from '@/components/sections/user/AuthSection';
-import { RegisterPage } from '@/components/sections/user/RegisterSection';
 import { AccountPage } from '@/components/sections/user/AccountSection'
+import { RegisterPage } from '@/components/sections/user/RegisterSection';
+import { FavoritesContainer } from '@/components/sections/favorite/favorites-container';
 
-type PageKey = 'categories' | 'generation' | 'recherches' | 'about' | 'lecture' | 'login' | 'register' | 'acount';
+
+type PageKey = 'categories' | 'generation' | 'favorites' | 'recherches' | 'about' | 'lecture' | 'login' | 'register' | 'acount';
 
 export default function Page() {
   const [currentPage, setCurrentPage] = useState<PageKey>('categories');
@@ -64,6 +66,7 @@ export default function Page() {
     const pages: Record<PageKey, ReactNode> = {
       categories: <HomePage onCategoryClick={() => goToLecture('default')} />,
       generation: <GenerationPage onBack={handleGenerationBack} onComplete={handleGenerationComplete} />,
+      favorites: <FavoritesContainer />,
       recherches: <SearchPage onTrackClick={goToLecture} />,
       about: <AboutPage />,
       lecture: <HomePage onCategoryClick={() => goToLecture('default')} />,

@@ -4,6 +4,7 @@ import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { Providers } from "./providers";
 import { GenerationProvider } from "@/context/generation_context";
+import { FavoriteProvider } from "@/context/favorite_context";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -23,7 +24,9 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${GeistSans.variable} ${GeistMono.variable}`}>
         <GenerationProvider>
+        <FavoriteProvider>
         <Providers>{children}</Providers>
+        </FavoriteProvider>
         </GenerationProvider>
       </body>
     </html>
