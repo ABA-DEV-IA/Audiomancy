@@ -8,7 +8,7 @@ Functions:
     normalize_license_url: Cleans license URL by removing region-specific suffixes.
     format_jamendo_track: Formats a single raw track into a JamendoTrackResponse.
 """
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from typing import List
 from urllib.parse import urlparse, urlunparse
 from app.utils.license import LICENSE_MAP  # Renommé depuis tracks.py
@@ -69,3 +69,16 @@ def format_jamendo_tracks(tracks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     Format a list of raw Jamendo track dictionaries.
     """
     return [format_jamendo_track(track) for track in tracks]
+
+
+def mongo_to_user_doc(document: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Convert a MongoDB document into a dictionary compatible with the User model.
+
+    Args:
+        document (dict): The MongoDB document.
+
+    Returns:
+        dict: A dictionary with "_id" converted to string as "id".
+    """
+    return {**document, "id": str(document["_id"])} if "_id" in document else document

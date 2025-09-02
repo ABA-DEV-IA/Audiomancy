@@ -1,5 +1,6 @@
 from app.db import favorite_collection, check_connection
 from app.models.favorite import Favorite, FavoriteResponse, FavoriteRenameRequest
+from app.utils.formatter import mongo_to_user_doc
 from fastapi import HTTPException
 from datetime import datetime
 from bson import ObjectId
@@ -60,9 +61,7 @@ async def list_favorites_service(user_id: str):
 
     result = []
     for fav in favorites:
-        fav["id"] = str(fav["_id"])
-        fav.pop("_id", None)
-        result.append(Favorite(**fav))
+        result.append(Favorite(**mongo_to_user_doc(fav)))
     return result
 
 

@@ -5,7 +5,7 @@ from .jamendo import JamendoTrackResponse
 
 
 class Favorite(BaseModel):
-    id: Optional[str] = Field(default=None, alias="_id") 
+    id: Optional[str] = Field(default=None) 
     user_id: str
     name: str
     track_list: List[JamendoTrackResponse] = []
@@ -25,3 +25,12 @@ class FavoriteRenameRequest(BaseModel):
     user_id: str
     favorite_id: str
     new_name: str
+    
+class FavoriteCreateRequest(BaseModel):
+    user_id: str
+    name: str
+    track_list: List[JamendoTrackResponse] = []
+    saved_at: datetime = Field(default_factory=datetime.utcnow)
+
+    class Config:
+        populate_by_name = True
