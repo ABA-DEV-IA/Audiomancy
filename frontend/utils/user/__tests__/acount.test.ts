@@ -1,57 +1,64 @@
-// saveProfile.test.ts
-import { saveProfile } from '@/utils/user/acount';
-import { modify as modifyService } from '@/services/userService';
+import { generateParticles, isPasswordValid, doPasswordsMatch } from "@/utils/user/acount";
 
-// Mock du service
-jest.mock('@/services/userService', () => ({
-  modify: jest.fn(),
-}));
-
-describe('saveProfile', () => {
-  const mockModify = modifyService as jest.MockedFunction<typeof modifyService>;
-
-  beforeEach(() => {
-    jest.clearAllMocks();
+describe("generateParticles", () => {
+  it("génère le nombre de particules demandé", () => {
+    const particles = generateParticles(10);
+    expect(particles).toHaveLength(10);
   });
 
-  it('doit retourner une erreur si userId est undefined', async () => {
-    const result = await saveProfile(undefined, 'Alice');
-    expect(result).toEqual({ success: false, error: 'Utilisateur non connecté' });
-    expect(mockModify).not.toHaveBeenCalled();
+  it("attribue un id unique par particule", () => {
+    const particles = generateParticles(5);
+    const ids = particles.map((p) => p.id);
+    expect(new Set(ids).size).toBe(5); // tous uniques
   });
 
-  it('doit appeler modifyService avec username uniquement si newPassword non fourni', async () => {
-    mockModify.mockResolvedValueOnce({}); // simulate success
-
-    const result = await saveProfile('user123', 'Alice');
-
-    expect(mockModify).toHaveBeenCalledWith('user123', 'Alice');
-    expect(result).toEqual({ success: true });
+  it("chaque particule a des valeurs valides", () => {
+    const particles = generateParticles(3);
+    particles.forEach((p) => {
+      expect(p.x).toBeGreaterThanOrEqual(0);
+      expect(p.x).toBeLessThanOrEqual(100);
+      expect(p.y).toBeGreaterThanOrEqual(0);
+      expect(p.y).toBeLessThanOrEqual(100);
+      expect(p.delay).toBeGreaterThanOrEqual(0);
+      expect(p.delay).toBeLessThanOrEqual(2);
+    });
   });
 
-  it('doit appeler modifyService avec username et newPassword si fourni', async () => {
-    mockModify.mockResolvedValueOnce({}); // simulate success
+  it("par défaut génère 25 particules", () => {
+    const particles = generateParticles();
+    expect(particles).toHaveLength(25);
+  });
+});
 
-    const result = await saveProfile('user123', 'Alice', 'newPass');
-
-    expect(mockModify).toHaveBeenCalledWith('user123', 'Alice', 'newPass');
-    expect(result).toEqual({ success: true });
+describe("isPasswordValid", () => {
+  it("retourne true si mot de passe est vide (non obligatoire)", () => {
+    expect(isPasswordValid("")).toBe(true);
   });
 
-  it('doit retourner une erreur si modifyService échoue', async () => {
-    mockModify.mockRejectedValueOnce(new Error('Erreur API'));
-
-    const result = await saveProfile('user123', 'Alice');
-
-    expect(mockModify).toHaveBeenCalledWith('user123', 'Alice');
-    expect(result).toEqual({ success: false, error: 'Erreur API' });
+  it("retourne false si mot de passe a moins de 6 caractères", () => {
+    expect(isPasswordValid("12345")).toBe(false);
   });
 
-  it('doit gérer les erreurs sans message', async () => {
-    mockModify.mockRejectedValueOnce({});
+  it("retourne true si mot de passe a au moins 6 caractères", () => {
+    expect(isPasswordValid("123456")).toBe(true);
+    expect(isPasswordValid("superpassword")).toBe(true);
+  });
+});
 
-    const result = await saveProfile('user123', 'Alice');
+describe("doPasswordsMatch", () => {
+  it("retourne true si newPassword est vide", () => {
+    expect(doPasswordsMatch("", "anything")).toBe(true);
+  });
 
-    expect(result).toEqual({ success: false, error: 'Erreur lors de la sauvegarde' });
+  it("retourne false si mots de passe ne correspondent pas", () => {
+    expect(doPasswordsMatch("password", "different")).toBe(false);
+  });
+
+  it("retourne false si confirmPassword est vide", () => {
+    expect(doPasswordsMatch("password", "")).toBe(false);
+  });
+
+  it("retourne true si les deux mots de passe correspondent et ne sont pas vides", () => {
+    expect(doPasswordsMatch("secret123", "secret123")).toBe(true);
   });
 });

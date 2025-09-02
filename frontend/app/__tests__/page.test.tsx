@@ -1,138 +1,174 @@
-import { render, screen, fireEvent } from '@testing-library/react';
-import { GenerationPage } from '@/components/sections/generation/GenerationSection';
-import React from 'react';
-import Page from '../page';
+import { render, screen, fireEvent } from "@testing-library/react";
+import React from "react";
+import Page from "../page";
 
-// Mock des composants enfants
-jest.mock('@/components/layout/sidebar', () => ({
+// === Mocks ===
+jest.mock("@/components/layout/sidebar", () => ({
   Sidebar: ({ onPageChange }: any) => (
-    <button data-testid="sidebar-btn" onClick={() => onPageChange('about')}>
-      Change Page
-    </button>
+    <div>
+      <button data-testid="to-home" onClick={() => onPageChange("categories")}>Home</button>
+      <button data-testid="to-about" onClick={() => onPageChange("about")}>About</button>
+      <button data-testid="to-generation" onClick={() => onPageChange("generation")}>Generation</button>
+      <button data-testid="to-recherches" onClick={() => onPageChange("recherches")}>Recherches</button>
+      <button data-testid="to-favorites" onClick={() => onPageChange("favorites")}>Favorites</button>
+      <button data-testid="to-login" onClick={() => onPageChange("login")}>Login</button>
+      <button data-testid="to-register" onClick={() => onPageChange("register")}>Register</button>
+      <button data-testid="to-account" onClick={() => onPageChange("acount")}>Account</button>
+    </div>
   ),
 }));
 
-jest.mock('@/components/layout/top-navbar', () => ({ TopNavbar: () => <div>TopNavbar</div> }));
-jest.mock('@/components/layout/footer', () => ({ Footer: () => <div>Footer</div> }));
+jest.mock("@/components/layout/top-navbar", () => ({
+  TopNavbar: () => <div>TopNavbar</div>,
+}));
+jest.mock("@/components/layout/footer", () => ({
+  Footer: () => <div>Footer</div>,
+}));
 
-jest.mock('@/components/sections/home/HomeSection', () => ({
+jest.mock("@/components/sections/home/HomeSection", () => ({
   HomePage: ({ onCategoryClick }: any) => (
     <div>
       HomePage
-      <button data-testid="home-btn" onClick={() => onCategoryClick()}>
+      <button data-testid="home-btn" onClick={onCategoryClick}>
         Go Lecture
       </button>
     </div>
   ),
 }));
 
-jest.mock('@/components/sections/search/SearchSection', () => ({
-  SearchPage: ({ onTrackClick }: any) => <div>SearchPage</div>,
+jest.mock("@/components/sections/search/SearchSection", () => ({
+  SearchPage: ({ onTrackClick }: any) => (
+    <div>
+      SearchPage
+      <button data-testid="search-btn" onClick={() => onTrackClick("track-1")}>
+        Select Track
+      </button>
+    </div>
+  ),
 }));
 
-jest.mock('@/components/sections/about/AboutSection', () => ({
+jest.mock("@/components/sections/about/AboutSection", () => ({
   AboutPage: () => <div>AboutPage</div>,
 }));
 
-jest.mock('@/components/sections/generation/GenerationSection', () => ({
+jest.mock("@/components/sections/generation/GenerationSection", () => ({
   GenerationPage: ({ onBack, onComplete }: any) => (
     <div>
       GenerationPage
-      <button data-testid="back-btn" onClick={onBack}>
-        Back
-      </button>
-      <button data-testid="complete-btn" onClick={onComplete}>
-        Complete
-      </button>
+      <button data-testid="back-btn" onClick={onBack}>Back</button>
+      <button data-testid="complete-btn" onClick={onComplete}>Complete</button>
     </div>
   ),
 }));
 
-jest.mock('@/components/sections/user/ConnexionSection', () => ({
-  LoginPage: ({ onLoginSuccess }: any) => (
+jest.mock("@/components/sections/user/AuthSection", () => ({
+  AuthPage: ({ onLoginSuccess, onSwitchToRegister }: any) => (
     <div>
-      LoginPage
-      <button data-testid="login-success-btn" onClick={onLoginSuccess}>
-        LoginSuccess
-      </button>
+      AuthPage
+      <button data-testid="login-success-btn" onClick={onLoginSuccess}>LoginSuccess</button>
+      <button data-testid="switch-register-btn" onClick={onSwitchToRegister}>SwitchToRegister</button>
     </div>
   ),
 }));
 
-jest.mock('@/components/sections/user/RegisterSection', () => ({
-  RegisterPage: ({ onRegisterSuccess }: any) => (
+jest.mock("@/components/sections/user/RegisterSection", () => ({
+  RegisterPage: ({ onRegisterSuccess, onSwitchToLogin }: any) => (
     <div>
       RegisterPage
-      <button data-testid="register-success-btn" onClick={onRegisterSuccess}>
-        RegisterSuccess
-      </button>
+      <button data-testid="register-success-btn" onClick={onRegisterSuccess}>RegisterSuccess</button>
+      <button data-testid="switch-login-btn" onClick={onSwitchToLogin}>SwitchToLogin</button>
     </div>
   ),
 }));
 
-jest.mock('@/components/sections/user/AcountSection', () => ({
-  AcountPage: () => <div>AcountPage</div>,
+jest.mock("@/components/sections/user/AccountSection", () => ({
+  AccountPage: () => <div>AccountPage</div>,
 }));
 
-describe('Page component', () => {
-  it('doit rendre la page initiale et sidebar', () => {
+jest.mock("@/components/sections/favorite/favorites-container", () => ({
+  FavoritesContainer: () => <div>FavoritesPage</div>,
+}));
+
+// === Tests ===
+describe("Page component", () => {
+  it("rend la page initiale (HomePage) + Sidebar", () => {
     render(<Page />);
-    expect(screen.getByText('HomePage')).toBeInTheDocument();
-    expect(screen.getByTestId('sidebar-btn')).toBeInTheDocument();
+    expect(screen.getByText("HomePage")).toBeInTheDocument();
+    expect(screen.getByText("TopNavbar")).toBeInTheDocument();
+    expect(screen.getByText("Footer")).toBeInTheDocument();
+    expect(screen.getByTestId("to-about")).toBeInTheDocument(); // bouton mocké de la sidebar
   });
 
-  it('doit changer de page via sidebar', () => {
+  it("change de page via Sidebar (AboutPage)", () => {
     render(<Page />);
-    fireEvent.click(screen.getByTestId('sidebar-btn'));
-    expect(screen.getByText('AboutPage')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("to-about"));
+    expect(screen.getByText("AboutPage")).toBeInTheDocument();
   });
 
-  it('doit aller en lecture via HomePage', () => {
+  it("va en lecture via HomePage (Go Lecture)", () => {
     render(<Page />);
-    fireEvent.click(screen.getByTestId('home-btn'));
-    // Lecture est rendu comme HomePage dans ton code
-    expect(screen.getByText('HomePage')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("home-btn"));
+    // lecture réutilise HomePage
+    expect(screen.getByText("HomePage")).toBeInTheDocument();
   });
 
-  it('doit gérer GenerationPage back et complete', () => {
+  it("va en lecture via SearchPage (onTrackClick)", () => {
     render(<Page />);
-
-    // Force currentPage = "generation" en simulant un rendu de GenerationPage
-    // Pour simplifier, on peut directement rendre le composant GenerationPage mocké
-    const { getByTestId } = screen;
-
-    // Clique back
-    fireEvent.click(getByTestId('sidebar-btn')); // ici mock simplifié → AboutPage
-    expect(screen.getByText('AboutPage')).toBeInTheDocument();
-
-    // Si tu veux tester back/complete dans GenerationPage, tu peux créer un test isolé
-    render(
-      <GenerationPage
-        onBack={() => console.log('Back clicked')}
-        onComplete={() => console.log('Complete clicked')}
-      />,
-    );
-    fireEvent.click(screen.getByTestId('back-btn'));
-    fireEvent.click(screen.getByTestId('complete-btn'));
+    fireEvent.click(screen.getByTestId("to-recherches"));
+    expect(screen.getByText("SearchPage")).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("search-btn"));
+    expect(screen.getByText("HomePage")).toBeInTheDocument(); // lecture = HomePage
   });
 
-  // it('doit gérer LoginPage', () => {
-  //   render(<Page />);
-  //   // Forcer currentPage = login
-  //   // Ici on simule le rendu mocké LoginPage
-  //   render(<LoginPage onLoginSuccess={() => console.log('Login success')} />);
-  //   fireEvent.click(screen.getByTestId('login-success-btn'));
-  // });
+  it("GenerationPage: Back renvoie aux catégories (HomePage)", () => {
+    render(<Page />);
+    fireEvent.click(screen.getByTestId("to-generation"));
+    expect(screen.getByText("GenerationPage")).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("back-btn"));
+    expect(screen.getByText("HomePage")).toBeInTheDocument();
+  });
 
-  // it('doit gérer RegisterPage', () => {
-  //   render(<Page />);
-  //   render(<RegisterPage onRegisterSuccess={() => console.log('Register success')} />);
-  //   fireEvent.click(screen.getByTestId('register-success-btn'));
-  // });
+  it("GenerationPage: Complete renvoie à lecture (HomePage)", () => {
+    render(<Page />);
+    fireEvent.click(screen.getByTestId("to-generation"));
+    expect(screen.getByText("GenerationPage")).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("complete-btn"));
+    expect(screen.getByText("HomePage")).toBeInTheDocument(); // lecture = HomePage
+  });
 
-  // it('doit gérer AcountPage', () => {
-  //   render(<Page />);
-  //   render(<AcountPage />);
-  //   expect(screen.getByText('AcountPage')).toBeInTheDocument();
-  // });
+  it("AuthPage: switch vers Register puis retour Login puis succès login", () => {
+    render(<Page />);
+    fireEvent.click(screen.getByTestId("to-login"));
+    expect(screen.getByText("AuthPage")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId("switch-register-btn"));
+    expect(screen.getByText("RegisterPage")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId("switch-login-btn"));
+    expect(screen.getByText("AuthPage")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId("login-success-btn"));
+    expect(screen.getByText("HomePage")).toBeInTheDocument();
+  });
+
+  it("RegisterPage: succès d'inscription renvoie aux catégories (HomePage)", () => {
+    render(<Page />);
+    fireEvent.click(screen.getByTestId("to-register"));
+    expect(screen.getByText("RegisterPage")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId("register-success-btn"));
+    expect(screen.getByText("HomePage")).toBeInTheDocument();
+  });
+
+  it("FavoritesPage", () => {
+    render(<Page />);
+    fireEvent.click(screen.getByTestId("to-favorites"));
+    expect(screen.getByText("FavoritesPage")).toBeInTheDocument();
+  });
+
+  it("AccountPage (clé 'acount')", () => {
+    render(<Page />);
+    fireEvent.click(screen.getByTestId("to-account"));
+    expect(screen.getByText("AccountPage")).toBeInTheDocument();
+  });
 });

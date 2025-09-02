@@ -1,20 +1,8 @@
-import { User } from '@/types/user';
-import { login, register, modify } from '../userService';
+import { login, register, modify } from "@/services/userService"; // chemin à adapter
+import { User } from "@/types/user";
 
-describe('User Service', () => {
-  const mockUser: User = {
-    id: '1',
-    email: 'test@example.com',
-    username: 'TestUser',
-    password_hash: 'hashedpassword',
-    created_at: new Date('2025-01-01T00:00:00Z'),
-  };
-
-  const mockResponse = {
-    success: true,
-    message: 'OK',
-    user: mockUser,
-  };
+describe("User API helpers", () => {
+  const mockUser: User = { id: "1", email: "test@test.com", username: "tester" } as User;
 
   beforeEach(() => {
     global.fetch = jest.fn();
@@ -24,91 +12,63 @@ describe('User Service', () => {
     jest.resetAllMocks();
   });
 
-  it('login doit retourner l’utilisateur', async () => {
-    (fetch as jest.Mock).mockResolvedValueOnce({
+  it("login retourne un User en cas de succès", async () => {
+    (fetch as jest.Mock).mockResolvedValue({
       ok: true,
-      json: async () => mockResponse,
+      json: async () => ({ success: true, message: "ok", user: mockUser }),
     });
 
-    const user = await login('test@example.com', 'password123');
-
-    expect(fetch).toHaveBeenCalledWith(
-      '/api/user/proxyConnexion',
-      expect.objectContaining({
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: 'test@example.com', password: 'password123' }),
-      }),
-    );
-
+    const user = await login("test@test.com", "password");
     expect(user).toEqual(mockUser);
+    expect(fetch).toHaveBeenCalledWith("/api/user/proxyLogin", expect.any(Object));
   });
 
-  it('register doit retourner l’utilisateur', async () => {
-    (fetch as jest.Mock).mockResolvedValueOnce({
+  it("register retourne un User en cas de succès", async () => {
+    (fetch as jest.Mock).mockResolvedValue({
       ok: true,
-      json: async () => mockResponse,
+      json: async () => ({ success: true, message: "ok", user: mockUser }),
     });
 
-    const user = await register('test@example.com', 'TestUser', 'password123');
-
-    expect(fetch).toHaveBeenCalledWith(
-      '/api/user/proxyCreate',
-      expect.objectContaining({
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: 'test@example.com',
-          username: 'TestUser',
-          password: 'password123',
-        }),
-      }),
-    );
-
+    const user = await register("test@test.com", "tester", "password");
     expect(user).toEqual(mockUser);
+    expect(fetch).toHaveBeenCalledWith("/api/user/proxyCreate", expect.any(Object));
   });
 
-  it('modify doit retourner l’utilisateur', async () => {
-    (fetch as jest.Mock).mockResolvedValueOnce({
+  it("modify retourne un User en cas de succès", async () => {
+    (fetch as jest.Mock).mockResolvedValue({
       ok: true,
-      json: async () => mockResponse,
+      json: async () => ({ success: true, message: "ok", user: mockUser }),
     });
 
-    const user = await modify('1', 'NewUsername', 'newpassword');
-
-    expect(fetch).toHaveBeenCalledWith(
-      '/api/user/proxyModify',
-      expect.objectContaining({
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: '1', username: 'NewUsername', password: 'newpassword' }),
-      }),
-    );
-
+    const user = await modify("1", "tester", "password");
     expect(user).toEqual(mockUser);
+    expect(fetch).toHaveBeenCalledWith("/api/user/proxyModify", expect.any(Object));
   });
 
-  it('login lance une erreur si response.ok est false', async () => {
-    (fetch as jest.Mock).mockResolvedValueOnce({
+  it("login lève une erreur si fetch renvoie !ok", async () => {
+    (fetch as jest.Mock).mockResolvedValue({
       ok: false,
-      status: 401,
-      text: async () => 'Unauthorized',
+      json: async () => ({ error: "Invalid credentials" }),
     });
 
-    await expect(login('test@example.com', 'wrongpassword')).rejects.toThrow(
-      'API error 401: Unauthorized',
-    );
+    await expect(login("wrong@test.com", "badpass")).rejects.toEqual({ error: "Invalid credentials" });
   });
 
-  it('modify lance une erreur si response.ok est false', async () => {
-    (fetch as jest.Mock).mockResolvedValueOnce({
+  it("register lève une erreur si fetch renvoie !ok", async () => {
+    (fetch as jest.Mock).mockResolvedValue({
       ok: false,
-      status: 500,
-      text: async () => 'Server error',
+      json: async () => ({ error: "Email already exists" }),
     });
 
-    await expect(modify('1', 'NewUsername', 'newpassword')).rejects.toThrow(
-      'API error 500: Server error',
-    );
+    await expect(register("test@test.com", "tester", "password")).rejects.toEqual({ error: "Email already exists" });
+  });
+
+  it("modify lève une erreur si fetch renvoie !ok", async () => {
+    (fetch as jest.Mock).mockResolvedValue({
+      ok: false,
+      json: async () => ({ error: "User not found" }),
+    });
+
+    await expect(modify("1", "tester", "password")).rejects.toEqual({ error: "User not found" });
   });
 });

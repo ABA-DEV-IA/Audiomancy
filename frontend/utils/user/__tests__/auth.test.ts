@@ -1,18 +1,32 @@
-import { handleLogin } from '@/utils/user/auth';
-import { login as loginService } from '@/services/userService';
+import { generateParticles, Particle } from "@/utils/user/auth";
 
-jest.mock('@/services/userService');
+describe("generateParticles", () => {
+  it("génère le bon nombre de particules demandé", () => {
+    const particles = generateParticles(10);
+    expect(particles).toHaveLength(10);
+  });
 
-test('handleLogin returns user on success', async () => {
-  (loginService as jest.Mock).mockResolvedValue({ id: 1, email: 'test@test.com' });
-  const result = await handleLogin('test@test.com', 'password');
-  expect(result.user).toBeDefined();
-  expect(result.error).toBeUndefined();
-});
+  it("utilise 15 particules par défaut si aucun argument n’est passé", () => {
+    const particles = generateParticles();
+    expect(particles).toHaveLength(15);
+  });
 
-test('handleLogin returns error on failure', async () => {
-  (loginService as jest.Mock).mockRejectedValue(new Error('Invalid credentials'));
-  const result = await handleLogin('wrong@test.com', 'badpass');
-  expect(result.user).toBeUndefined();
-  expect(result.error).toBe('Invalid credentials');
+  it("chaque particule a un id unique et incrémenté", () => {
+    const particles = generateParticles(5);
+    particles.forEach((p, index) => {
+      expect(p.id).toBe(index);
+    });
+  });
+
+  it("chaque particule respecte les bornes des valeurs", () => {
+    const particles = generateParticles(5);
+    particles.forEach((p: Particle) => {
+      expect(p.x).toBeGreaterThanOrEqual(0);
+      expect(p.x).toBeLessThanOrEqual(100);
+      expect(p.y).toBeGreaterThanOrEqual(0);
+      expect(p.y).toBeLessThanOrEqual(100);
+      expect(p.delay).toBeGreaterThanOrEqual(0);
+      expect(p.delay).toBeLessThanOrEqual(3);
+    });
+  });
 });
