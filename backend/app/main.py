@@ -19,18 +19,15 @@ from app.routes.favorite_routes import router as favorite_router
 from app.core.security import get_api_key
 from app.routes.speech_token_routes import router as speech_router
 
-# Activer Swagger seulement si swagger_on=True
 docs_url = "/docs" if settings.swagger_on else None
 redoc_url = "/redoc" if settings.swagger_on else None
 
-# Créer l'app FastAPI
 app = FastAPI(
     title="Audiomancy API",
     docs_url=docs_url,
     redoc_url=redoc_url
 )
 
-# Middleware CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
@@ -39,7 +36,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Inclure les routes avec dépendance globale API Key
 app.include_router(jamendo_router, dependencies=[Depends(get_api_key)])
 app.include_router(ai_router, dependencies=[Depends(get_api_key)])
 app.include_router(user_router, dependencies=[Depends(get_api_key)])
