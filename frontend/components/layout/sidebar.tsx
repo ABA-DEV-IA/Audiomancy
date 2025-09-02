@@ -24,7 +24,9 @@ export function Sidebar({
   const menuItems = [
     { id: 'categories', label: 'Catégories', icon: Home },
     { id: 'generation', label: 'Génération', icon: Sparkles },
-    { id: "favorites", label: "Mes Favoris", icon: Heart },
+    ...(isAuthenticated
+      ? [{ id: "favorites", label: "Mes Favoris", icon: Heart }]
+      : []), // 👈 seulement si connecté
     { id: 'recherches', label: 'Recherche', icon: Search },
     { id: 'about', label: 'À propos', icon: Info },
   ];

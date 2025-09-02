@@ -15,6 +15,7 @@ export default function PlayerPage({
   currentTrackIndex,
   onSelectTrack,
   audioRef,
+  isFavorite=false
 }: PlayerPageProps) {
   const router = useRouter();
 
@@ -80,13 +81,13 @@ export default function PlayerPage({
           <p className="mt-2">Playlist : {playlistId}</p>
           
           {/* BOUTON AJOUT FAVORI */}
-          <button
+          {!isFavorite && (<button
             type="button"
             onClick={openModal}
             className="mt-3 mr-3 rounded bg-gradient-to-r from-[#4CE0B3] to-[#3AB68B] px-4 py-2 font-semibold text-black hover:scale-105"
           >
             Ajouter aux favoris
-          </button>
+          </button>)}
 
           <button
             type="button"

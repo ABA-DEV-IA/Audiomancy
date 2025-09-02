@@ -6,11 +6,15 @@ import { listFavorites, deleteFavorite, renameFavorite } from "@/services/favori
 import { FavoritesPage } from "./favorites-page";
 import { DeleteFavoriteModal } from "@/components/sections/favorite/delete-favorite-modal";
 import { EditPlaylistModal } from "@/components/sections/favorite/edit-playlist-modal";
+import { usePlaylist } from "@/context/favorite_context"
+import { useRouter } from "next/navigation";
+import { Track } from "@/types/track";
 
 interface Playlist {
   id: string;
   name: string;
   createdAt: string;
+  tracks: Track[];
 }
 
 export function FavoritesContainer() {
@@ -18,13 +22,13 @@ export function FavoritesContainer() {
   const [favorites, setFavorites] = useState<Playlist[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const { setFavorite } = usePlaylist();
+  const router = useRouter();
 
-  // Modals
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selected, setSelected] = useState<Playlist | null>(null);
 
-  // Charger les favoris
   useEffect(() => {
     async function fetchFavs() {
       if (!isAuthenticated || !user?.id) {
@@ -38,17 +42,17 @@ export function FavoritesContainer() {
 
       try {
         const favs = await listFavorites(user.id);
-        // ⚡️ Toujours renvoyer un tableau, même si vide
         const mapped = (favs ?? []).map(f => ({
             id: f.id,
             name: f.name,
-            createdAt: new Date(f.saved_at ?? Date.now()).toLocaleDateString("fr-FR")
+            createdAt: new Date(f.saved_at ?? Date.now()).toLocaleDateString("fr-FR"),
+            tracks: f.track_list
         }));
         setFavorites(mapped);
       } catch (err: any) {
         console.error(err);
         setError("Impossible de charger les favoris");
-        setFavorites([]); // fallback : tableau vide
+        setFavorites([]);
       } finally {
         setLoading(false);
       }
@@ -57,13 +61,11 @@ export function FavoritesContainer() {
     fetchFavs();
   }, [isAuthenticated, user]);
 
-  // Open edit modal
   const handleEdit = (playlist: Playlist) => {
     setSelected(playlist);
     setEditModalOpen(true);
   };
 
-  // Save rename
   const handleRenameSave = async (playlistId: string, newName: string) => {
     if (!user?.id) return;
     try {
@@ -77,13 +79,11 @@ export function FavoritesContainer() {
     }
   };
 
-  // Open delete modal
   const handleDelete = (playlist: Playlist) => {
     setSelected(playlist);
     setDeleteModalOpen(true);
   };
 
-  // Confirm delete
   const handleDeleteConfirm = async (playlistId: string) => {
     if (!user?.id) return;
     try {
@@ -95,16 +95,25 @@ export function FavoritesContainer() {
     }
   };
 
-  // Render
+  const goToFavorite = (title:string, playlist:Track[]) => {
+    setFavorite({
+      title: title,
+      playlist: playlist,
+    });
+
+    router.push("/lecture/favorite");
+  };
+
   if (loading) return <div className="p-8 text-white">Chargement des favoris...</div>;
   if (error) return <div className="p-8 text-red-400">Erreur : {error}</div>;
 
   return (
     <>
       <FavoritesPage
-        favorites={favorites} // ⚡️ même tableau vide = affiche "Aucun favori pour le moment"
+        favorites={favorites}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        onPlay={goToFavorite}
       />
 
       <EditPlaylistModal
