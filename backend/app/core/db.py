@@ -13,7 +13,11 @@ MONGO_PASSWORD = settings.mongo_password
 MONGO_DBNAME = settings.mongo_db_name
 
 if MONGO_USERNAME and MONGO_PASSWORD:
-    MONGO_URL = f"mongodb://{MONGO_USERNAME}:{MONGO_PASSWORD}@{MONGO_HOST}:{MONGO_PORT}/?ssl=true&replicaSet=globaldb&retrywrites=false"
+    MONGO_URL = (
+        f"mongodb://{MONGO_USERNAME}:{MONGO_PASSWORD}"
+        f"@{MONGO_HOST}:{MONGO_PORT}/"
+        "?ssl=true&replicaSet=globaldb&retrywrites=false"
+    )
 else:
     MONGO_URL = f"mongodb://{MONGO_HOST}:{MONGO_PORT}"
 
@@ -33,7 +37,6 @@ async def check_connection() -> bool:
         bool: True if connection is successful, False otherwise.
     """
     try:
-        # The "ping" command checks if the connection is working
         await client.admin.command("ping")
         return True
     except PyMongoError:

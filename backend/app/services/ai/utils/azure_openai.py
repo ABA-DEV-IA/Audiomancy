@@ -1,8 +1,6 @@
 """ Module creating the LLM for the AI agent """
 
-import os
 from langchain_openai import AzureChatOpenAI
-from dotenv import load_dotenv
 from app.core.config import settings
 
 def get_llm():

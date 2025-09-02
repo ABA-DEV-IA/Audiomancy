@@ -8,10 +8,10 @@ Functions:
     normalize_license_url: Cleans license URL by removing region-specific suffixes.
     format_jamendo_track: Formats a single raw track into a JamendoTrackResponse.
 """
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 from typing import List
 from urllib.parse import urlparse, urlunparse
-from app.utils.license import LICENSE_MAP  # Renommé depuis tracks.py
+from app.utils.license import LICENSE_MAP
 
 
 def normalize_license_url(url: str) -> str:
