@@ -67,7 +67,7 @@ def test_update_user():
         "username": "updateduser",
         "password": "newpassword"
     }
-    response = client.put("/user/update", json=payload, headers=HEADERS)
+    response = client.put("/user/modify", json=payload, headers=HEADERS)
     assert response.status_code == 200
     data = response.json()
     assert data["success"] is True

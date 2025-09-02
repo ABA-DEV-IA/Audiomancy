@@ -48,7 +48,7 @@ export const aboutConfig = {
     { name: 'Next.js', color: '#A45EE5' },
     { name: 'TypeScript', color: '#FF7BAC' },
     { name: 'Tailwind CSS', color: '#4CE0B3' },
-    { name: 'Chat Gpt4', color: '#FF934F' },
+    { name: 'GPT4', color: '#FF934F' },
     { name: 'Jamendo API', color: '#A3D5FF' },
     { name: 'Python', color: '#D9B3FF' },
     { name: 'FastAPI', color: '#6A0DAD' },

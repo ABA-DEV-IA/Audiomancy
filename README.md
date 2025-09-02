@@ -1,8 +1,8 @@
 # Audiomancy
 
-![Python](https://img.shields.io/badge/python-3.13+-blue?logo=python) ![Node.js](https://img.shields.io/badge/node.js-22+-green?logo=node.js)![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-brightgreen)![Next.js](https://img.shields.io/badge/Next.js-15+-black?logo=next.js)![Build](https://img.shields.io/github/actions/workflow/status/USERNAME/audiomancy/ci.yml?branch=main)![Coverage](https://img.shields.io/codecov/c/github/USERNAME/audiomancy/main?logo=codecov)![License](https://img.shields.io/badge/license-MIT-blue)![Release](https://img.shields.io/github/v/release/USERNAME/audiomancy)
+![Python](https://img.shields.io/badge/python-3.13+-blue?logo=python) ![Node.js](https://img.shields.io/badge/node.js-22+-green?logo=node.js)![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-brightgreen)![Next.js](https://img.shields.io/badge/Next.js-15+-black?logo=next.js)![License](https://img.shields.io/badge/license-MIT-blue)![Release](https://img.shields.io/github/v/release/USERNAME/audiomancy)
 
-![background_readme.png](background_readme.png)
+![background_readme.png](img_readme/background_readme.png)
 
 **Audiomancy** est une plateforme web basée sur l’IA pour la génération, la gestion et la lecture de playlists musicales. Elle combine :
 
@@ -23,6 +23,7 @@ Audiomancy permet de créer automatiquement des playlists adaptées à un thème
 - [Tests](#tests)
 - [Équipe](#%C3%A9quipe)
 - [Licence](#licence)
+- [Annexe](#annexe)
 
 * * *
 
@@ -36,6 +37,18 @@ Audiomancy permet de créer automatiquement des playlists adaptées à un thème
 - Interface moderne et responsive (mobile & desktop)
 
 * * *
+
+## Arborescence 
+
+```bash
+.
+├── LICENSE
+├── azure_functions/    # Fonctions serverless Azure
+├── backend/            # API FastAPI + logique métier
+├── frontend/           # Application Next.js/React
+├── img_readme/         # Images pour le README
+└── README.md
+```
 
 ## Architecture
 
@@ -75,6 +88,8 @@ Audiomancy permet de créer automatiquement des playlists adaptées à un thème
 - Azure CLI (optionnel)
 - .env frontend comme backend (en tout cas pour le développement local )
 
+⚠️ Des fichiers .env.example sont fournis dans backend/ et frontend/. Copiez-les en .env et complétez les clés nécessaires (Jamendo, OpenAI, Azure, etc.).
+
 ### Backend
 
 ```bash
@@ -110,8 +125,8 @@ npm install -g azure-functions-core-tools@4 --unsafe-perm true
 cd backend
 uvicorn app.main:app --reload
 ```
-
-API disponible : `http://localhost:8000`
+- API disponible : `http://localhost:8000` 
+- Documentation Swagger : `http://localhost:8000/docs`
 
 ### Lancer le frontend
 
@@ -146,14 +161,25 @@ pytest
 
 | Nom | Rôle | GitHub |
 | --- | --- | --- |
-| Benjamin | Backend , Architecture, Configuration | https://github.com/benjsant |
-| Aurelien R | Frontend, UI, MongoDB/Utilisateur | https://github.com/aruide |
-| Aurelien L | Azure, IA, MongoDb/Favoris | https://github.com/Aurelien-L |
+| Benjamin | Backend , Architecture, Configuration | [@benjsant](https://github.com/benjsant)  |
+| Aurelien R | Frontend, UI, MongoDB/Utilisateur | [@aruide](https://github.com/aruide)  |
+| Aurelien L | Azure, IA, MongoDb/Favoris | [@Aurelien-L](https://github.com/Aurelien-L)|
 
 * * *
 
 ## Licence
 
-Ce projet est sous licence **MIT**.
+Ce projet est sous licence [MIT](LICENSE).
 
 * * *
+
+## Annexe 
+
+### Page Accueil: 
+![accueil](img_readme/accueil.png)
+
+### Page Generation: 
+![generation](img_readme/generation.png)
+
+### Lecteur de Musique:
+![player](img_readme/player.png)
