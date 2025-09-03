@@ -82,13 +82,13 @@ Audiomancy permet de créer automatiquement des playlists adaptées à un thème
 
 ### Prérequis
 
-- Python 3.13+
-- Node.js 22+
-- Docker (optionnel)
-- Azure CLI (optionnel)
-- .env frontend comme backend (en tout cas pour le développement local )
+- Python 3.13+  
+- Node.js 22+  
+- Docker (optionnel)  
+- Azure CLI (optionnel)  
+- Fichiers `.env` pour frontend et backend (développement local)
 
-⚠️ Des fichiers .env.example sont fournis dans backend/ et frontend/. Copiez-les en .env et complétez les clés nécessaires (Jamendo, OpenAI, Azure, etc.).
+⚠️ Des fichiers `.env.example` sont fournis dans `backend/` et `frontend/`. Copiez-les en `.env` et complétez les clés nécessaires (Jamendo, OpenAI, Azure, etc.).
 
 ### Backend
 
@@ -103,7 +103,7 @@ pip install -r requirements.txt
 
 ```bash
 cd frontend
-npm install # ou pnpm install
+npm install  # ou pnpm install
 ```
 
 ### Azure Functions
@@ -115,37 +115,53 @@ npm install -g azurite
 npm install -g azure-functions-core-tools@4 --unsafe-perm true
 ```
 
-* * *
+---
 
 ## Utilisation
 
-### Lancer le backend
+Pour exécuter Audiomancy en environnement local, plusieurs services doivent tourner en parallèle.  
+Il est recommandé d’ouvrir différentes fenêtres ou onglets de terminal pour chaque service.
+
+### 1. Lancer le backend (FastAPI)
 
 ```bash
 cd backend
 uvicorn app.main:app --reload
 ```
-- API disponible : `http://localhost:8000` 
-- Documentation Swagger : `http://localhost:8000/docs`
 
-### Lancer le frontend
+- API disponible : [http://localhost:8000](http://localhost:8000)  
+- Documentation Swagger : [http://localhost:8000/docs](http://localhost:8000/docs)
+
+### 2. Lancer le frontend (Next.js)
 
 ```bash
 cd frontend
 npm run dev
 ```
 
-Application disponible : `http://localhost:3000`
+- Application disponible : [http://localhost:3000](http://localhost:3000)
 
-### Lancer les fonctions Azure
+### 3. Lancer l’émulateur Azure Storage (Azurite)
+
+```bash
+cd azure_functions
+azurite
+```
+
+- Service accessible par défaut : [http://127.0.0.1:10000](http://127.0.0.1:10000)
+
+### 4. Lancer les Azure Functions
 
 ```bash
 cd azure_functions
 func start
 ```
 
-* * *
+- Les fonctions seront exécutées localement et prêtes à interagir avec le backend et le stockage émulé
 
+⚡ Une fois ces quatre services en route, Audiomancy sera pleinement fonctionnelle.
+
+* * *
 ## Tests
 
 ### Backend
@@ -155,6 +171,12 @@ cd backend
 pytest
 ```
 
+### Frontend
+
+```bash
+cd frontend
+npm run test
+```
 * * *
 
 ## Équipe
