@@ -4,7 +4,6 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   const { wish, size } = await request.json();
-  console.log(`reçu = ${wish} : ${size}`);
 
   // Simule des données de playlist basées sur le wish et la taille
   const fakePlaylist = Array.from({ length: size }).map((_, index) => ({

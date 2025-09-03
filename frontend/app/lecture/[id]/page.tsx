@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import LecturePage from "@/components/sections/lecture/lecture-page";
+import LecturePage from "@/components/sections/lecture/LectureSection";
 
 export default function Page() {
   const params = useParams();
@@ -17,5 +17,5 @@ export default function Page() {
 
   if (!tags) return <p>Chargement...</p>;
 
-  return <LecturePage params={{ id: params.id as string, tags }} />;
+  return <LecturePage trackId={params.id as string} tags={tags} />;
 }

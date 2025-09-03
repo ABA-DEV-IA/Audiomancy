@@ -1,28 +1,53 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, ReactNode } from 'react';
+
 import { Sidebar } from '@/components/layout/sidebar';
-import { TopNavbar } from '@/components/top-navbar';
-import { HomePage } from '@/components/sections/homeSection';
-import { SearchPage } from '@/components/sections/searchSection';
-import { AboutPage } from '@/components/sections/aboutSection';
-import { GenerationPage } from '@/components/sections/generationSection';
+import { TopNavbar } from '@/components/layout/top-navbar';
+import { HomePage } from '@/components/sections/home/HomeSection';
+import { SearchPage } from '@/components/sections/search/SearchSection';
+import { AboutPage } from '@/components/sections/about/AboutSection';
+import { GenerationPage } from '@/components/sections/generation/GenerationSection';
 import { Footer } from '@/components/layout/footer';
+import { AuthPage } from '@/components/sections/user/AuthSection';
+import { AccountPage } from '@/components/sections/user/AccountSection'
+import { RegisterPage } from '@/components/sections/user/RegisterSection';
+import { FavoritesContainer } from '@/components/sections/favorite/favorites-container';
 
-export default function App() {
-  const [currentPage, setCurrentPage] = useState('categories');
+
+type PageKey = 'categories' | 'generation' | 'favorites' | 'recherches' | 'about' | 'lecture' | 'login' | 'register' | 'acount';
+
+export default function Page() {
+  const [currentPage, setCurrentPage] = useState<PageKey>('categories');
   const [sidebarOpen, setSidebarOpen] = useState(true);
-
-  // Nouvel état pour l'id du morceau sélectionné
   const [currentTrackId, setCurrentTrackId] = useState<string | null>(null);
 
-  // Aller sur la page lecture avec un morceau spécifique
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        // Mobile → sidebar fermée
+        setSidebarOpen(false);
+      } else if (window.innerWidth < 1024) {
+        // Tablette → sidebar réduite
+        setSidebarOpen(false); // réduite (donc juste l’icône)
+      } else {
+        // Desktop → sidebar ouverte
+        setSidebarOpen(true);
+      }
+    };
+
+    handleResize(); // appel initial
+    window.addEventListener('resize', handleResize);
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const goToLecture = (id: string) => {
     setCurrentTrackId(id);
     setCurrentPage('lecture');
   };
 
-  const handlePageChange = (page: string) => {
+  const handlePageChange = (page: PageKey) => {
     setCurrentPage(page);
     if (page !== 'lecture') {
       setCurrentTrackId(null);
@@ -37,38 +62,41 @@ export default function App() {
     setCurrentPage('categories');
   };
 
-  const renderPage = () => {
-    switch (currentPage) {
-      case 'categories':
-        return <HomePage onCategoryClick={() => goToLecture('default')} />;
-      case 'generation':
-        return (
-          <GenerationPage
-            onBack={handleGenerationBack}
-            onComplete={handleGenerationComplete}
-          />
-        );
-      case 'recherches':
-        return <SearchPage onTrackClick={goToLecture} />;
-      case 'about':
-        return <AboutPage />;
-      default:
-        return <HomePage onCategoryClick={() => goToLecture('default')} />;
-    }
+  const renderPage = (): ReactNode => {
+    const pages: Record<PageKey, ReactNode> = {
+      categories: <HomePage onCategoryClick={() => goToLecture('default')} />,
+      generation: <GenerationPage onBack={handleGenerationBack} onComplete={handleGenerationComplete} />,
+      favorites: <FavoritesContainer />,
+      recherches: <SearchPage onTrackClick={goToLecture} />,
+      about: <AboutPage />,
+      lecture: <HomePage onCategoryClick={() => goToLecture('default')} />,
+      login: <AuthPage onLoginSuccess={() => setCurrentPage('categories')} onSwitchToRegister={() => setCurrentPage('register')} />,
+      register: <RegisterPage onRegisterSuccess={() => setCurrentPage('categories')} onSwitchToLogin={() => setCurrentPage('login')} />,
+      acount: <AccountPage />
+    };
+
+    return pages[currentPage];
   };
 
   return (
-    <div className="flex h-screen bg-[#F2E9E4]">
+    <div className="relative flex min-h-screen overflow-x-hidden bg-background">
+      {/* Sidebar en overlay */}
       <Sidebar
         isOpen={sidebarOpen}
-        onToggle={() => setSidebarOpen(!sidebarOpen)}
+        onToggle={() => setSidebarOpen((prev) => !prev)}
         currentPage={currentPage}
         onPageChange={handlePageChange}
       />
 
-      <div className="flex-1 flex flex-col">
+      {/* Main content, décalé de la sidebar réduite */}
+      <div className="flex flex-1 flex-col min-h-screen overflow-hidden pl-16 transition-all duration-300">
         <TopNavbar />
-        <main className="flex-1 overflow-hidden">{renderPage()}</main>
+
+        {/* Scrollable content */}
+        <main className="flex-1 overflow-y-auto overflow-x-hidden">
+          {renderPage()}
+        </main>
+
         <Footer />
       </div>
     </div>

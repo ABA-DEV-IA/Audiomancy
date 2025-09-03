@@ -21,3 +21,9 @@ dotenv
 ddgs #duckduckgo-search
 langchain
 langchain-openai
+motor
+pymongo
+pydantic[email]
+passlib[bcrypt]
+azure-cognitiveservices-speech
+pymongo

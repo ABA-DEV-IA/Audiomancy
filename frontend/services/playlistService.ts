@@ -1,46 +1,33 @@
-// src/services/playlistService.ts
-import { API_PLAYLIST_URL } from '@/config/api';
-import { API_PLAYLIST_GENERATE_URL } from '@/config/api';
-import { Track } from '@/types/track';
+import { Track } from "@/types/track";
 
-// 🔹 Récupérer une playlist à partir des tags
-export async function fetchPlaylistTracks(playlistTags: string): Promise<Track[]> {
-
-  const response = await fetch(`${API_PLAYLIST_URL}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      tags: playlistTags.replace(/\s+/g, '+'), // ex: "rock chill" → "rock+chill"
-      // duration_min, duration_max, limit seront pris par défaut côté API
-    }),
+/**
+ * Helper pour effectuer une requête POST et retourner du JSON typé.
+ */
+async function fetchJson<T>(url: string, body: Record<string, unknown>): Promise<T> {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
   });
 
   if (!response.ok) {
-    throw new Error('Erreur lors de la récupération des pistes');
+    const errorText = await response.text();
+    throw new Error(`API error ${response.status}: ${errorText}`);
   }
 
-  const data = await response.json();
-
-  return data;
+  return response.json() as Promise<T>;
 }
 
+/**
+ * Récupérer une playlist à partir des tags et d’un trackId (catégorie).
+ */
+export async function fetchPlaylistTracks(trackId: string, tags: string): Promise<Track[]> {
+  return fetchJson<Track[]>("/api/proxyPlaylist", { trackId, tags });
+}
+
+/**
+ * Générer une playlist en fonction d'un prompt et d'une limite.
+ */
 export async function fetchPlaylistTracksGenerate(limit: number, prompt: string): Promise<Track[]> {
-  console.log('generate playlist with tags:');
-
-  const response = await fetch(`${API_PLAYLIST_GENERATE_URL}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      limit: limit,
-      prompt: prompt
-    }),
-  });
-
-  if (!response.ok) {
-    throw new Error('Erreur lors de la récupération des pistes');
-  }
-
-  const data = await response.json();
-
-  return data;
+  return fetchJson<Track[]>("/api/proxyPlaylistGenerate", { limit, prompt });
 }

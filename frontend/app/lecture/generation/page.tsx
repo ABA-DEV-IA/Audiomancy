@@ -3,10 +3,10 @@
 'use client';
 
 import { GenerationProvider } from '@/context/generation_context';
-import LecturePageGenerate from '@/components/sections/lecture/lectureGenerateSection';
+import LectureGeneratePage from '@/components/sections/lecture/lectureGenerateSection';
 
 export default function Page() {
   return (
-    <LecturePageGenerate />
+    <LectureGeneratePage />
   );
 }
