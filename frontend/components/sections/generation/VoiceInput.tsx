@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import * as SpeechSDK from "microsoft-cognitiveservices-speech-sdk";
 import { Button } from "@/components/ui/button";
-import { Hourglass, Mic } from 'lucide-react' ; 
+import { Hourglass, Mic } from "lucide-react";
 
 interface VoiceInputProps {
   onResult: (text: string) => void;
@@ -19,9 +19,10 @@ const VoiceInput: React.FC<VoiceInputProps> = ({ onResult }) => {
       const response = await fetch("/api/speech-token", { method: "POST" });
       if (!response.ok) throw new Error("Impossible d'obtenir le token");
 
-      const { key, region } = await response.json();
+      const { token, region } = await response.json();
 
-      const speechConfig = SpeechSDK.SpeechConfig.fromSubscription(key, region);
+      // Use token-based auth instead of subscription key
+      const speechConfig = SpeechSDK.SpeechConfig.fromAuthorizationToken(token, region);
       speechConfig.speechRecognitionLanguage = "fr-FR";
 
       const audioConfig = SpeechSDK.AudioConfig.fromDefaultMicrophoneInput();

@@ -10,8 +10,6 @@
  */
 
 type Config = {
-  speechKey: string;
-  speechRegion: string;
   fastApiUrl: string;
   fastApiKey: string;
 };
@@ -43,8 +41,6 @@ function getEnvVar(name: string, required = true): string {
  */
 export function getConfig(): Config {
   return {
-    speechKey: getEnvVar("SPEECH_KEY"),
-    speechRegion: getEnvVar("SPEECH_REGION"),
     fastApiUrl: getEnvVar("FASTAPI_URL"),
     fastApiKey: getEnvVar("API_KEY"),
   };

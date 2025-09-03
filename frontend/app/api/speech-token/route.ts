@@ -2,14 +2,7 @@ import { NextResponse } from "next/server";
 import { getConfig } from "@/lib/config";
 
 export async function POST(request: Request) {
-  const { speechKey, speechRegion, fastApiUrl, fastApiKey } = getConfig();
-
-  if (!speechKey || !speechRegion) {
-    return NextResponse.json(
-      { error: "Server misconfiguration: missing Speech Key or Region" },
-      { status: 500 }
-    );
-  }
+  const { fastApiUrl, fastApiKey } = getConfig();
 
   if (!fastApiUrl || !fastApiKey) {
     return NextResponse.json(

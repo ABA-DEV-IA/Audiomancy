@@ -1,37 +1,35 @@
 """
 This module defines the FastAPI router responsible for exposing the 
-Azure Speech service token endpoint. The endpoint allows the frontend 
-(e.g., a React/Next.js application) to request the authentication 
-credentials required to interact with Azure Cognitive Services 
-(Speech-to-Text).
+Azure Speech service token endpoint. Instead of returning the raw 
+speech key (dangerous), it requests a temporary token from Azure 
+and returns it to the frontend.
 """
 
+import requests
 from fastapi import APIRouter, HTTPException
 from app.core.config import settings
 
 router = APIRouter()
 
-speech_key = settings.speech_key
-speech_region = settings.speech_region
-
 @router.post("/speech-token", tags=["Speech"])
 def get_speech_token():
-
     """
-    Returns the Azure Speech Recognition API token.
-    This token is used to authenticate the API call.
-    The keys are provided by the following environment variables:
-    - `speech_key`: Speech Recognition API key.
-    - `speech_region`: Region where the service is deployed.
-    If these variables are not defined, a 500 error is thrown.
+    Requests a temporary Azure Speech token using the subscription key.
+    Returns the token + region, which the frontend can safely use.
     """
 
-    secret_key = speech_key
-    region = speech_region
+    if not settings.speech_key or not settings.speech_region:
+        raise HTTPException(status_code=500, detail="Missing Azure Speech config")
 
-    print(secret_key)
-    print(region)
-    if not secret_key or not region:
-        raise HTTPException(status_code=500, detail="Config Azure manquante")
+    token_url = f"https://{settings.speech_region}.api.cognitive.microsoft.com/sts/v1.0/issueToken"
+    headers = {
+        "Ocp-Apim-Subscription-Key": settings.speech_key
+    }
 
-    return {"key": secret_key, "region": region}
+    try:
+        response = requests.post(token_url, headers=headers)
+        response.raise_for_status()
+        access_token = response.text
+        return {"token": access_token, "region": settings.speech_region}
+    except requests.RequestException as e:
+        raise HTTPException(status_code=500, detail=f"Azure token request failed: {e}")
