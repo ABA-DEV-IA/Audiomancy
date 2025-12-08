@@ -1,9 +1,5 @@
 """
-blob_tools.py
-
-Utilities for interacting with Azure Blob Storage for caching track data.
-Includes safe filenames, optional overwrite control, and robust error handling.
-All blobs are stored under a "cache/" prefix to allow lifecycle management.
+blob_tools.py (version compatible CI/CD & tests unitaires)
 """
 
 import logging
@@ -20,48 +16,47 @@ logger = logging.getLogger(__name__)
 cache_blob_name = settings.cache_blob_name
 azure_storage_connection_string = settings.azure_storage_connection_string
 
-if not azure_storage_connection_string:
-    raise ValueError(
-        "AZURE_STORAGE_CONNECTION_STRING environment variable is not set"
-    )
+# IMPORTANT : on NE crée PAS le client ici.
+_blob_service_client: BlobServiceClient | None = None
 
-blob_service_client = BlobServiceClient.from_connection_string(azure_storage_connection_string)
+
+def get_blob_service_client() -> BlobServiceClient:
+    """
+    Lazy loader for BlobServiceClient.  
+    Avoids import-time initialization (critical for CI/CD and pytest).
+    """
+    global _blob_service_client
+
+    if _blob_service_client is None:
+        if not azure_storage_connection_string:
+            raise RuntimeError(
+                "AZURE_STORAGE_CONNECTION_STRING must be set before using blob tools."
+            )
+
+        _blob_service_client = BlobServiceClient.from_connection_string(
+            azure_storage_connection_string
+        )
+
+    return _blob_service_client
+
 
 # --- Internal prefix for cache blobs ---
 CACHE_PREFIX = "cache/"
 
 
 def create_container_if_not_exists(container_name: str = cache_blob_name) -> ContainerClient:
-    """
-    Ensure the container exists. Create it if it doesn't.
-    
-    Args:
-        container_name (str): Name of the Azure Blob container.
-    
-    Returns:
-        ContainerClient: The client for interacting with the container.
-    """
-    container_client = blob_service_client.get_container_client(container_name)
+    client = get_blob_service_client()
+    container_client = client.get_container_client(container_name)
+
     try:
         container_client.get_container_properties()
     except ResourceNotFoundError:
         container_client.create_container()
+
     return container_client
 
 
 def generate_cache_filename(category: str) -> str:
-    """
-    Return a safe blob filename for a given music category or mood.
-    Stored inside the "cache/" folder.
-    
-    Non-alphanumeric characters are replaced with underscores.
-    
-    Args:
-        category (str): Music category or mood.
-    
-    Returns:
-        str: Safe blob filename with "cache/" prefix.
-    """
     safe_name = "".join(c if c.isalnum() else "_" for c in category.strip().lower())
     return f"{CACHE_PREFIX}{safe_name}_cache.json"
 
@@ -72,16 +67,7 @@ def upload_blob(
     container_name: str = cache_blob_name,
     overwrite: bool = False
 ) -> None:
-    """
-    Upload a string as a blob inside the "cache/" folder, optionally preventing overwrite.
-    Handles race conditions where the blob might exist concurrently.
-    
-    Args:
-        blob_name (str): Name of the blob (must already include CACHE_PREFIX).
-        data (str): String data to upload.
-        container_name (str): Name of the container.
-        overwrite (bool): Whether to overwrite existing blob. Defaults to False.
-    """
+
     container_client = create_container_if_not_exists(container_name)
     blob_client: BlobClient = container_client.get_blob_client(blob_name)
 
@@ -96,16 +82,6 @@ def upload_blob(
 
 
 def download_blob(blob_name: str, container_name: str = cache_blob_name) -> Optional[str]:
-    """
-    Download blob content as string.
-    
-    Args:
-        blob_name (str): Name of the blob (must already include CACHE_PREFIX).
-        container_name (str): Name of the container.
-    
-    Returns:
-        Optional[str]: Blob content as string, or None if blob does not exist.
-    """
     container_client = create_container_if_not_exists(container_name)
     blob_client: BlobClient = container_client.get_blob_client(blob_name)
 
@@ -118,13 +94,6 @@ def download_blob(blob_name: str, container_name: str = cache_blob_name) -> Opti
 
 
 def delete_blob(blob_name: str, container_name: str = cache_blob_name) -> None:
-    """
-    Delete a blob if it exists.
-    
-    Args:
-        blob_name (str): Name of the blob (must already include CACHE_PREFIX).
-        container_name (str): Name of the container.
-    """
     container_client = create_container_if_not_exists(container_name)
     blob_client: BlobClient = container_client.get_blob_client(blob_name)
 
@@ -134,14 +103,5 @@ def delete_blob(blob_name: str, container_name: str = cache_blob_name) -> None:
 
 
 def list_blobs(container_name: str = cache_blob_name) -> List[str]:
-    """
-    List all blob names in a container.
-    
-    Args:
-        container_name (str): Name of the container.
-    
-    Returns:
-        List[str]: List of blob names.
-    """
     container_client = create_container_if_not_exists(container_name)
     return [b.name for b in container_client.list_blobs()]
