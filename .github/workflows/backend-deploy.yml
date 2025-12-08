@@ -4,16 +4,9 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
   workflow_dispatch:
 
 jobs:
-
-  tests:
-    name: Run clean and tests
-    uses: ./.github/workflows/tests.yml
 
   build-and-push:
     runs-on: ubuntu-latest
