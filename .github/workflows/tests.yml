@@ -1,56 +1,64 @@
-name: Run tests unitaire
+name: Run tests unitaires
 
 on:
   workflow_call:
 
 jobs:
   pylint:
-    name: clean (pylint)
+    name: Lint (pylint)
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout du code
-      uses: actions/checkout@v4
+      - name: Checkout du code
+        uses: actions/checkout@v4
 
-    - name: Configuration Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.13"
-        cache: "pip"      # Active le cache pip automatiquement
-        cache-dependency-path: "requirements.txt"
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
 
-    - name: Installation des dépendances
-    # pip cache fonctionne automatiquement avec actions/setup-python
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+      - name: Cache des dépendances
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('backend/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
-    - name: Exécution de pylint
-      run: |
-        pylint .
-  
+      - name: Installer les dépendances
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+
+      - name: Exécution de pylint
+        run: |
+          pylint backend/
+
   pytests:
-    name: tests (pytest)
+    name: Tests unitaires (pytest)
     runs-on: ubuntu-latest
-    needs: pylint
-
+    needs: pylint    # attend que pylint soit fini
     steps:
-    - name: Checkout du code
-      uses: actions/checkout@v4
+      - name: Checkout du code
+        uses: actions/checkout@v4
 
-    - name: Configuration Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.13"
-        cache: "pip"
-        cache-dependency-path: "requirements.txt"
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
 
-    - name: Installation des dépendances
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install pytest pytest-asyncio
+      - name: Cache des dépendances
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('backend/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
-    - name: Exécution des tests Pytest
-      run: |
-        pytest
+      - name: Installer les dépendances
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+
+      - name: Exécution des tests
+        run: |
+          pytest backend/
