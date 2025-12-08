@@ -1,6 +1,6 @@
 # Audiomancy
 
-![Python](https://img.shields.io/badge/python-3.13+-blue?logo=python) ![Node.js](https://img.shields.io/badge/node.js-22+-green?logo=node.js)![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-brightgreen)![Next.js](https://img.shields.io/badge/Next.js-15+-black?logo=next.js)![License](https://img.shields.io/badge/license-MIT-blue)![Release](https://img.shields.io/github/v/release/USERNAME/audiomancy)
+![Python](https://img.shields.io/badge/python-3.13+-blue?logo=python) ![Node.js](https://img.shields.io/badge/node.js-22+-green?logo=node.js)![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-brightgreen)![Next.js](https://img.shields.io/badge/Next.js-15+-black?logo=next.js)![License](https://img.shields.io/badge/license-MIT-blue)![Release](https://img.shields.io/github/v/release/ABA-DEV-IA/audiomancy)
 
 ![background_readme.png](img_readme/background_readme.png)
 

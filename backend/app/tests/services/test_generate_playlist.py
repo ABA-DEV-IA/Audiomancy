@@ -75,13 +75,15 @@ def test_generate_playlist_agent_failure(api_client):
 
 
 def test_generate_playlist_invalid_limit(api_client):
-    """🚫 Case where 'limit' is invalid -> FastAPI/Pydantic should return 422"""
     response = api_client.post(
         "/generate/playlist",
-        json={"prompt": "Une playlist impossible", "limit": 1}  # ❌ not in {10, 25, 50}
+        json={"prompt": "Une playlist impossible", "limit": 1}
     )
 
     assert response.status_code == 422
     data = response.json()
-    assert data["detail"][0]["msg"] == "Value error, limit must be one of 10, 25, or 50"
-    assert data["detail"][0]["loc"][-1] == "limit"
+
+    # Ici data["detail"] est une string, pas une liste de dicts
+    assert isinstance(data["detail"], str)
+    assert "limit must be one of 10, 25, or 50" in data["detail"]
+
