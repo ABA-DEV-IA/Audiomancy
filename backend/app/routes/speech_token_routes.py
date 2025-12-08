@@ -27,9 +27,9 @@ def get_speech_token():
     }
 
     try:
-        response = requests.post(token_url, headers=headers)
+        response = requests.post(token_url, headers=headers, timeout=10)
         response.raise_for_status()
         access_token = response.text
         return {"token": access_token, "region": settings.speech_region}
     except requests.RequestException as e:
-        raise HTTPException(status_code=500, detail=f"Azure token request failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Azure token request failed: {e}") from e
