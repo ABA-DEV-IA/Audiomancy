@@ -1,0 +1,14 @@
+name: Run tests on all branches (except main)
+
+on:
+  push:
+    branches-ignore:
+      - main
+  pull_request:
+    branches-ignore:
+      - main
+  workflow_dispatch:
+
+jobs:
+  run-tests:
+    uses: ./.github/workflows/tests.yml
