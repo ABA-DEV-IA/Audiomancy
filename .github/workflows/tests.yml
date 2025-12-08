@@ -31,7 +31,8 @@ jobs:
 
       - name: Exécution de pylint
         run: |
-          pylint backend/
+          cd backend
+          pylint .
 
   pytests:
     name: Tests unitaires (pytest)
@@ -61,4 +62,5 @@ jobs:
 
       - name: Exécution des tests
         run: |
-          pytest backend/
+          cd backend
+          pytest
