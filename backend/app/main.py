@@ -11,6 +11,8 @@ Attributes:
 """
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.exceptions import RequestValidationError
+
 from app.core.config import settings
 from app.routes.jamendo_routes import router as jamendo_router
 from app.routes.ai_routes import router as ai_router
@@ -19,7 +21,6 @@ from app.routes.favorite_routes import router as favorite_router
 from app.core.security import get_api_key
 from app.routes.speech_token_routes import router as speech_router
 from app.errors.handlers import validation_exception_handler
-from fastapi.exceptions import RequestValidationError
 
 docs_url = "/docs" if settings.swagger_on else None
 redoc_url = "/redoc" if settings.swagger_on else None
