@@ -79,3 +79,13 @@ uvicorn==0.35.0
 urllib3==2.5.0
 validators==0.35.0
 zstandard==0.24.0
+opentelemetry-sdk==1.28.0
+opentelemetry-api==1.28.0
+opentelemetry-instrumentation==0.49b0
+opentelemetry-instrumentation-fastapi==0.49b0
+opentelemetry-instrumentation-requests==0.49b0
+opentelemetry-instrumentation-logging==0.49b0
+opentelemetry-instrumentation-urllib==0.49b0
+opentelemetry-instrumentation-system-metrics==0.49b0
+azure-monitor-opentelemetry-exporter==1.0.0b23
+
