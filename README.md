@@ -35,6 +35,7 @@ Audiomancy permet de créer automatiquement des playlists adaptées à un thème
 - Authentification et sessions sécurisées
 - Intégration avec **Azure Speech** pour synthèse et reconnaissance vocale
 - Interface moderne et responsive (mobile & desktop)
+- Intégration et Déploiement continu sur Azure Container Registry
 
 * * *
 
