@@ -41,7 +41,7 @@ jobs:
 
       # Upload de l'image en artifact
       - name: Upload image artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: backend-image
           path: /tmp/backend-image.tar
@@ -54,7 +54,7 @@ jobs:
     steps:
       # Download de l'image
       - name: Download image artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: backend-image
           path: /tmp
