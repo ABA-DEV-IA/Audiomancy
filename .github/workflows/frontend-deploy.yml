@@ -47,7 +47,7 @@ jobs:
       - name: Generate tag
         id: generate_tag
         run: |
-          TAG=$(date +'%Y-%m-%d_%H-%M-%S')
+          TAG=latest
           echo "Using tag: $TAG"
           echo "tag=$TAG" >> $GITHUB_OUTPUT
 
