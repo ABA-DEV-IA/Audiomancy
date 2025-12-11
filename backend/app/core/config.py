@@ -39,10 +39,10 @@ class Settings(BaseSettings):
     Secrets from Key Vault are cached in-memory per container instance to avoid multiple requests.
     """
 
-    # Comma-separated string for allowed CORS origins
+    # CORS
     allowed_origins: Optional[str] = None
 
-    # Example secrets and configuration values
+    # Your existing values
     jamendo_client_id: Optional[str] = None
     azure_openai_api_key: Optional[str] = None
     azure_key_vault_url: Optional[str] = None
@@ -63,6 +63,9 @@ class Settings(BaseSettings):
     mongo_password: Optional[str] = None
     mongo_db_name: Optional[str] = None
 
+    # 🔥 NEW → Application Insights
+    azure_appinsights_connection_string: Optional[str] = None
+
     # Internal cache for Key Vault secrets
     _secrets_cache: dict = {}
 
@@ -72,18 +75,8 @@ class Settings(BaseSettings):
     def load_from_key_vault(self, force_reload: bool = False) -> None:
         """
         Override settings with secrets from Azure Key Vault if available.
-
-        Uses DefaultAzureCredential to authenticate with Managed Identity (in production)
-        or developer credentials (if running locally with Azure CLI). Each secret in Key Vault
-        is injected into the settings if the attribute exists.
-
-        Args:
-            force_reload (bool): If True, reload secrets from Key Vault even if cached.
-
-        Notes:
-            Secrets are cached in `_secrets_cache` to avoid multiple Key Vault calls
-            per container runtime. Cache persists as long as the container is running.
         """
+
         if not self.azure_key_vault_url:
             print("[INFO] No Key Vault URL provided. Using .env only.")
             return
@@ -120,13 +113,6 @@ class Settings(BaseSettings):
     def cors_origins(self) -> List[str]:
         """
         Return allowed_origins as a list for CORSMiddleware.
-
-        Handles dev/prod logic:
-        - Dev: defaults to localhost if allowed_origins not set
-        - Prod: must come from Key Vault or environment variable
-
-        Returns:
-            List[str]: List of allowed CORS origins
         """
         if self.allowed_origins:
             return [origin.strip() for origin in self.allowed_origins.split(",")]
@@ -134,6 +120,6 @@ class Settings(BaseSettings):
         return ["http://localhost:3000", "http://127.0.0.1:3000"]
 
 
-# Singleton instance to use throughout the application
+# Singleton instance
 settings = Settings()
 settings.load_from_key_vault()
