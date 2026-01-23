@@ -7,5 +7,7 @@ def ai_executor(prompt: str) -> str:
 
     response = AI_AGENT.run(prompt)
     filtered_response = filter_final_answer(response)
+    
+    print(f"🎵 [AI EXECUTOR] Returning tags to Jamendo: '{filtered_response}'")
 
     return filtered_response

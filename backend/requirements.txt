@@ -92,3 +92,5 @@ opentelemetry-instrumentation-logging==0.49b0
 
 # ---- Azure Monitor Exporter ----
 azure-monitor-opentelemetry-exporter==1.0.0b23
+
+# Note: DeepSeek API is OpenAI-compatible, using openai SDK (see above)

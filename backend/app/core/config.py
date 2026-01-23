@@ -1,12 +1,17 @@
 """
 Application configuration module.
 
-Loads application settings from environment variables via `.env` file for development
-and optionally overrides them with secrets from Azure Key Vault in production.
-Supports caching secrets in memory to avoid repeated Key Vault calls.
+This module is responsible for loading and managing application configuration
+values. It supports:
 
-Attributes:
-    settings (Settings): Singleton instance containing all loaded configuration values.
+- Loading configuration from environment variables (via a `.env` file)
+  for local development.
+- Overriding configuration values with secrets stored in Azure Key Vault
+  in production environments.
+- In-memory caching of secrets to avoid repeated calls to Azure Key Vault.
+
+This design allows the application to remain cloud-agnostic while ensuring
+secure secret management and clean separation of concerns.
 """
 
 from typing import Optional, List
@@ -15,77 +20,156 @@ from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
 from azure.core.exceptions import AzureError
 
+
 def to_snake_case(name: str) -> str:
     """
     Convert a Key Vault secret name to a Python-friendly snake_case attribute name.
 
+    Azure Key Vault secrets are typically named using uppercase letters
+    and hyphens (e.g. "DEEPSEEK-API-KEY"). This helper converts them to
+    snake_case so they can be mapped to Pydantic settings attributes.
+
     Args:
-        name (str): The secret name in Key Vault, e.g., "AZURE-OPENAI-API-KEY"
+        name (str): The secret name from Azure Key Vault.
 
     Returns:
-        str: The converted snake_case string, e.g., "azure_openai_api_key"
+        str: The converted snake_case string.
     """
     return name.lower().replace("-", "_")
 
 
 class Settings(BaseSettings):
     """
-    Application settings class using Pydantic BaseSettings.
+    Application settings class.
 
-    Loads values from `.env` for local development and can override with Azure Key Vault
-    secrets when `azure_key_vault_url` is provided. Provides a property to get CORS origins
-    as a list for FastAPI middleware.
+    This class defines all configuration values used by the application.
+    Values are loaded in the following order:
 
-    Secrets from Key Vault are cached in-memory per container instance to avoid multiple requests.
+    1. Environment variables (via `.env` file in development).
+    2. Azure Key Vault secrets (if `azure_key_vault_url` is provided).
+
+    Secrets loaded from Azure Key Vault are cached in memory to avoid
+    unnecessary network calls during the application's lifetime.
     """
 
-    # CORS
+    # ------------------------------------------------------------------
+    # 🌐 CORS CONFIGURATION
+    # ------------------------------------------------------------------
     allowed_origins: Optional[str] = None
 
-    # Your existing values
+    # ------------------------------------------------------------------
+    # 🎵 JAMENDO API CONFIGURATION
+    # ------------------------------------------------------------------
     jamendo_client_id: Optional[str] = None
-    azure_openai_api_key: Optional[str] = None
-    azure_key_vault_url: Optional[str] = None
-    deployment_name: Optional[str] = None
-    endpoint_url: Optional[str] = None
     jamendo_url: Optional[str] = None
+
+    # ------------------------------------------------------------------
+    # 🧠 DEEPSEEK LLM CONFIGURATION
+    # ------------------------------------------------------------------
+    deepseek_api_key: Optional[str] = None
+    deepseek_base_url: Optional[str] = "https://api.deepseek.com"
+    """
+    deepseek_api_key:
+        Secret API key used to authenticate requests to the DeepSeek API.
+
+    deepseek_base_url:
+        Base URL for the DeepSeek API. This is optional and can be overridden
+        in case of proxying, self-hosted deployments, or future API changes.
+    """
+
+    deepseek_model: Optional[str] = "deepseek-chat"
+    """
+    deepseek_model:
+        Name of the DeepSeek model used for chat completion.
+        Default is "deepseek-chat".
+    """
+
+    deepseek_temperature: float = 0.0
+    """
+    deepseek_temperature:
+        Sampling temperature for the model.
+        - 0.0 → deterministic output (recommended for ReAct agents)
+        - Higher values → more creative but less predictable
+    """
+
+    deepseek_max_tokens: int = 512
+    """
+    deepseek_max_tokens:
+        Maximum number of tokens generated in the response.
+        This acts as a hard limit to control cost and response size.
+    """
+
+    # ------------------------------------------------------------------
+    # 🎤 SPEECH / AUDIO SERVICES
+    # ------------------------------------------------------------------
     speech_key: Optional[str] = None
     speech_region: Optional[str] = None
-    cache_blob_name: Optional[str] = None
-    azure_storage_connection_string: Optional[str] = None
 
+    # ------------------------------------------------------------------
+    # ☁️ AZURE INFRASTRUCTURE (STILL USED)
+    # ------------------------------------------------------------------
+    azure_key_vault_url: Optional[str] = None
+    azure_storage_connection_string: Optional[str] = None
+    cache_blob_name: Optional[str] = None
+
+    # ------------------------------------------------------------------
+    # 📊 OBSERVABILITY / MONITORING
+    # ------------------------------------------------------------------
+    azure_appinsights_connection_string: Optional[str] = None
+
+    # ------------------------------------------------------------------
+    # 🔐 API SECURITY & DOCUMENTATION
+    # ------------------------------------------------------------------
     api_key: Optional[str] = None
     swagger_on: bool = False
 
+    # ------------------------------------------------------------------
+    # 🗄️ DATABASE (MONGODB)
+    # ------------------------------------------------------------------
     mongo_host: Optional[str] = None
     mongo_port: Optional[str] = None
     mongo_username: Optional[str] = None
     mongo_password: Optional[str] = None
     mongo_db_name: Optional[str] = None
 
-    # 🔥 NEW → Application Insights
-    azure_appinsights_connection_string: Optional[str] = None
-
-    # Internal cache for Key Vault secrets
+    # ------------------------------------------------------------------
+    # 🔒 INTERNAL CACHE (KEY VAULT SECRETS)
+    # ------------------------------------------------------------------
     _secrets_cache: dict = {}
 
-    # Pydantic settings configuration: read from .env, ignore extra keys
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    # ------------------------------------------------------------------
+    # ⚙️ PYDANTIC SETTINGS CONFIGURATION
+    # ------------------------------------------------------------------
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        extra="ignore"
+    )
 
     def load_from_key_vault(self, force_reload: bool = False) -> None:
         """
-        Override settings with secrets from Azure Key Vault if available.
+        Load and override configuration values from Azure Key Vault.
+
+        If `azure_key_vault_url` is not provided, this method does nothing
+        and the application relies solely on environment variables.
+
+        Secrets retrieved from Azure Key Vault are:
+        - Automatically converted to snake_case
+        - Applied only if a corresponding attribute exists in this class
+        - Cached in memory to avoid repeated calls
+
+        Args:
+            force_reload (bool): If True, forces a reload of secrets
+                                 from Azure Key Vault even if cached.
         """
 
         if not self.azure_key_vault_url:
-            print("[INFO] No Key Vault URL provided. Using .env only.")
+            print("[INFO] No Azure Key Vault URL provided. Using .env values only.")
             return
 
         if self._secrets_cache and not force_reload:
-            # Load from cache
             for key, value in self._secrets_cache.items():
                 setattr(self, key, value)
-            print("[INFO] Configuration loaded from cache.")
+            print("[INFO] Configuration loaded from Key Vault cache.")
             return
 
         try:
@@ -96,10 +180,13 @@ class Settings(BaseSettings):
             )
 
             new_cache = {}
+
             for secret_props in client.list_properties_of_secrets():
                 key = to_snake_case(secret_props.name)
-                value = client.get_secret(secret_props.name).value
+
+                # Only apply secrets that exist in the Settings model
                 if hasattr(self, key):
+                    value = client.get_secret(secret_props.name).value
                     setattr(self, key, value)
                     new_cache[key] = value
 
@@ -107,19 +194,28 @@ class Settings(BaseSettings):
             print("[INFO] Configuration successfully loaded from Azure Key Vault.")
 
         except AzureError as error:
-            print(f"[WARNING] Could not load secrets from Key Vault: {error}")
+            print(f"[WARNING] Failed to load secrets from Azure Key Vault: {error}")
 
     @property
     def cors_origins(self) -> List[str]:
         """
-        Return allowed_origins as a list for CORSMiddleware.
+        Return allowed CORS origins as a list.
+
+        This property converts the comma-separated `allowed_origins`
+        string into a list compatible with FastAPI's CORSMiddleware.
+
+        Returns:
+            List[str]: List of allowed CORS origins.
         """
         if self.allowed_origins:
             return [origin.strip() for origin in self.allowed_origins.split(",")]
 
+        # Default values for local development
         return ["http://localhost:3000", "http://127.0.0.1:3000"]
 
 
-# Singleton instance
+# ----------------------------------------------------------------------
+# 📦 SINGLETON SETTINGS INSTANCE
+# ----------------------------------------------------------------------
 settings = Settings()
 settings.load_from_key_vault()

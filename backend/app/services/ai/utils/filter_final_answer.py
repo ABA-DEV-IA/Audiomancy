@@ -1,29 +1,38 @@
-""" Module providing the function filtering the final response from the agent """
-
+"""
+Module providing the function filtering the final response from the agent
+"""
 
 def filter_final_answer(text: str) -> str:
     """
-    Given a text, returns the content of the line that starts with "Final Answer:"
-    (case insensitive). If no such line is found, returns the whole text.
+    Extracts and validates the 'Final Answer' line from the agent output.
 
-    The purpose of this function is to extract the final answer provided by the
-    AI agent from the full text of its output.
-
-    Args:
-        text (str): The text to process.
-
-    Returns:
-        str: The final answer if found, the whole text otherwise.
+    Ensures:
+    - Only the content after 'Final Answer:' is returned
+    - Exactly 7 space-separated tags
     """
 
     final_answer = None
 
     for line in text.splitlines():
-        line_lower = line.lower().strip()
-        if line_lower.startswith("final answer:"):
+        if line.lower().strip().startswith("final answer:"):
             final_answer = line.split(":", 1)[1].strip()
+            break
 
-    if final_answer is None:
+    if not final_answer:
+        print("⚠️  [FILTER DEBUG] No 'Final Answer:' found in response")
         return text.strip()
 
-    return final_answer
+    print(f"✅ [FILTER DEBUG] Raw Final Answer: {final_answer}")
+
+    # 🔒 Normalisation et sécurité
+    tags = final_answer.split()
+
+    # Si le modèle dévie, on coupe proprement
+    if len(tags) > 7:
+        print(f"⚠️  [FILTER DEBUG] Truncating {len(tags)} tags to 7")
+        tags = tags[:7]
+
+    result = " ".join(tags)
+    print(f"🎯 [FILTER DEBUG] Extracted Tags ({len(tags)}): {result}")
+    
+    return result
