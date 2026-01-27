@@ -5,6 +5,7 @@ This module configures the FastAPI application instance, including telemetry (Az
 CORS, custom exception handlers, API key security, and the various API route groups.
 """
 
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
@@ -17,14 +18,36 @@ from app.routes.jamendo_routes import router as jamendo_router
 from app.routes.ai_routes import router as ai_router
 from app.routes.user_routes import router as user_router
 from app.routes.favorite_routes import router as favorite_router
+from app.routes.health_routes import router as health_router
 # from app.routes.speech_token_routes import router as speech_router  # [DÉSACTIVÉ] Azure Speech TTS
 
 from app.errors.handlers import validation_exception_handler
 from app.utils.cache_tools import ensure_cache_indexes
+from app.core.scheduler import start_scheduler, stop_scheduler
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Swagger visible ou non selon settings
 docs_url = "/docs" if settings.swagger_on else None
 redoc_url = "/redoc" if settings.swagger_on else None
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Lifespan context manager for startup and shutdown events"""
+    # Startup
+    logger.info("🚀 Starting Audiomancy Backend...")
+    await ensure_cache_indexes()
+    start_scheduler()
+    logger.info("✅ Startup complete")
+    
+    yield
+    
+    # Shutdown
+    logger.info("🛑 Shutting down Audiomancy Backend...")
+    stop_scheduler()
+    logger.info("✅ Shutdown complete")
 
 
 def create_app() -> FastAPI:
@@ -35,19 +58,28 @@ def create_app() -> FastAPI:
     fastapi_app = FastAPI(
         title="Audiomancy API",
         docs_url=docs_url,
-        redoc_url=redoc_url
+        redoc_url=redoc_url,
+        lifespan=lifespan
     )
 
-    # --- TELEMETRY INIT (Azure App Insights + OpenTelemetry) ---
-    # Conservé pour la compétence C20: Surveiller une application d'IA
-    # TODO: Remplacer Azure Monitor par Jaeger pour monitoring local
-    if settings.azure_appinsights_connection_string:
-        # On passe l'app pour tracer automatiquement les requêtes entrantes
-        setup_telemetry(
-            connection_string=settings.azure_appinsights_connection_string,
-            service_name="audiomancy-backend",
-            app=fastapi_app
-        )
+    # --- TELEMETRY INIT (Jaeger + OpenTelemetry) ---
+    # Compétence C20: Surveiller une application d'IA
+    # Monitoring local avec Jaeger (remplace Azure App Insights)
+    
+    # Toujours activer Jaeger en développement
+    setup_telemetry(
+        service_name="audiomancy-backend",
+        app=fastapi_app,
+        jaeger_endpoint=None  # Utilise JAEGER_ENDPOINT ou défaut Docker
+    )
+    
+    # [LEGACY] Support Azure App Insights si configuré (pour rétrocompatibilité)
+    # if settings.azure_appinsights_connection_string:
+    #     setup_telemetry(
+    #         connection_string=settings.azure_appinsights_connection_string,
+    #         service_name="audiomancy-backend",
+    #         app=fastapi_app
+    #     )
 
     # --- CORS ---
     fastapi_app.add_middleware(
@@ -61,13 +93,11 @@ def create_app() -> FastAPI:
     # --- Custom Exceptions ---
     fastapi_app.add_exception_handler(RequestValidationError, validation_exception_handler)
 
-    # --- Startup Event: Initialize MongoDB cache indexes ---
-    @fastapi_app.on_event("startup")
-    async def startup_event():
-        """Initialize cache indexes on startup"""
-        await ensure_cache_indexes()
-
     # --- ROUTERS ---
+    # Health check route (no authentication required)
+    fastapi_app.include_router(health_router)
+    
+    # Protected routes
     protected = [Depends(get_api_key)]
     fastapi_app.include_router(jamendo_router, dependencies=protected)
     fastapi_app.include_router(ai_router, dependencies=protected)

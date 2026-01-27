@@ -68,7 +68,7 @@ def generate_cache_key(category: str) -> str:
 async def save_cache(
     cache_key: str,
     data: Any,
-    ttl_days: int = 7
+    ttl_days: int = 1
 ) -> bool:
     """
     Save data to MongoDB cache with automatic expiration.

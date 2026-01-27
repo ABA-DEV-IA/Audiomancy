@@ -35,8 +35,12 @@ services:
     environment:
       MONGO_HOST: mongodb
       MONGO_PORT: "27017"
+      FRONTEND_URL: http://frontend:3000
+      JAEGER_ENDPOINT: http://jaeger:4317
     depends_on:
       mongodb:
+        condition: service_healthy
+      jaeger:
         condition: service_healthy
     networks:
       - audiomancy-network
@@ -70,21 +74,28 @@ services:
     command: sh -c "npm install && npm run dev"
 
   # ===================================================================
-  # [OPTIONNEL] Jaeger - Tracing distribué (remplace Azure App Insights)
-  # Décommenter pour activer le monitoring local
+  # Jaeger - Tracing distribué (remplace Azure App Insights)
   # ===================================================================
-  # jaeger:
-  #   image: jaegertracing/all-in-one:latest
-  #   container_name: audiomancy-jaeger
-  #   restart: unless-stopped
-  #   ports:
-  #     - "16686:16686"
-  #     - "6831:6831/udp"
-  #     - "14268:14268"
-  #   environment:
-  #     COLLECTOR_ZIPKIN_HOST_PORT: :9411
-  #   networks:
-  #     - audiomancy-network
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: audiomancy-jaeger
+    restart: unless-stopped
+    ports:
+      - "16686:16686"  # UI Jaeger
+      - "6831:6831/udp"  # Jaeger agent (compact)
+      - "14268:14268"  # Jaeger collector HTTP
+      - "4317:4317"  # OTLP gRPC
+      - "4318:4318"  # OTLP HTTP
+    environment:
+      COLLECTOR_ZIPKIN_HOST_PORT: :9411
+      COLLECTOR_OTLP_ENABLED: "true"
+    networks:
+      - audiomancy-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:14269/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # ===================================================================
   # [OPTIONNEL] HashiCorp Vault - Gestion des secrets (remplace Azure Key Vault)

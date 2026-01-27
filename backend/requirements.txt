@@ -80,6 +80,9 @@ urllib3==2.5.0
 validators==0.35.0
 zstandard==0.24.0
 
+# ---- Scheduler (remplace Azure Functions) ----
+APScheduler==3.11.0
+
 # ---- OpenTelemetry (versions compatibles entre elles) ----
 # Conservé pour la compétence C20 (monitoring et journalisation)
 opentelemetry-api==1.28.0
@@ -91,8 +94,11 @@ opentelemetry-instrumentation-system-metrics==0.49b0
 opentelemetry-instrumentation-asgi==0.49b0
 opentelemetry-instrumentation-logging==0.49b0
 
+# ---- Jaeger Exporter (monitoring local) ----
+opentelemetry-exporter-otlp-proto-grpc==1.28.0
+
 # ---- Azure Monitor Exporter ----
-# [OPTIONNEL] Remplaçable par Jaeger/Prometheus pour monitoring local
-azure-monitor-opentelemetry-exporter==1.0.0b23
+# [OPTIONNEL] Remplacé par Jaeger pour monitoring local
+# azure-monitor-opentelemetry-exporter==1.0.0b23
 
 # Note: DeepSeek API est compatible OpenAI, utilise le SDK openai (voir ci-dessus)

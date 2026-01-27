@@ -126,6 +126,17 @@ class Settings(BaseSettings):
     swagger_on: bool = False
 
     # ------------------------------------------------------------------
+    # 🌐 FRONTEND URL (for scheduler calls)
+    # ------------------------------------------------------------------
+    frontend_url: Optional[str] = "http://localhost:3000"
+    """
+    frontend_url:
+        URL of the frontend application. Used by APScheduler to call
+        frontend API routes like /api/dailycategories.
+        Default: http://localhost:3000
+    """
+
+    # ------------------------------------------------------------------
     # 🗄️ DATABASE (MONGODB)
     # ------------------------------------------------------------------
     mongo_host: Optional[str] = None
