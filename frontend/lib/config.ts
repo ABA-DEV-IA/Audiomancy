@@ -41,7 +41,7 @@ function getEnvVar(name: string, required = true): string {
  */
 export function getConfig(): Config {
   return {
-    fastApiUrl: getEnvVar("FASTAPI_URL"),
-    fastApiKey: getEnvVar("API_KEY"),
+    fastApiUrl: getEnvVar("NEXT_PUBLIC_API_URL") || getEnvVar("FASTAPI_URL", false),
+    fastApiKey: getEnvVar("FASTAPI_API_KEY"),
   };
 }

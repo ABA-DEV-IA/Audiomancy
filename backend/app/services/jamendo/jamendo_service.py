@@ -20,12 +20,12 @@ from app.models.jamendo import JamendoTrackResponse
 from app.services.jamendo.jamendo_client import fetch_tracks
 from app.utils.formatter import format_jamendo_tracks
 from app.utils.randomizer import choose_random_tags, sample_tracks
-from app.utils.blob_tools import download_blob, upload_blob, generate_cache_filename
+from app.utils.cache_tools import get_cache, save_cache, generate_cache_key
 
 logger = logging.getLogger(__name__)
 
 
-def get_tracks_for_reader(
+async def get_tracks_for_reader(
     tags: str,
     duration_min: int = 180,
     duration_max: int = 480,
@@ -59,18 +59,18 @@ def get_tracks_for_reader(
     tags = choose_random_tags(tags)
     logger.debug("Tags after randomization: %s", tags)
 
-    # --- Check cache if track_id is provided ---
+    # --- Check MongoDB cache if track_id is provided ---
     if track_id:
-        cache_filename = generate_cache_filename(track_id)
-        logger.debug("Looking for cache: %s", cache_filename)
-        cached_data = download_blob(cache_filename)
+        cache_key = generate_cache_key(track_id)
+        logger.info("🔍 Looking for cache: %s", cache_key)
+        cached_data = await get_cache(cache_key)
 
         if cached_data:
-            logger.info("Cache HIT for %s", cache_filename)
-            cached_tracks = json.loads(cached_data)
-            return [JamendoTrackResponse(**track) for track in cached_tracks]
+            logger.info("✅ Cache HIT for %s (found %d tracks)", cache_key, len(cached_data))
+            # Return cached data as-is (list of dicts)
+            return cached_data
 
-        logger.info("Cache MISS for %s", cache_filename)
+        logger.info("❌ Cache MISS for %s", cache_key)
 
     # --- Fetch from Jamendo ---
     params = {
@@ -99,10 +99,12 @@ def get_tracks_for_reader(
     formatted_tracks = format_jamendo_tracks(selected_tracks)
     logger.info("Formatted %d tracks", len(formatted_tracks))
 
-    # --- Save to cache if applicable ---
+    # --- Save to MongoDB cache if applicable ---
     if track_id:
-        cache_filename = generate_cache_filename(track_id)
-        logger.debug("Saving playlist to cache: %s", cache_filename)
-        upload_blob(cache_filename, json.dumps(formatted_tracks))
+        cache_key = generate_cache_key(track_id)
+        logger.info("💾 Saving %d tracks to cache: %s", len(formatted_tracks), cache_key)
+        # formatted_tracks is already a list of dicts
+        await save_cache(cache_key, formatted_tracks, ttl_days=7)
+        logger.info("✅ Cache saved successfully for %s", cache_key)
 
     return formatted_tracks

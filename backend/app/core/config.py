@@ -16,9 +16,11 @@ secure secret management and clean separation of concerns.
 
 from typing import Optional, List
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from azure.identity import DefaultAzureCredential
-from azure.keyvault.secrets import SecretClient
-from azure.core.exceptions import AzureError
+
+# Azure imports désactivés - Uniquement si Key Vault est utilisé
+# from azure.identity import DefaultAzureCredential
+# from azure.keyvault.secrets import SecretClient
+# from azure.core.exceptions import AzureError
 
 
 def to_snake_case(name: str) -> str:
@@ -100,17 +102,17 @@ class Settings(BaseSettings):
     """
 
     # ------------------------------------------------------------------
-    # 🎤 SPEECH / AUDIO SERVICES
+    # 🎤 SPEECH / AUDIO SERVICES [DÉSACTIVÉ - Migration hors Azure]
     # ------------------------------------------------------------------
-    speech_key: Optional[str] = None
-    speech_region: Optional[str] = None
+    # speech_key: Optional[str] = None
+    # speech_region: Optional[str] = None
 
     # ------------------------------------------------------------------
-    # ☁️ AZURE INFRASTRUCTURE (STILL USED)
+    # ☁️ AZURE INFRASTRUCTURE [PARTIELLEMENT DÉSACTIVÉ]
     # ------------------------------------------------------------------
-    azure_key_vault_url: Optional[str] = None
-    azure_storage_connection_string: Optional[str] = None
-    cache_blob_name: Optional[str] = None
+    azure_key_vault_url: Optional[str] = None  # Optionnel: utiliser .env en local
+    # azure_storage_connection_string: Optional[str] = None  # Remplacé par MongoDB cache
+    # cache_blob_name: Optional[str] = None  # Remplacé par MongoDB cache
 
     # ------------------------------------------------------------------
     # 📊 OBSERVABILITY / MONITORING
@@ -166,6 +168,16 @@ class Settings(BaseSettings):
             print("[INFO] No Azure Key Vault URL provided. Using .env values only.")
             return
 
+        # Vérifier si les modules Azure sont disponibles
+        try:
+            from azure.identity import DefaultAzureCredential
+            from azure.keyvault.secrets import SecretClient
+            from azure.core.exceptions import AzureError
+        except ImportError:
+            print("[WARNING] Azure SDK not installed. Install azure-identity and azure-keyvault-secrets to use Key Vault.")
+            print("[INFO] Using .env values only.")
+            return
+
         if self._secrets_cache and not force_reload:
             for key, value in self._secrets_cache.items():
                 setattr(self, key, value)
@@ -193,7 +205,7 @@ class Settings(BaseSettings):
             self._secrets_cache = new_cache
             print("[INFO] Configuration successfully loaded from Azure Key Vault.")
 
-        except AzureError as error:
+        except Exception as error:
             print(f"[WARNING] Failed to load secrets from Azure Key Vault: {error}")
 
     @property

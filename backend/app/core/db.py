@@ -13,12 +13,19 @@ MONGO_PASSWORD = settings.mongo_password
 MONGO_DBNAME = settings.mongo_db_name
 
 if MONGO_USERNAME and MONGO_PASSWORD:
-    MONGO_URL = (
-        f"mongodb://{MONGO_USERNAME}:{MONGO_PASSWORD}"
-        f"@{MONGO_HOST}:{MONGO_PORT}/"
-        "?ssl=true&replicaSet=globaldb&retrywrites=false"
-    )
+    # Détection automatique : Cosmos DB si le host contient "cosmos.azure.com"
+    if "cosmos.azure.com" in MONGO_HOST:
+        # Mode production (Azure Cosmos DB avec SSL)
+        MONGO_URL = (
+            f"mongodb://{MONGO_USERNAME}:{MONGO_PASSWORD}"
+            f"@{MONGO_HOST}:{MONGO_PORT}/"
+            "?ssl=true&replicaSet=globaldb&retrywrites=false"
+        )
+    else:
+        # MongoDB standard avec auth (sans SSL)
+        MONGO_URL = f"mongodb://{MONGO_USERNAME}:{MONGO_PASSWORD}@{MONGO_HOST}:{MONGO_PORT}"
 else:
+    # Mode local (MongoDB standard sans auth, sans SSL)
     MONGO_URL = f"mongodb://{MONGO_HOST}:{MONGO_PORT}"
 
 # Initialize client and database
@@ -28,6 +35,7 @@ db = client[MONGO_DBNAME]
 # Collections
 users_collection = db["user"]
 favorite_collection = db["favorite"]
+cache_collection = db["cache"]  # Cache MongoDB (remplace Azure Blob Storage)
 
 async def check_connection() -> bool:
     """

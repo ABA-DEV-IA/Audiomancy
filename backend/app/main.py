@@ -17,9 +17,10 @@ from app.routes.jamendo_routes import router as jamendo_router
 from app.routes.ai_routes import router as ai_router
 from app.routes.user_routes import router as user_router
 from app.routes.favorite_routes import router as favorite_router
-from app.routes.speech_token_routes import router as speech_router
+# from app.routes.speech_token_routes import router as speech_router  # [DÉSACTIVÉ] Azure Speech TTS
 
 from app.errors.handlers import validation_exception_handler
+from app.utils.cache_tools import ensure_cache_indexes
 
 # Swagger visible ou non selon settings
 docs_url = "/docs" if settings.swagger_on else None
@@ -38,6 +39,8 @@ def create_app() -> FastAPI:
     )
 
     # --- TELEMETRY INIT (Azure App Insights + OpenTelemetry) ---
+    # Conservé pour la compétence C20: Surveiller une application d'IA
+    # TODO: Remplacer Azure Monitor par Jaeger pour monitoring local
     if settings.azure_appinsights_connection_string:
         # On passe l'app pour tracer automatiquement les requêtes entrantes
         setup_telemetry(
@@ -58,13 +61,19 @@ def create_app() -> FastAPI:
     # --- Custom Exceptions ---
     fastapi_app.add_exception_handler(RequestValidationError, validation_exception_handler)
 
+    # --- Startup Event: Initialize MongoDB cache indexes ---
+    @fastapi_app.on_event("startup")
+    async def startup_event():
+        """Initialize cache indexes on startup"""
+        await ensure_cache_indexes()
+
     # --- ROUTERS ---
     protected = [Depends(get_api_key)]
     fastapi_app.include_router(jamendo_router, dependencies=protected)
     fastapi_app.include_router(ai_router, dependencies=protected)
     fastapi_app.include_router(user_router, dependencies=protected)
     fastapi_app.include_router(favorite_router, dependencies=protected)
-    fastapi_app.include_router(speech_router, dependencies=protected)
+    # fastapi_app.include_router(speech_router, dependencies=protected)  # [DÉSACTIVÉ] Azure Speech TTS
 
     return fastapi_app
 

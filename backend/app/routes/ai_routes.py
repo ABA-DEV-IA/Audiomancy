@@ -21,7 +21,7 @@ from app.services.jamendo.jamendo_service import get_tracks_for_reader
 router = APIRouter(prefix="/generate", tags=["Generate"])
 
 @router.post("/playlist", response_model=List[GeneratedTrack])
-def generate_playlist(prompt: PromptRequest):
+async def generate_playlist(prompt: PromptRequest):
 
     """
     Endpoint for generating a playlist based on a user prompt.
@@ -37,6 +37,8 @@ def generate_playlist(prompt: PromptRequest):
     """
     try:
         tags = ai_executor(prompt.prompt)
-        return get_tracks_for_reader(tags=tags, limit=prompt.limit)
+        tracks = await get_tracks_for_reader(tags=tags, limit=prompt.limit)
+        # Convert dict/JamendoTrackResponse to GeneratedTrack
+        return [GeneratedTrack(**track) if isinstance(track, dict) else GeneratedTrack(**track.model_dump()) for track in tracks]
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
