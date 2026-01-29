@@ -14,59 +14,9 @@ This design allows the application to remain cloud-agnostic while ensuring
 secure secret management and clean separation of concerns.
 """
 
-from typing import Optional, List, Any
+from typing import Optional, List
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from datetime import datetime, timedelta
-
-# Azure imports désactivés - Uniquement si Key Vault est utilisé
-# from azure.identity import DefaultAzureCredential
-# from azure.keyvault.secrets import SecretClient
-# from azure.core.exceptions import AzureError
-
-
-class TokenCredential:
-    """
-    Simple token-based credential for Azure Key Vault authentication.
-
-    This credential class wraps a static bearer token for use with
-    Azure Key Vault when using token-based authentication instead of
-    DefaultAzureCredential.
-    """
-    def __init__(self, token: str):
-        self.token = token
-
-    def get_token(self, *scopes: str, **kwargs: Any):
-        """
-        Return the access token with a far future expiration.
-
-        Args:
-            *scopes: The scopes for which the token is valid (ignored).
-            **kwargs: Additional arguments (ignored).
-
-        Returns:
-            AccessToken: An access token object with the bearer token.
-        """
-        from azure.core.credentials import AccessToken
-        # Set expiration to 1 year in the future
-        expires_on = datetime.now() + timedelta(days=365)
-        return AccessToken(self.token, int(expires_on.timestamp()))
-
-
-def to_snake_case(name: str) -> str:
-    """
-    Convert a Key Vault secret name to a Python-friendly snake_case attribute name.
-
-    Azure Key Vault secrets are typically named using uppercase letters
-    and hyphens (e.g. "DEEPSEEK-API-KEY"). This helper converts them to
-    snake_case so they can be mapped to Pydantic settings attributes.
-
-    Args:
-        name (str): The secret name from Azure Key Vault.
-
-    Returns:
-        str: The converted snake_case string.
-    """
-    return name.lower().replace("-", "_")
+import requests
 
 
 class Settings(BaseSettings):
@@ -137,12 +87,11 @@ class Settings(BaseSettings):
     # speech_region: Optional[str] = None
 
     # ------------------------------------------------------------------
-    # ☁️ AZURE INFRASTRUCTURE [PARTIELLEMENT DÉSACTIVÉ]
+    # ☁️ VAULT CONFIGURATION
     # ------------------------------------------------------------------
-    azure_key_vault_url: Optional[str] = None  # Optionnel: utiliser .env en local
+    vault_url: Optional[str] = None  # URL du HashiCorp Vault
     vault_token: Optional[str] = None  # Token pour authentification vault
-    # azure_storage_connection_string: Optional[str] = None  # Remplacé par MongoDB cache
-    # cache_blob_name: Optional[str] = None  # Remplacé par MongoDB cache
+    vault_mount_path: str = "secret"  # Mount path par défaut pour KV engine
 
     # ------------------------------------------------------------------
     # 📊 OBSERVABILITY / MONITORING
@@ -188,56 +137,38 @@ class Settings(BaseSettings):
         extra="ignore"
     )
 
-    def load_from_key_vault(self, force_reload: bool = False) -> None:
+    def load_from_vault(self, force_reload: bool = False) -> None:
         """
-        Load and override configuration values from Azure Key Vault.
+        Load and override configuration values from HashiCorp Vault.
 
-        If `azure_key_vault_url` is not provided, this method does nothing
+        If `vault_url` is not provided, this method does nothing
         and the application relies solely on environment variables.
 
-        Secrets retrieved from Azure Key Vault are:
-        - Automatically converted to snake_case
+        Secrets retrieved from HashiCorp Vault are:
+        - Mapped using secret_mapping dictionary
         - Applied only if a corresponding attribute exists in this class
         - Cached in memory to avoid repeated calls
 
         Args:
             force_reload (bool): If True, forces a reload of secrets
-                                 from Azure Key Vault even if cached.
+                                 from Vault even if cached.
         """
 
-        if not self.azure_key_vault_url:
-            print("[INFO] No Azure Key Vault URL provided. Using .env values only.")
-            return
-
-        # Vérifier si les modules Azure sont disponibles
-        try:
-            from azure.identity import DefaultAzureCredential
-            from azure.keyvault.secrets import SecretClient
-            from azure.core.exceptions import AzureError
-        except ImportError:
-            print("[WARNING] Azure SDK not installed. Install azure-identity and azure-keyvault-secrets to use Key Vault.")
-            print("[INFO] Using .env values only.")
+        if not self.vault_url or not self.vault_token:
+            print("[INFO] No Vault URL or token provided. Using .env values only.")
             return
 
         if self._secrets_cache and not force_reload:
             for key, value in self._secrets_cache.items():
                 setattr(self, key, value)
-            print("[INFO] Configuration loaded from Key Vault cache.")
+            print("[INFO] Configuration loaded from Vault cache.")
             return
 
         try:
-            # Choisir le credential en fonction de la présence du token
-            if self.vault_token:
-                credential = TokenCredential(self.vault_token)
-                print("[INFO] Using token-based authentication for Key Vault.")
-            else:
-                credential = DefaultAzureCredential()
-                print("[INFO] Using DefaultAzureCredential for Key Vault.")
-
-            client = SecretClient(
-                vault_url=self.azure_key_vault_url,
-                credential=credential
-            )
+            # Headers pour l'authentification HashiCorp Vault
+            headers = {
+                'X-Vault-Token': self.vault_token
+            }
 
             # Mapping des noms de secrets du vault vers les attributs Settings
             secret_mapping = {
@@ -263,27 +194,36 @@ class Settings(BaseSettings):
 
             new_cache = {}
 
-            for secret_props in client.list_properties_of_secrets():
-                secret_name = secret_props.name.lower()
+            # Récupérer chaque secret depuis HashiCorp Vault
+            for secret_name, attr_name in secret_mapping.items():
+                if not hasattr(self, attr_name):
+                    continue
 
-                # Utiliser le mapping si disponible, sinon convertir en snake_case
-                if secret_name in secret_mapping:
-                    key = secret_mapping[secret_name]
-                else:
-                    key = to_snake_case(secret_props.name)
+                try:
+                    # HashiCorp Vault KV v2 API: /v1/{mount_path}/data/{secret_name}
+                    url = f"{self.vault_url}/v1/{self.vault_mount_path}/data/{secret_name}"
+                    response = requests.get(url, headers=headers, timeout=5)
 
-                # Only apply secrets that exist in the Settings model
-                if hasattr(self, key):
-                    value = client.get_secret(secret_props.name).value
-                    setattr(self, key, value)
-                    new_cache[key] = value
-                    print(f"[INFO] Loaded secret '{secret_props.name}' → '{key}'")
+                    if response.status_code == 200:
+                        data = response.json()
+                        # KV v2 structure: data.data.value
+                        value = data['data']['data']['value']
+                        setattr(self, attr_name, value)
+                        new_cache[attr_name] = value
+                        print(f"[INFO] Loaded secret '{secret_name}' → '{attr_name}'")
+                    elif response.status_code == 404:
+                        print(f"[WARNING] Secret '{secret_name}' not found in Vault")
+                    else:
+                        print(f"[WARNING] Failed to load '{secret_name}': HTTP {response.status_code}")
+
+                except Exception as error:
+                    print(f"[WARNING] Failed to load secret '{secret_name}': {error}")
 
             self._secrets_cache = new_cache
-            print(f"[INFO] Configuration successfully loaded from Azure Key Vault ({len(new_cache)} secrets).")
+            print(f"[INFO] Configuration successfully loaded from HashiCorp Vault ({len(new_cache)} secrets).")
 
         except Exception as error:
-            print(f"[WARNING] Failed to load secrets from Azure Key Vault: {error}")
+            print(f"[WARNING] Failed to connect to HashiCorp Vault: {error}")
 
     @property
     def cors_origins(self) -> List[str]:
@@ -307,4 +247,4 @@ class Settings(BaseSettings):
 # 📦 SINGLETON SETTINGS INSTANCE
 # ----------------------------------------------------------------------
 settings = Settings()
-settings.load_from_key_vault()
+settings.load_from_vault()

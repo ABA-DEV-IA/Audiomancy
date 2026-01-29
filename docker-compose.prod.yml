@@ -39,11 +39,12 @@ services:
       # Jamendo API URL
       JAMENDO_URL: "https://api.jamendo.com/v3.0"
 
-      # Vault Configuration
+      # HashiCorp Vault Configuration
       # Toutes les configurations sensibles (MongoDB, DeepSeek, Jamendo, API Key)
-      # sont chargées depuis le Key Vault "audiomancy" au démarrage
-      AZURE_KEY_VAULT_URL: ${VAULT_URL:-}
+      # sont chargées depuis HashiCorp Vault au démarrage
+      VAULT_URL: ${VAULT_URL:-}
       VAULT_TOKEN: ${VAULT_TOKEN:-}
+      VAULT_MOUNT_PATH: ${VAULT_MOUNT_PATH:-secret}
     depends_on:
       mongodb:
         condition: service_healthy

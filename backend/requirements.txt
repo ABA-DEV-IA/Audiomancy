@@ -2,9 +2,9 @@ annotated-types==0.7.0
 anyio==4.10.0
 astroid==3.3.11
 # azure-cognitiveservices-speech==1.45.0  # [DÉSACTIVÉ] TTS Azure Speech
-azure-core==1.35.0  # Requis pour Azure Key Vault
-# azure-identity==1.24.0  # [DÉSACTIVÉ] Utilise TokenCredential personnalisé
-azure-keyvault-secrets==4.10.0  # Azure Key Vault pour secrets management
+# azure-core==1.35.0  # [DÉSACTIVÉ] Remplacé par HashiCorp Vault
+# azure-identity==1.24.0  # [DÉSACTIVÉ] Remplacé par HashiCorp Vault
+# azure-keyvault-secrets==4.10.0  # [DÉSACTIVÉ] Remplacé par HashiCorp Vault
 # azure-storage-blob==12.26.0  # [DÉSACTIVÉ] Remplacé par MongoDB cache
 bcrypt==4.3.0
 certifi==2025.8.3
