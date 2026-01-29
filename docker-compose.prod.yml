@@ -41,23 +41,18 @@ services:
       SWAGGER_ON: "true"
       PORT: "8000"
 
-      # Jamendo API (requis pour la musique)
-      JAMENDO_CLIENT_ID: ${JAMENDO_CLIENT_ID:-}
+      # Jamendo API Configuration (client_id chargé depuis vault)
       JAMENDO_URL: "https://api.jamendo.com/v3.0"
 
-      # DeepSeek AI (requis pour l'IA)
-      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      # DeepSeek AI Configuration (api_key chargé depuis vault)
       DEEPSEEK_BASE_URL: "https://api.deepseek.com"
       DEEPSEEK_MODEL: "deepseek-chat"
       DEEPSEEK_TEMPERATURE: "0.0"
       DEEPSEEK_MAX_TOKENS: "512"
 
-      # Vault Configuration
+      # Vault Configuration (secrets chargés depuis Key Vault "audiomancy")
       AZURE_KEY_VAULT_URL: ${VAULT_URL:-}
       VAULT_TOKEN: ${VAULT_TOKEN:-}
-
-      # API Security
-      API_KEY: ${API_KEY:-changeme}
     depends_on:
       mongodb:
         condition: service_healthy

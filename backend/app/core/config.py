@@ -239,19 +239,34 @@ class Settings(BaseSettings):
                 credential=credential
             )
 
+            # Mapping des noms de secrets du vault vers les attributs Settings
+            secret_mapping = {
+                'deepseek': 'deepseek_api_key',
+                'jamendo': 'jamendo_client_id',
+                'api-key': 'api_key',
+                'apikey': 'api_key',
+            }
+
             new_cache = {}
 
             for secret_props in client.list_properties_of_secrets():
-                key = to_snake_case(secret_props.name)
+                secret_name = secret_props.name.lower()
+
+                # Utiliser le mapping si disponible, sinon convertir en snake_case
+                if secret_name in secret_mapping:
+                    key = secret_mapping[secret_name]
+                else:
+                    key = to_snake_case(secret_props.name)
 
                 # Only apply secrets that exist in the Settings model
                 if hasattr(self, key):
                     value = client.get_secret(secret_props.name).value
                     setattr(self, key, value)
                     new_cache[key] = value
+                    print(f"[INFO] Loaded secret '{secret_props.name}' → '{key}'")
 
             self._secrets_cache = new_cache
-            print("[INFO] Configuration successfully loaded from Azure Key Vault.")
+            print(f"[INFO] Configuration successfully loaded from Azure Key Vault ({len(new_cache)} secrets).")
 
         except Exception as error:
             print(f"[WARNING] Failed to load secrets from Azure Key Vault: {error}")
