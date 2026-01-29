@@ -39,6 +39,7 @@ services:
       FRONTEND_URL: http://localhost:3000
       ALLOWED_ORIGINS: "http://localhost:3000,http://127.0.0.1:3000,http://10.8.0.1:3000"
       SWAGGER_ON: "true"
+      PORT: "8000"
 
       # Jamendo API (requis pour la musique)
       JAMENDO_CLIENT_ID: ${JAMENDO_CLIENT_ID:-}
@@ -50,6 +51,10 @@ services:
       DEEPSEEK_MODEL: "deepseek-chat"
       DEEPSEEK_TEMPERATURE: "0.0"
       DEEPSEEK_MAX_TOKENS: "512"
+
+      # Vault Configuration
+      AZURE_KEY_VAULT_URL: ${VAULT_URL:-}
+      VAULT_TOKEN: ${VAULT_TOKEN:-}
 
       # API Security
       API_KEY: ${API_KEY:-changeme}
@@ -68,6 +73,7 @@ services:
     environment:
       NEXT_PUBLIC_API_URL: http://10.8.0.1:8000
       NODE_ENV: production
+      PORT: "3000"
     depends_on:
       - backend
 
