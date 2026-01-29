@@ -30,27 +30,18 @@ services:
     restart: unless-stopped
     network_mode: "container:wg-easy"
     environment:
-      # MongoDB Configuration (localhost car même network stack)
-      MONGO_HOST: localhost
-      MONGO_PORT: "27017"
-      MONGO_DB_NAME: audiomancy
-
       # API Configuration
       FRONTEND_URL: http://localhost:3000
       ALLOWED_ORIGINS: "http://localhost:3000,http://127.0.0.1:3000,http://10.8.0.1:3000"
       SWAGGER_ON: "true"
       PORT: "8000"
 
-      # Jamendo API Configuration (client_id chargé depuis vault)
+      # Jamendo API URL
       JAMENDO_URL: "https://api.jamendo.com/v3.0"
 
-      # DeepSeek AI Configuration (api_key chargé depuis vault)
-      DEEPSEEK_BASE_URL: "https://api.deepseek.com"
-      DEEPSEEK_MODEL: "deepseek-chat"
-      DEEPSEEK_TEMPERATURE: "0.0"
-      DEEPSEEK_MAX_TOKENS: "512"
-
-      # Vault Configuration (secrets chargés depuis Key Vault "audiomancy")
+      # Vault Configuration
+      # Toutes les configurations sensibles (MongoDB, DeepSeek, Jamendo, API Key)
+      # sont chargées depuis le Key Vault "audiomancy" au démarrage
       AZURE_KEY_VAULT_URL: ${VAULT_URL:-}
       VAULT_TOKEN: ${VAULT_TOKEN:-}
     depends_on:

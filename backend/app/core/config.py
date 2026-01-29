@@ -241,8 +241,22 @@ class Settings(BaseSettings):
 
             # Mapping des noms de secrets du vault vers les attributs Settings
             secret_mapping = {
+                # DeepSeek configuration
                 'deepseek': 'deepseek_api_key',
+                'deepseek-base-url': 'deepseek_base_url',
+                'deepseek-model': 'deepseek_model',
+                'deepseek-temperature': 'deepseek_temperature',
+                'deepseek-max-tokens': 'deepseek_max_tokens',
+
+                # MongoDB configuration
+                'mongodb-host': 'mongo_host',
+                'mongodb-port': 'mongo_port',
+                'mongodb-db-name': 'mongo_db_name',
+
+                # Jamendo configuration
                 'jamendo': 'jamendo_client_id',
+
+                # API Security
                 'api-key': 'api_key',
                 'apikey': 'api_key',
             }
