@@ -111,7 +111,6 @@ jobs:
           port: ${{ secrets.VPS_PORT }}
           script: |
             mkdir -p /home/${{ secrets.VPS_USERNAME }}/audiomancy
-            chmod 755 /home/${{ secrets.VPS_USERNAME }}/audiomancy
 
       # Copier les fichiers nécessaires sur le VPS
       - name: Copy deployment files to VPS
