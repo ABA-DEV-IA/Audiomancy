@@ -14,13 +14,42 @@ This design allows the application to remain cloud-agnostic while ensuring
 secure secret management and clean separation of concerns.
 """
 
-from typing import Optional, List
+from typing import Optional, List, Any
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from datetime import datetime, timedelta
 
 # Azure imports désactivés - Uniquement si Key Vault est utilisé
 # from azure.identity import DefaultAzureCredential
 # from azure.keyvault.secrets import SecretClient
 # from azure.core.exceptions import AzureError
+
+
+class TokenCredential:
+    """
+    Simple token-based credential for Azure Key Vault authentication.
+
+    This credential class wraps a static bearer token for use with
+    Azure Key Vault when using token-based authentication instead of
+    DefaultAzureCredential.
+    """
+    def __init__(self, token: str):
+        self.token = token
+
+    def get_token(self, *scopes: str, **kwargs: Any):
+        """
+        Return the access token with a far future expiration.
+
+        Args:
+            *scopes: The scopes for which the token is valid (ignored).
+            **kwargs: Additional arguments (ignored).
+
+        Returns:
+            AccessToken: An access token object with the bearer token.
+        """
+        from azure.core.credentials import AccessToken
+        # Set expiration to 1 year in the future
+        expires_on = datetime.now() + timedelta(days=365)
+        return AccessToken(self.token, int(expires_on.timestamp()))
 
 
 def to_snake_case(name: str) -> str:
@@ -111,6 +140,7 @@ class Settings(BaseSettings):
     # ☁️ AZURE INFRASTRUCTURE [PARTIELLEMENT DÉSACTIVÉ]
     # ------------------------------------------------------------------
     azure_key_vault_url: Optional[str] = None  # Optionnel: utiliser .env en local
+    vault_token: Optional[str] = None  # Token pour authentification vault
     # azure_storage_connection_string: Optional[str] = None  # Remplacé par MongoDB cache
     # cache_blob_name: Optional[str] = None  # Remplacé par MongoDB cache
 
@@ -196,7 +226,14 @@ class Settings(BaseSettings):
             return
 
         try:
-            credential = DefaultAzureCredential()
+            # Choisir le credential en fonction de la présence du token
+            if self.vault_token:
+                credential = TokenCredential(self.vault_token)
+                print("[INFO] Using token-based authentication for Key Vault.")
+            else:
+                credential = DefaultAzureCredential()
+                print("[INFO] Using DefaultAzureCredential for Key Vault.")
+
             client = SecretClient(
                 vault_url=self.azure_key_vault_url,
                 credential=credential
