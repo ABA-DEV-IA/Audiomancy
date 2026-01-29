@@ -53,13 +53,6 @@ services:
 
       # API Security
       API_KEY: ${API_KEY:-changeme}
-
-      # Azure Key Vault Configuration
-      AZURE_KEY_VAULT_URL: ${AZURE_KEY_VAULT_URL:-}
-      # Azure Service Principal Authentication
-      AZURE_CLIENT_ID: ${AZURE_CLIENT_ID:-}
-      AZURE_CLIENT_SECRET: ${AZURE_CLIENT_SECRET:-}
-      AZURE_TENANT_ID: ${AZURE_TENANT_ID:-}
     depends_on:
       mongodb:
         condition: service_healthy

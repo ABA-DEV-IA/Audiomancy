@@ -136,18 +136,13 @@ jobs:
           script: |
             cd /home/${{ secrets.VPS_USERNAME }}/audiomancy
 
-            # Créer le fichier .env avec les variables pour GHCR et Azure Key Vault
+            # Créer le fichier .env avec les variables pour GHCR
             cat > .env << EOF
             REGISTRY=ghcr.io
             REPO_NAME=${{ steps.repo.outputs.repo_lower }}
             VPS_HOST=${{ secrets.VPS_HOST }}
             GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
-
-            # Azure Key Vault Configuration
-            AZURE_KEY_VAULT_URL=${{ secrets.AZURE_KEY_VAULT_URL }}
-            AZURE_CLIENT_ID=${{ secrets.AZURE_CLIENT_ID }}
-            AZURE_CLIENT_SECRET=${{ secrets.AZURE_CLIENT_SECRET }}
-            AZURE_TENANT_ID=${{ secrets.AZURE_TENANT_ID }}
+            DEEPSEEK_API_KEY=${{ secrets.DEEPSEEK_API_KEY }}
             EOF
 
             # Rendre le script de déploiement exécutable
