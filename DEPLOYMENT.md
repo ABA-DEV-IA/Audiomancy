@@ -49,6 +49,181 @@ Sur votre VPS OVH, assurez-vous que :
    # Déconnectez-vous et reconnectez-vous pour appliquer les changements
    ```
 
+## Accès via VPN WireGuard
+
+### Architecture Réseau
+
+Le VPS utilise WireGuard pour créer un tunnel VPN sécurisé. Tous les services Audiomancy sont accessibles uniquement via ce VPN grâce au firewall qui bloque les accès directs depuis Internet.
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    VPS OVH - 152.228.129.204                 │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  WireGuard VPN Interface (wg0)                               │
+│  └─ Réseau : 10.8.0.0/24                                     │
+│     ├─ Gateway VPS : 10.8.0.1                                │
+│     └─ Clients : 10.8.0.2, 10.8.0.3, etc.                    │
+│                                                              │
+│  ┌────────────────────────────────────────────────────────┐ │
+│  │  Docker Network (audiomancy-network)                   │ │
+│  │                                                         │ │
+│  │  ┌─────────────────────────────────────────┐          │ │
+│  │  │  MongoDB                                 │          │ │
+│  │  │  Container: audiomancy-mongodb           │          │ │
+│  │  │  Internal: mongodb:27017                 │          │ │
+│  │  │  VPN Access: 10.8.0.1:27017             │          │ │
+│  │  └─────────────────────────────────────────┘          │ │
+│  │                   ↑                                     │ │
+│  │  ┌─────────────────────────────────────────┐          │ │
+│  │  │  Backend FastAPI                         │          │ │
+│  │  │  Container: audiomancy-backend           │          │ │
+│  │  │  Internal: backend:8000                  │          │ │
+│  │  │  VPN Access: 10.8.0.1:8000              │          │ │
+│  │  │  DockerHub: {username}/audiomancy-backend│          │ │
+│  │  └─────────────────────────────────────────┘          │ │
+│  │                   ↑                                     │ │
+│  │  ┌─────────────────────────────────────────┐          │ │
+│  │  │  Frontend Next.js                        │          │ │
+│  │  │  Container: audiomancy-frontend          │          │ │
+│  │  │  Internal: frontend:8080                 │          │ │
+│  │  │  VPN Access: 10.8.0.1:3000              │          │ │
+│  │  │  DockerHub: {username}/audiomancy-frontend│         │ │
+│  │  └─────────────────────────────────────────┘          │ │
+│  └────────────────────────────────────────────────────────┘ │
+│                                                              │
+│  Firewall (UFW)                                              │
+│  ├─ Autorisé : Port 51820/udp (WireGuard)                   │
+│  ├─ Autorisé : Port 51821 (WireGuard WebUI)                 │
+│  └─ Bloqué : Tous les autres accès directs depuis Internet  │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Conteneurs Déployés
+
+| Conteneur | Image | Port Interne | Accès VPN | Description |
+|-----------|-------|--------------|-----------|-------------|
+| **audiomancy-mongodb** | `mongo:7.0` | 27017 | `10.8.0.1:27017` | Base de données MongoDB + Cache |
+| **audiomancy-backend** | `{username}/audiomancy-backend:latest` | 8000 | `10.8.0.1:8000` | API FastAPI + Business Logic |
+| **audiomancy-frontend** | `{username}/audiomancy-frontend:latest` | 8080 | `10.8.0.1:3000` | Interface Next.js |
+
+### Configuration WireGuard
+
+Le VPS utilise `wg-easy` pour gérer facilement WireGuard :
+
+- **Interface Web** : `http://152.228.129.204:51821` (accessible depuis Internet avec mot de passe)
+- **Port VPN** : `51820/udp`
+- **Réseau VPN** : `10.8.0.0/24`
+- **Gateway** : `10.8.0.1` (l'adresse du VPS dans le VPN)
+
+### Comment se Connecter au VPN
+
+#### 1. Obtenir votre Configuration WireGuard
+
+1. Accédez à l'interface WireGuard : `http://152.228.129.204:51821`
+2. Entrez le mot de passe configuré dans `WG_PASSWORD`
+3. Créez un nouveau client ou téléchargez la configuration existante
+4. Téléchargez le fichier `.conf` ou scannez le QR code
+
+#### 2. Installer WireGuard sur votre Machine
+
+**Windows :**
+```bash
+# Télécharger depuis https://www.wireguard.com/install/
+# Installer et importer le fichier .conf
+```
+
+**macOS :**
+```bash
+brew install wireguard-tools
+# Ou installer l'app depuis l'App Store
+```
+
+**Linux :**
+```bash
+sudo apt install wireguard
+# Copier le fichier .conf dans /etc/wireguard/
+sudo wg-quick up wg0
+```
+
+#### 3. Activer la Connexion VPN
+
+Une fois connecté au VPN, vous obtenez une adresse IP dans le réseau `10.8.0.0/24` (par exemple `10.8.0.2`).
+
+### Accéder aux Services Audiomancy via VPN
+
+Une fois connecté au VPN WireGuard, accédez aux services via l'adresse gateway du VPS :
+
+#### Frontend (Interface Utilisateur)
+```
+http://10.8.0.1:3000
+```
+- Interface Next.js
+- Appels automatiques vers le backend via le réseau Docker interne
+
+#### Backend (API)
+```
+http://10.8.0.1:8000
+```
+- API REST FastAPI
+- Documentation interactive : `http://10.8.0.1:8000/docs`
+- Schéma OpenAPI : `http://10.8.0.1:8000/openapi.json`
+
+#### MongoDB (Base de données)
+```
+mongodb://10.8.0.1:27017
+```
+- Accès direct à MongoDB (si nécessaire pour des outils comme MongoDB Compass)
+- Utilisé en interne par le backend
+
+### Variables d'Environnement Réseau
+
+Les conteneurs sont configurés pour communiquer entre eux via le réseau Docker `audiomancy-network` :
+
+```yaml
+# Dans docker-compose.prod.yml
+environment:
+  # Le backend communique avec MongoDB via le nom du service Docker
+  MONGO_HOST: mongodb
+  MONGO_PORT: "27017"
+
+  # Le frontend communique avec le backend via le nom du service Docker
+  NEXT_PUBLIC_API_URL: http://10.8.0.1:8000
+```
+
+### Vérification de la Connectivité
+
+Une fois connecté au VPN, testez l'accès aux services :
+
+```bash
+# Vérifier la connectivité VPN
+ping 10.8.0.1
+
+# Vérifier le backend
+curl http://10.8.0.1:8000/health
+
+# Vérifier le frontend
+curl -I http://10.8.0.1:3000
+```
+
+### Sécurité
+
+#### Avantages de cette Configuration
+
+1. **Isolation Réseau** : Les services ne sont PAS accessibles depuis Internet
+2. **Chiffrement** : Tout le trafic passe par le tunnel VPN chiffré WireGuard
+3. **Contrôle d'Accès** : Seuls les clients VPN autorisés peuvent accéder aux services
+4. **Firewall** : Le firewall UFW bloque tous les accès directs sauf WireGuard
+
+#### Ports Exposés sur Internet
+
+Seuls ces ports sont accessibles depuis Internet :
+
+- `51820/udp` : WireGuard VPN (nécessaire pour établir le tunnel)
+- `51821/tcp` : Interface Web WireGuard (protégée par mot de passe)
+
+Tous les autres ports (3000, 8000, 27017) sont **bloqués** par le firewall et accessibles **uniquement via VPN**.
+
 ## Workflow de Déploiement
 
 ### Déclenchement automatique
