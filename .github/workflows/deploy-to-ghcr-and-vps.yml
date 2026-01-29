@@ -10,6 +10,7 @@ on:
       - 'backend/**'
       - 'frontend/**'
       - 'docker-compose.prod.yml'
+      - 'deploy.sh'
       - '.github/workflows/deploy-to-ghcr-and-vps.yml'
   workflow_dispatch:
 
