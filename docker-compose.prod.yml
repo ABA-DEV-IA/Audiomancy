@@ -34,9 +34,29 @@ services:
     ports:
       - "8000:8000"
     environment:
+      # MongoDB Configuration
       MONGO_HOST: mongodb
       MONGO_PORT: "27017"
+      MONGO_DB_NAME: audiomancy
+
+      # API Configuration
       FRONTEND_URL: http://frontend:3000
+      ALLOWED_ORIGINS: "http://localhost:3000,http://127.0.0.1:3000,http://${VPS_HOST}:3000"
+      SWAGGER_ON: "true"
+
+      # Jamendo API (requis pour la musique)
+      JAMENDO_CLIENT_ID: ${JAMENDO_CLIENT_ID:-}
+      JAMENDO_URL: "https://api.jamendo.com/v3.0"
+
+      # DeepSeek AI (requis pour l'IA)
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      DEEPSEEK_BASE_URL: "https://api.deepseek.com"
+      DEEPSEEK_MODEL: "deepseek-chat"
+      DEEPSEEK_TEMPERATURE: "0.0"
+      DEEPSEEK_MAX_TOKENS: "512"
+
+      # API Security
+      API_KEY: ${API_KEY:-changeme}
     depends_on:
       mongodb:
         condition: service_healthy
