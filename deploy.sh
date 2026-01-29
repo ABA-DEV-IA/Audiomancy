@@ -17,31 +17,31 @@ fi
 # Se connecter à GitHub Container Registry (si le token est disponible)
 if [ -n "$GITHUB_TOKEN" ]; then
     echo "🔐 Connexion à GitHub Container Registry..."
-    echo "$GITHUB_TOKEN" | docker login ghcr.io -u github-actions --password-stdin
+    echo "$GITHUB_TOKEN" | sudo docker login ghcr.io -u github-actions --password-stdin
 fi
 
 # Arrêter les conteneurs existants
 echo "⏸️  Arrêt des conteneurs existants..."
-docker-compose -f docker-compose.prod.yml down || true
+sudo docker-compose -f docker-compose.prod.yml down || true
 
 # Supprimer les anciennes images
 echo "🗑️  Nettoyage des anciennes images..."
-docker image prune -f
+sudo docker image prune -f
 
 # Télécharger les dernières images depuis GitHub Container Registry
 echo "📥 Téléchargement des dernières images..."
-docker-compose -f docker-compose.prod.yml pull
+sudo docker-compose -f docker-compose.prod.yml pull
 
 # Démarrer les nouveaux conteneurs
 echo "🎬 Démarrage des nouveaux conteneurs..."
-docker-compose -f docker-compose.prod.yml up -d
+sudo docker-compose -f docker-compose.prod.yml up -d
 
 # Afficher le statut des conteneurs
 echo ""
 echo "=========================================="
 echo "📊 Statut des conteneurs :"
 echo "=========================================="
-docker-compose -f docker-compose.prod.yml ps
+sudo docker-compose -f docker-compose.prod.yml ps
 
 # Vérifier que les conteneurs sont bien démarrés
 echo ""
@@ -53,7 +53,7 @@ echo "=========================================="
 sleep 5
 
 # Vérifier MongoDB
-if docker ps | grep -q audiomancy-mongodb; then
+if sudo docker ps | grep -q audiomancy-mongodb; then
     echo "✅ MongoDB is running"
 else
     echo "❌ MongoDB failed to start"
@@ -61,7 +61,7 @@ else
 fi
 
 # Vérifier Backend
-if docker ps | grep -q audiomancy-backend; then
+if sudo docker ps | grep -q audiomancy-backend; then
     echo "✅ Backend is running"
 else
     echo "❌ Backend failed to start"
@@ -69,7 +69,7 @@ else
 fi
 
 # Vérifier Frontend
-if docker ps | grep -q audiomancy-frontend; then
+if sudo docker ps | grep -q audiomancy-frontend; then
     echo "✅ Frontend is running"
 else
     echo "❌ Frontend failed to start"
