@@ -91,7 +91,8 @@ class Settings(BaseSettings):
     # ------------------------------------------------------------------
     vault_url: Optional[str] = None  # URL du HashiCorp Vault
     vault_token: Optional[str] = None  # Token pour authentification vault
-    vault_mount_path: str = "secret"  # Mount path par défaut pour KV engine
+    vault_mount_path: str = "secrets"  # Mount path du KV engine
+    vault_path_prefix: str = "audiomancy/kv"  # Préfixe du chemin des secrets
 
     # ------------------------------------------------------------------
     # 📊 OBSERVABILITY / MONITORING
@@ -200,8 +201,8 @@ class Settings(BaseSettings):
                     continue
 
                 try:
-                    # HashiCorp Vault KV v2 API: /v1/{mount_path}/data/{secret_name}
-                    url = f"{self.vault_url}/v1/{self.vault_mount_path}/data/{secret_name}"
+                    # HashiCorp Vault KV v2 API: /v1/{mount_path}/data/{path_prefix}/{secret_name}
+                    url = f"{self.vault_url}/v1/{self.vault_mount_path}/data/{self.vault_path_prefix}/{secret_name}"
                     response = requests.get(url, headers=headers, timeout=5)
 
                     if response.status_code == 200:

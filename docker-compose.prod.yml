@@ -42,9 +42,11 @@ services:
       # HashiCorp Vault Configuration
       # Toutes les configurations sensibles (MongoDB, DeepSeek, Jamendo, API Key)
       # sont chargées depuis HashiCorp Vault au démarrage
+      # Path: secrets/audiomancy/kv/{secret-name}
       VAULT_URL: ${VAULT_URL:-}
       VAULT_TOKEN: ${VAULT_TOKEN:-}
-      VAULT_MOUNT_PATH: ${VAULT_MOUNT_PATH:-secret}
+      VAULT_MOUNT_PATH: ${VAULT_MOUNT_PATH:-secrets}
+      VAULT_PATH_PREFIX: ${VAULT_PATH_PREFIX:-audiomancy/kv}
     depends_on:
       mongodb:
         condition: service_healthy
