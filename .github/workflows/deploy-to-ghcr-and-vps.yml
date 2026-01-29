@@ -101,6 +101,18 @@ jobs:
         run: |
           echo "repo_lower=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
 
+      # Préparer le répertoire de déploiement sur le VPS
+      - name: Prepare deployment directory on VPS
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            mkdir -p /home/${{ secrets.VPS_USERNAME }}/audiomancy
+            chmod 755 /home/${{ secrets.VPS_USERNAME }}/audiomancy
+
       # Copier les fichiers nécessaires sur le VPS
       - name: Copy deployment files to VPS
         uses: appleboy/scp-action@v0.1.7
@@ -124,12 +136,18 @@ jobs:
           script: |
             cd /home/${{ secrets.VPS_USERNAME }}/audiomancy
 
-            # Créer le fichier .env avec les variables pour GHCR
+            # Créer le fichier .env avec les variables pour GHCR et Azure Key Vault
             cat > .env << EOF
             REGISTRY=ghcr.io
             REPO_NAME=${{ steps.repo.outputs.repo_lower }}
             VPS_HOST=${{ secrets.VPS_HOST }}
             GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+
+            # Azure Key Vault Configuration
+            AZURE_KEY_VAULT_URL=${{ secrets.AZURE_KEY_VAULT_URL }}
+            AZURE_CLIENT_ID=${{ secrets.AZURE_CLIENT_ID }}
+            AZURE_CLIENT_SECRET=${{ secrets.AZURE_CLIENT_SECRET }}
+            AZURE_TENANT_ID=${{ secrets.AZURE_TENANT_ID }}
             EOF
 
             # Rendre le script de déploiement exécutable
