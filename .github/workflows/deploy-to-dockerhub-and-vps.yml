@@ -1,0 +1,129 @@
+name: Build, Push to DockerHub and Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+      - OVH
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - 'docker-compose.prod.yml'
+      - '.github/workflows/deploy-to-dockerhub-and-vps.yml'
+  workflow_dispatch:
+
+env:
+  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+  BACKEND_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/audiomancy-backend
+  FRONTEND_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/audiomancy-frontend
+
+jobs:
+  build-and-push:
+    name: Build and Push Docker Images to DockerHub
+    runs-on: ubuntu-latest
+
+    steps:
+      # Récupération du code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Login to DockerHub
+      - name: Log in to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      # Setup Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Build and push Backend image
+      - name: Build and push Backend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: |
+            ${{ env.BACKEND_IMAGE }}:latest
+            ${{ env.BACKEND_IMAGE }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # Build and push Frontend image
+      - name: Build and push Frontend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          tags: |
+            ${{ env.FRONTEND_IMAGE }}:latest
+            ${{ env.FRONTEND_IMAGE }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            NODE_ENV=production
+
+      # Summary
+      - name: Images published to DockerHub
+        run: |
+          echo "✅ Images published to DockerHub"
+          echo "📦 Backend: ${{ env.BACKEND_IMAGE }}:latest"
+          echo "📦 Frontend: ${{ env.FRONTEND_IMAGE }}:latest"
+          echo "🔗 DockerHub: https://hub.docker.com/u/${{ secrets.DOCKERHUB_USERNAME }}"
+
+  deploy-to-vps:
+    name: Deploy to OVH VPS
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+      # Récupération du code (pour avoir le docker-compose.prod.yml et le script de déploiement)
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Copier les fichiers nécessaires sur le VPS
+      - name: Copy deployment files to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          source: "docker-compose.prod.yml,deploy.sh"
+          target: "/home/${{ secrets.VPS_USERNAME }}/audiomancy"
+          strip_components: 0
+
+      # Se connecter au VPS et déployer
+      - name: Deploy on VPS via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            cd /home/${{ secrets.VPS_USERNAME }}/audiomancy
+
+            # Créer le fichier .env si nécessaire
+            cat > .env << EOF
+            DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
+            VPS_HOST=${{ secrets.VPS_HOST }}
+            EOF
+
+            # Rendre le script de déploiement exécutable
+            chmod +x deploy.sh
+
+            # Exécuter le script de déploiement
+            ./deploy.sh
+
+      # Summary
+      - name: Deployment successful
+        run: |
+          echo "✅ Deployment to VPS successful"
+          echo "🚀 Application running at:"
+          echo "   - Frontend: http://${{ secrets.VPS_HOST }}:3000"
+          echo "   - Backend: http://${{ secrets.VPS_HOST }}:8000"

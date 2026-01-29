@@ -1,7 +1,8 @@
+version: "3.8"
+
 services:
   # ===================================================================
   # MongoDB - Base de données principale + Cache
-  # Remplace Azure Cosmos DB et Azure Blob Storage
   # ===================================================================
   mongodb:
     image: mongo:7.0
@@ -21,57 +22,40 @@ services:
       retries: 5
 
   # ===================================================================
-  # Backend FastAPI
+  # Backend FastAPI - Image depuis DockerHub
   # ===================================================================
   backend:
-    image: python:3.11-slim
+    image: ${DOCKERHUB_USERNAME}/audiomancy-backend:latest
     container_name: audiomancy-backend
     restart: unless-stopped
-    working_dir: /app
     ports:
       - "8000:8000"
-    env_file:
-      - ./backend/.env
     environment:
       MONGO_HOST: mongodb
       MONGO_PORT: "27017"
       FRONTEND_URL: http://frontend:3000
-      JAEGER_ENDPOINT: http://jaeger:4317
     depends_on:
       mongodb:
         condition: service_healthy
-      jaeger:
-        condition: service_healthy
     networks:
       - audiomancy-network
-    volumes:
-      - ./backend:/app
-    command: sh -c "pip install -r requirements.txt && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
 
   # ===================================================================
-  # Frontend Next.js
+  # Frontend Next.js - Image depuis DockerHub
   # ===================================================================
   frontend:
-    image: node:22-alpine
+    image: ${DOCKERHUB_USERNAME}/audiomancy-frontend:latest
     container_name: audiomancy-frontend
     restart: unless-stopped
-    working_dir: /app
     ports:
-      - "3000:3000"
-    env_file:
-      - ./frontend/.env.local
+      - "3000:8080"
     environment:
-      NEXT_PUBLIC_API_URL: http://backend:8000
-      NODE_ENV: ${NODE_ENV:-development}
+      NEXT_PUBLIC_API_URL: http://${VPS_HOST}:8000
+      NODE_ENV: production
     depends_on:
       - backend
     networks:
       - audiomancy-network
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-      - /app/.next
-    command: sh -c "npm install && npm run dev"
 
 # ===================================================================
 # Volumes persistants
