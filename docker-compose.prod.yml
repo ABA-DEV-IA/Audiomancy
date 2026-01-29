@@ -11,13 +11,10 @@ services:
     image: mongo:7.0
     container_name: audiomancy-mongodb
     restart: unless-stopped
-    ports:
-      - "27017:27017"
+    network_mode: "container:wg-easy"
     volumes:
       - mongo_data:/data/db
       - mongo_config:/data/configdb
-    networks:
-      - audiomancy-network
     healthcheck:
       test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
       interval: 10s
@@ -31,17 +28,16 @@ services:
     image: ${REGISTRY}/${REPO_NAME}/backend:latest
     container_name: audiomancy-backend
     restart: unless-stopped
-    ports:
-      - "8000:8000"
+    network_mode: "container:wg-easy"
     environment:
-      # MongoDB Configuration
-      MONGO_HOST: mongodb
+      # MongoDB Configuration (localhost car même network stack)
+      MONGO_HOST: localhost
       MONGO_PORT: "27017"
       MONGO_DB_NAME: audiomancy
 
       # API Configuration
-      FRONTEND_URL: http://frontend:3000
-      ALLOWED_ORIGINS: "http://localhost:3000,http://127.0.0.1:3000,http://${VPS_HOST}:3000"
+      FRONTEND_URL: http://localhost:3000
+      ALLOWED_ORIGINS: "http://localhost:3000,http://127.0.0.1:3000,http://10.8.0.1:3000"
       SWAGGER_ON: "true"
 
       # Jamendo API (requis pour la musique)
@@ -60,8 +56,6 @@ services:
     depends_on:
       mongodb:
         condition: service_healthy
-    networks:
-      - audiomancy-network
 
   # ===================================================================
   # Frontend Next.js - Image depuis GitHub Container Registry
@@ -70,15 +64,12 @@ services:
     image: ${REGISTRY}/${REPO_NAME}/frontend:latest
     container_name: audiomancy-frontend
     restart: unless-stopped
-    ports:
-      - "3000:8080"
+    network_mode: "container:wg-easy"
     environment:
-      NEXT_PUBLIC_API_URL: http://${VPS_HOST}:8000
+      NEXT_PUBLIC_API_URL: http://10.8.0.1:8000
       NODE_ENV: production
     depends_on:
       - backend
-    networks:
-      - audiomancy-network
 
 # ===================================================================
 # Volumes persistants
@@ -88,10 +79,3 @@ volumes:
     driver: local
   mongo_config:
     driver: local
-
-# ===================================================================
-# Réseau interne
-# ===================================================================
-networks:
-  audiomancy-network:
-    driver: bridge
