@@ -2,9 +2,9 @@ annotated-types==0.7.0
 anyio==4.10.0
 astroid==3.3.11
 # azure-cognitiveservices-speech==1.45.0  # [DÉSACTIVÉ] TTS Azure Speech
-# azure-core==1.35.0  # [DÉSACTIVÉ] Plus de services Azure core
-# azure-identity==1.24.0  # [OPTIONNEL] Uniquement si Key Vault utilisé
-# azure-keyvault-secrets==4.10.0  # [OPTIONNEL] Uniquement si Key Vault utilisé
+azure-core==1.35.0  # Requis pour Azure Key Vault
+azure-identity==1.24.0  # Requis pour Azure Key Vault authentication
+azure-keyvault-secrets==4.10.0  # Azure Key Vault pour secrets management
 # azure-storage-blob==12.26.0  # [DÉSACTIVÉ] Remplacé par MongoDB cache
 bcrypt==4.3.0
 certifi==2025.8.3
@@ -38,8 +38,8 @@ langsmith==0.4.23
 lxml==6.0.1
 mccabe==0.7.0
 motor==3.7.1
-# msal==1.33.0  # [OPTIONNEL] Dépendance Azure Identity
-# msal-extensions==1.3.1  # [OPTIONNEL] Dépendance Azure Identity
+msal==1.33.0  # Dépendance Azure Identity
+msal-extensions==1.3.1  # Dépendance Azure Identity
 mypy==1.17.1
 mypy_extensions==1.1.0
 openai==1.104.2  # Utilisé par DeepSeek (API compatible OpenAI)
