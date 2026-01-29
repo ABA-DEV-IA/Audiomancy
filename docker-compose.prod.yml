@@ -1,5 +1,8 @@
 version: "3.8"
 
+# Configuration de production pour le VPS OVH
+# Dernière mise à jour : 2026-01-29
+
 services:
   # ===================================================================
   # MongoDB - Base de données principale + Cache
