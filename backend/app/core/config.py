@@ -187,6 +187,7 @@ class Settings(BaseSettings):
 
                 # Jamendo configuration
                 'jamendo': 'jamendo_client_id',
+                'jamendo-url': 'jamendo_url',
 
                 # API Security
                 'api-key': 'api_key',

@@ -36,9 +36,6 @@ services:
       SWAGGER_ON: "true"
       PORT: "8000"
 
-      # Jamendo API URL
-      JAMENDO_URL: "https://api.jamendo.com/v3.0"
-
       # HashiCorp Vault Configuration
       # Toutes les configurations sensibles (MongoDB, DeepSeek, Jamendo, API Key)
       # sont chargées depuis HashiCorp Vault au démarrage
