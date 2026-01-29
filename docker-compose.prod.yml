@@ -25,10 +25,10 @@ services:
       retries: 5
 
   # ===================================================================
-  # Backend FastAPI - Image depuis DockerHub
+  # Backend FastAPI - Image depuis GitHub Container Registry
   # ===================================================================
   backend:
-    image: ${DOCKERHUB_USERNAME}/audiomancy-backend:latest
+    image: ${REGISTRY}/${REPO_NAME}/backend:latest
     container_name: audiomancy-backend
     restart: unless-stopped
     ports:
@@ -44,10 +44,10 @@ services:
       - audiomancy-network
 
   # ===================================================================
-  # Frontend Next.js - Image depuis DockerHub
+  # Frontend Next.js - Image depuis GitHub Container Registry
   # ===================================================================
   frontend:
-    image: ${DOCKERHUB_USERNAME}/audiomancy-frontend:latest
+    image: ${REGISTRY}/${REPO_NAME}/frontend:latest
     container_name: audiomancy-frontend
     restart: unless-stopped
     ports:

@@ -14,10 +14,10 @@ if [ -f .env ]; then
     export $(cat .env | grep -v '^#' | xargs)
 fi
 
-# Se connecter à DockerHub (si les credentials sont disponibles)
-if [ -n "$DOCKERHUB_USERNAME" ] && [ -n "$DOCKERHUB_PASSWORD" ]; then
-    echo "🔐 Connexion à DockerHub..."
-    echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+# Se connecter à GitHub Container Registry (si le token est disponible)
+if [ -n "$GITHUB_TOKEN" ]; then
+    echo "🔐 Connexion à GitHub Container Registry..."
+    echo "$GITHUB_TOKEN" | docker login ghcr.io -u github-actions --password-stdin
 fi
 
 # Arrêter les conteneurs existants
@@ -28,7 +28,7 @@ docker-compose -f docker-compose.prod.yml down || true
 echo "🗑️  Nettoyage des anciennes images..."
 docker image prune -f
 
-# Télécharger les dernières images depuis DockerHub
+# Télécharger les dernières images depuis GitHub Container Registry
 echo "📥 Téléchargement des dernières images..."
 docker-compose -f docker-compose.prod.yml pull
 
