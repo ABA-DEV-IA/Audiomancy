@@ -110,7 +110,12 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT }}
           script: |
+            # Créer le répertoire s'il n'existe pas
             mkdir -p /home/${{ secrets.VPS_USERNAME }}/audiomancy
+
+            # Corriger le propriétaire et les permissions avec sudo
+            sudo chown -R ${{ secrets.VPS_USERNAME }}:${{ secrets.VPS_USERNAME }} /home/${{ secrets.VPS_USERNAME }}/audiomancy
+            sudo chmod -R 755 /home/${{ secrets.VPS_USERNAME }}/audiomancy
 
       # Copier les fichiers nécessaires sur le VPS
       - name: Copy deployment files to VPS
