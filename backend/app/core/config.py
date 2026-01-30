@@ -203,7 +203,11 @@ class Settings(BaseSettings):
             for secret_name, key_mappings in secret_config.items():
                 try:
                     # HashiCorp Vault KV v2 API: /v1/{mount_path}/data/{path_prefix}/{secret_name}
-                    url = f"{self.vault_url}/v1/{self.vault_mount_path}/data/{self.vault_path_prefix}/{secret_name}"
+                    # Construire l'URL en tenant compte du cas où vault_path_prefix est vide
+                    if self.vault_path_prefix:
+                        url = f"{self.vault_url}/v1/{self.vault_mount_path}/data/{self.vault_path_prefix}/{secret_name}"
+                    else:
+                        url = f"{self.vault_url}/v1/{self.vault_mount_path}/data/{secret_name}"
                     response = requests.get(url, headers=headers, timeout=5)
 
                     if response.status_code == 200:

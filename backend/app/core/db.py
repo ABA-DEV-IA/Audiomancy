@@ -2,6 +2,7 @@
 Database module for MongoDB connection and collections using Motor.
 """
 
+from urllib.parse import quote_plus
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.errors import PyMongoError
 from app.core.config import settings
@@ -13,17 +14,21 @@ MONGO_PASSWORD = settings.mongo_password
 MONGO_DBNAME = settings.mongo_db_name
 
 if MONGO_USERNAME and MONGO_PASSWORD:
+    # URL-encode username and password to handle special characters
+    username_encoded = quote_plus(MONGO_USERNAME)
+    password_encoded = quote_plus(MONGO_PASSWORD)
+
     # Détection automatique : Cosmos DB si le host contient "cosmos.azure.com"
     if "cosmos.azure.com" in MONGO_HOST:
         # Mode production (Azure Cosmos DB avec SSL)
         MONGO_URL = (
-            f"mongodb://{MONGO_USERNAME}:{MONGO_PASSWORD}"
+            f"mongodb://{username_encoded}:{password_encoded}"
             f"@{MONGO_HOST}:{MONGO_PORT}/"
             "?ssl=true&replicaSet=globaldb&retrywrites=false"
         )
     else:
         # MongoDB standard avec auth (sans SSL)
-        MONGO_URL = f"mongodb://{MONGO_USERNAME}:{MONGO_PASSWORD}@{MONGO_HOST}:{MONGO_PORT}"
+        MONGO_URL = f"mongodb://{username_encoded}:{password_encoded}@{MONGO_HOST}:{MONGO_PORT}"
 else:
     # Mode local (MongoDB standard sans auth, sans SSL)
     MONGO_URL = f"mongodb://{MONGO_HOST}:{MONGO_PORT}"
