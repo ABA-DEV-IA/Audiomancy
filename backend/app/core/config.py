@@ -194,6 +194,8 @@ class Settings(BaseSettings):
                 },
                 'apikey': {
                     'api_key': 'api_key',
+                    'swagger_on': 'swagger_on',
+                    'allowed_origins': 'allowed_origins',
                 },
             }
 
