@@ -171,36 +171,34 @@ class Settings(BaseSettings):
                 'X-Vault-Token': self.vault_token
             }
 
-            # Mapping des noms de secrets du vault vers les attributs Settings
-            secret_mapping = {
-                # DeepSeek configuration
-                'deepseek': 'deepseek_api_key',
-                'deepseek-base-url': 'deepseek_base_url',
-                'deepseek-model': 'deepseek_model',
-                'deepseek-temperature': 'deepseek_temperature',
-                'deepseek-max-tokens': 'deepseek_max_tokens',
-
-                # MongoDB configuration
-                'mongodb-host': 'mongo_host',
-                'mongodb-port': 'mongo_port',
-                'mongodb-db-name': 'mongo_db_name',
-
-                # Jamendo configuration
-                'jamendo': 'jamendo_client_id',
-                'jamendo-url': 'jamendo_url',
-
-                # API Security
-                'api-key': 'api_key',
-                'apikey': 'api_key',
+            # Configuration des secrets groupés dans le Vault
+            # Chaque secret contient plusieurs clés (structure groupée)
+            secret_config = {
+                'deepseek': {
+                    'api_key': 'deepseek_api_key',
+                    'base_url': 'deepseek_base_url',
+                    'model': 'deepseek_model',
+                    'temperature': 'deepseek_temperature',
+                    'max-tokens': 'deepseek_max_tokens',
+                },
+                'mongoDB': {
+                    'host': 'mongo_host',
+                    'port': 'mongo_port',
+                    'db_name': 'mongo_db_name',
+                },
+                'jamendo': {
+                    'client_id': 'jamendo_client_id',
+                    'url': 'jamendo_url',
+                },
+                'apikey': {
+                    'api_key': 'api_key',
+                },
             }
 
             new_cache = {}
 
-            # Récupérer chaque secret depuis HashiCorp Vault
-            for secret_name, attr_name in secret_mapping.items():
-                if not hasattr(self, attr_name):
-                    continue
-
+            # Récupérer chaque secret groupé depuis HashiCorp Vault
+            for secret_name, key_mappings in secret_config.items():
                 try:
                     # HashiCorp Vault KV v2 API: /v1/{mount_path}/data/{path_prefix}/{secret_name}
                     url = f"{self.vault_url}/v1/{self.vault_mount_path}/data/{self.vault_path_prefix}/{secret_name}"
@@ -208,11 +206,19 @@ class Settings(BaseSettings):
 
                     if response.status_code == 200:
                         data = response.json()
-                        # KV v2 structure: data.data.value
-                        value = data['data']['data']['value']
-                        setattr(self, attr_name, value)
-                        new_cache[attr_name] = value
-                        print(f"[INFO] Loaded secret '{secret_name}' → '{attr_name}'")
+                        # KV v2 structure: data.data contient toutes les clés du secret
+                        secret_data = data['data']['data']
+
+                        # Extraire chaque clé du secret et la mapper à l'attribut Settings
+                        for vault_key, settings_attr in key_mappings.items():
+                            if vault_key in secret_data and hasattr(self, settings_attr):
+                                value = secret_data[vault_key]
+                                setattr(self, settings_attr, value)
+                                new_cache[settings_attr] = value
+                                print(f"[INFO] Loaded '{secret_name}.{vault_key}' → '{settings_attr}'")
+                            elif vault_key not in secret_data:
+                                print(f"[WARNING] Key '{vault_key}' not found in secret '{secret_name}'")
+
                     elif response.status_code == 404:
                         print(f"[WARNING] Secret '{secret_name}' not found in Vault")
                     else:
