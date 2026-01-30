@@ -148,6 +148,7 @@ jobs:
             GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
             VAULT_URL=${{ secrets.VAULT_URL }}
             VAULT_TOKEN=${{ secrets.VAULT_TOKEN }}
+            FASTAPI_API_KEY=${{ secrets.FASTAPI_API_KEY }}
             EOF
 
             # Rendre le script de déploiement exécutable
