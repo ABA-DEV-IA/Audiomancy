@@ -185,6 +185,8 @@ class Settings(BaseSettings):
                     'host': 'mongo_host',
                     'port': 'mongo_port',
                     'db_name': 'mongo_db_name',
+                    'username': 'mongo_username',
+                    'password': 'mongo_password',
                 },
                 'jamendo': {
                     'client_id': 'jamendo_client_id',
