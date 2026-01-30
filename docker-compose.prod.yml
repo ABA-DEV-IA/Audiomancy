@@ -58,6 +58,7 @@ services:
     network_mode: "container:wg-easy"
     environment:
       NEXT_PUBLIC_API_URL: http://127.0.0.1:8000
+      FASTAPI_API_KEY: ${FASTAPI_API_KEY:-}
       NODE_ENV: production
       PORT: "3000"
     depends_on:
