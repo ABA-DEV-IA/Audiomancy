@@ -31,7 +31,7 @@ services:
     network_mode: "container:wg-easy"
     environment:
       # API Configuration
-      FRONTEND_URL: http://frontend:3000
+      FRONTEND_URL: http://127.0.0.1:3000
       ALLOWED_ORIGINS: "http://localhost:3000,http://127.0.0.1:3000,http://10.8.0.1:3000"
       SWAGGER_ON: "true"
       PORT: "8000"
@@ -57,7 +57,7 @@ services:
     restart: unless-stopped
     network_mode: "container:wg-easy"
     environment:
-      NEXT_PUBLIC_API_URL: http://backend:8000
+      NEXT_PUBLIC_API_URL: http://127.0.0.1:8000
       NODE_ENV: production
       PORT: "3000"
     depends_on:
