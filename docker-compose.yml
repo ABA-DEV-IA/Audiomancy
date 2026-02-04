@@ -36,11 +36,8 @@ services:
       MONGO_HOST: mongodb
       MONGO_PORT: "27017"
       FRONTEND_URL: http://frontend:3000
-      JAEGER_ENDPOINT: http://jaeger:4317
     depends_on:
       mongodb:
-        condition: service_healthy
-      jaeger:
         condition: service_healthy
     networks:
       - audiomancy-network
@@ -73,6 +70,108 @@ services:
       - /app/.next
     command: sh -c "npm install && npm run dev"
 
+  # ===================================================================
+  # MONITORING STACK (C20 - Compétence de surveillance)
+  # ===================================================================
+
+  # Prometheus - Collecte et stockage des métriques
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: audiomancy-prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.listen-address=:9090'
+    ports:
+      - "19090:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus.local.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/prometheus/alert.rules.local.yml:/etc/prometheus/alert.rules.yml:ro
+      - prometheus_data:/prometheus
+    networks:
+      - audiomancy-network
+    restart: unless-stopped
+
+  # Grafana - Visualisation des métriques et logs
+  grafana:
+    image: grafana/grafana:latest
+    container_name: audiomancy-grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_INSTALL_PLUGINS: ""
+      GF_SERVER_HTTP_PORT: 9091
+    ports:
+      - "19091:9091"
+    depends_on:
+      - prometheus
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./monitoring/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    networks:
+      - audiomancy-network
+    restart: unless-stopped
+
+  # Pushgateway - Pour métriques batch/cronjobs
+  pushgateway:
+    image: prom/pushgateway:latest
+    container_name: audiomancy-pushgateway
+    command:
+      - '--web.listen-address=:9092'
+    ports:
+      - "19092:9092"
+    networks:
+      - audiomancy-network
+    restart: unless-stopped
+
+  # AlertManager - Gestion des alertes
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: audiomancy-alertmanager
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+    ports:
+      - "19093:9093"
+    volumes:
+      - ./monitoring/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - alertmanager_data:/alertmanager
+    networks:
+      - audiomancy-network
+    restart: unless-stopped
+
+  # Loki - Agrégation de logs (RGPD-compliant)
+  loki:
+    image: grafana/loki:latest
+    container_name: audiomancy-loki
+    ports:
+      - "19100:3100"
+    volumes:
+      - ./monitoring/loki/loki-config.yml:/etc/loki/local-config.yaml:ro
+      - loki_data:/loki
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - audiomancy-network
+    restart: unless-stopped
+
+  # Promtail - Collecteur de logs Docker
+  promtail:
+    image: grafana/promtail:latest
+    container_name: audiomancy-promtail
+    volumes:
+      - ./monitoring/promtail/promtail-config.yml:/etc/promtail/config.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command: -config.file=/etc/promtail/config.yml
+    depends_on:
+      - loki
+    networks:
+      - audiomancy-network
+    restart: unless-stopped
+
 # ===================================================================
 # Volumes persistants
 # ===================================================================
@@ -80,6 +179,15 @@ volumes:
   mongo_data:
     driver: local
   mongo_config:
+    driver: local
+  # Monitoring volumes
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  alertmanager_data:
+    driver: local
+  loki_data:
     driver: local
 
 # ===================================================================

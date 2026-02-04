@@ -83,6 +83,10 @@ zstandard==0.24.0
 # ---- Scheduler (remplace Azure Functions) ----
 APScheduler==3.11.0
 
+# ---- Prometheus (métriques pour monitoring) ----
+prometheus-client==0.21.0
+psutil==7.0.1
+
 # ---- OpenTelemetry (versions compatibles entre elles) ----
 # Conservé pour la compétence C20 (monitoring et journalisation)
 opentelemetry-api==1.28.0

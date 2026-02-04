@@ -13,12 +13,15 @@ from fastapi.exceptions import RequestValidationError
 from app.core.config import settings
 from app.core.telemetry import setup_telemetry
 from app.core.security import get_api_key
+from app.core.metrics_middleware import PrometheusMiddleware
 
 from app.routes.jamendo_routes import router as jamendo_router
 from app.routes.ai_routes import router as ai_router
 from app.routes.user_routes import router as user_router
 from app.routes.favorite_routes import router as favorite_router
 from app.routes.health_routes import router as health_router
+from app.routes.metrics_routes import router as metrics_router
+from app.routes.gdpr_routes import router as gdpr_router
 # from app.routes.speech_token_routes import router as speech_router  # [DÉSACTIVÉ] Azure Speech TTS
 
 from app.errors.handlers import validation_exception_handler
@@ -90,13 +93,18 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
+    # --- Prometheus Metrics Middleware (C20) ---
+    fastapi_app.add_middleware(PrometheusMiddleware)
+
     # --- Custom Exceptions ---
     fastapi_app.add_exception_handler(RequestValidationError, validation_exception_handler)
 
     # --- ROUTERS ---
-    # Health check route (no authentication required)
+    # Public routes (no authentication required)
     fastapi_app.include_router(health_router)
-    
+    fastapi_app.include_router(metrics_router)  # Prometheus metrics (C20)
+    fastapi_app.include_router(gdpr_router)  # GDPR/RGPD compliance (C20)
+
     # Protected routes
     protected = [Depends(get_api_key)]
     fastapi_app.include_router(jamendo_router, dependencies=protected)

@@ -1,5 +1,5 @@
 """
-DeepSeek LLM client wrapper with debug logging.
+DeepSeek LLM client wrapper with debug logging and Prometheus metrics.
 
 Provides a minimal and robust abstraction over the DeepSeek API
 for text generation in a ReAct-based agent.
@@ -8,9 +8,19 @@ Note: DeepSeek API is OpenAI-compatible, so we use the OpenAI SDK
 with a custom base_url pointing to DeepSeek's API endpoint.
 """
 
+import time
+import logging
 from typing import Optional
 from openai import OpenAI
 from app.core.config import settings
+from app.routes.metrics_routes import (
+    deepseek_requests_total,
+    deepseek_latency_seconds,
+    deepseek_tokens_used,
+    deepseek_errors_total
+)
+
+logger = logging.getLogger(__name__)
 
 
 class DeepSeekClient:
@@ -55,6 +65,9 @@ class DeepSeekClient:
         Raises:
             RuntimeError: If the API response is invalid or empty.
         """
+        # Start timer for latency metric
+        start_time = time.time()
+
         messages = []
 
         if system_prompt:
@@ -63,10 +76,10 @@ class DeepSeekClient:
         messages.append({"role": "user", "content": prompt})
 
         # 🔹 Debug log of the outgoing messages
-        print("⚡️ [DeepSeek DEBUG] Sending messages to API:")
+        logger.debug("Sending messages to DeepSeek API:")
         for msg in messages:
             snippet = msg['content'][:500] + ("..." if len(msg['content']) > 500 else "")
-            print(f" - {msg['role']}: {snippet}")
+            logger.debug(f" - {msg['role']}: {snippet}")
 
         try:
             # Use OpenAI SDK's chat completion API (compatible with DeepSeek)
@@ -76,21 +89,51 @@ class DeepSeekClient:
                 temperature=self.temperature,
                 max_tokens=self.max_tokens,
             )
+
+            # Record successful request
+            deepseek_requests_total.labels(status="success").inc()
+
+            # Record latency
+            latency = time.time() - start_time
+            deepseek_latency_seconds.observe(latency)
+
+            # Defensive checks
+            if not response or not response.choices:
+                deepseek_errors_total.labels(error_type="empty_response").inc()
+                raise RuntimeError("DeepSeek returned an empty response")
+
+            choice = response.choices[0]
+            content = choice.message.content
+
+            if not content:
+                deepseek_errors_total.labels(error_type="no_content").inc()
+                raise RuntimeError("DeepSeek response contained no content")
+
+            # Record token usage (if available)
+            if hasattr(response, 'usage') and response.usage:
+                if hasattr(response.usage, 'prompt_tokens'):
+                    deepseek_tokens_used.labels(type="prompt").inc(response.usage.prompt_tokens)
+                if hasattr(response.usage, 'completion_tokens'):
+                    deepseek_tokens_used.labels(type="completion").inc(response.usage.completion_tokens)
+                if hasattr(response.usage, 'total_tokens'):
+                    deepseek_tokens_used.labels(type="total").inc(response.usage.total_tokens)
+
+            # 🔹 Debug log of the incoming response
+            snippet = content[:500] + ("..." if len(content) > 500 else "")
+            logger.debug(f"Received response from DeepSeek:\n{snippet}\n")
+            logger.info(f"DeepSeek API call completed in {latency:.2f}s")
+
+            return content.strip()
+
         except Exception as exc:
+            # Record failed request
+            deepseek_requests_total.labels(status="error").inc()
+            error_type = type(exc).__name__
+            deepseek_errors_total.labels(error_type=error_type).inc()
+
+            logger.error(
+                f"DeepSeek API call failed: {exc}",
+                extra={"error_type": error_type},
+                exc_info=True
+            )
             raise RuntimeError(f"DeepSeek API call failed: {exc}") from exc
-
-        # Defensive checks
-        if not response or not response.choices:
-            raise RuntimeError("DeepSeek returned an empty response")
-
-        choice = response.choices[0]
-        content = choice.message.content
-
-        if not content:
-            raise RuntimeError("DeepSeek response contained no content")
-
-        # 🔹 Debug log of the incoming response
-        snippet = content[:500] + ("..." if len(content) > 500 else "")
-        print(f"⚡️ [DeepSeek DEBUG] Received response:\n{snippet}\n")
-
-        return content.strip()
