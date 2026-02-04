@@ -9,6 +9,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.core.config import settings
 from app.core.telemetry import setup_telemetry
@@ -89,6 +90,10 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+    # --- PROMETHEUS METRICS ---
+    # Expose /metrics endpoint for Prometheus scraping
+    Instrumentator().instrument(fastapi_app).expose(fastapi_app, endpoint="/metrics")
 
     # --- Custom Exceptions ---
     fastapi_app.add_exception_handler(RequestValidationError, validation_exception_handler)

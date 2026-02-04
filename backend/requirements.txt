@@ -101,4 +101,7 @@ opentelemetry-exporter-otlp-proto-grpc==1.28.0
 # [OPTIONNEL] Remplacé par Jaeger pour monitoring local
 # azure-monitor-opentelemetry-exporter==1.0.0b23
 
+# ---- Prometheus Metrics ----
+prometheus-fastapi-instrumentator==7.0.0
+
 # Note: DeepSeek API est compatible OpenAI, utilise le SDK openai (voir ci-dessus)
