@@ -9,11 +9,11 @@
 ## ✅ Ce qui a été fait (Session actuelle)
 
 ### 🏗️ Infrastructure & Migration
-- ✅ Migration complète Azure → Local (MongoDB, DeepSeek, APScheduler, Jaeger)
-- ✅ Docker Compose avec 4 services (MongoDB, Backend, Frontend, Jaeger)
+- ✅ Migration complète Azure → Local (MongoDB, DeepSeek, APScheduler, Prometheus/Grafana/Loki)
+- ✅ Docker Compose avec 6+ services (MongoDB, Backend, Frontend, Prometheus, Grafana, Loki, AlertManager)
 - ✅ Cache MongoDB avec TTL (22× plus rapide que Jamendo direct)
 - ✅ APScheduler remplace Azure Functions (daily categories)
-- ✅ Jaeger monitoring actif (OpenTelemetry OTLP)
+- ✅ Prometheus/Grafana/Loki monitoring stack actif (metrics, dashboards, logs)
 - ✅ DeepSeek LLM fonctionnel (ReAct agent)
 
 ### 🔧 CI/CD
@@ -114,7 +114,7 @@ touch docs/incidents/REGISTRE.md
 # - INC-001 : AttributeError cache MongoDB (jamendo_service.py)
 # - INC-002 : Async/await chain AI routes
 # - INC-003 : Scheduler past_due detection
-# - INC-004 : Jaeger traces manquantes
+# - INC-004 : Prometheus metrics export issues
 # - INC-005 : CI/CD push direct vers main
 
 # Format par incident :
@@ -133,7 +133,7 @@ touch docs/incidents/RUNBOOK-COMMON-ISSUES.md
 # Problèmes courants avec solutions :
 # - DeepSeek timeout → retry strategy
 # - MongoDB cache vide → purge commande
-# - Jaeger pas de traces → vérifier JAEGER_ENDPOINT
+# - Prometheus pas de métriques → vérifier exposition /metrics endpoint
 # - APScheduler job bloqué → restart scheduler
 # - CORS errors → vérifier allowed_origins
 # - Tests pytest fail → vérifier .env.test
@@ -147,7 +147,7 @@ touch docs/incidents/TEMPLATE-POST-MORTEM.md
 # Workflow formalisé :
 # 1. Détection (health checks, logs, user report)
 # 2. Classification (🔴 CRITIQUE, 🟠 HAUTE, 🟡 MOYENNE, 🟢 FAIBLE)
-# 3. Investigation (Jaeger, logs, reproduction)
+# 3. Investigation (Grafana dashboards, Loki logs, Prometheus metrics, reproduction)
 # 4. Résolution (branche fix/, PR, tests)
 # 5. Documentation (registre, runbook)
 
@@ -184,7 +184,7 @@ touch docs/architecture/erd-mongodb.puml
 
 # Diagrammes attendus :
 # - C4 Context : Audiomancy + acteurs externes (Jamendo, DeepSeek)
-# - C4 Container : Backend, Frontend, MongoDB, Jaeger
+# - C4 Container : Backend, Frontend, MongoDB, Prometheus, Grafana, Loki
 # - C4 Component : Routes, Services, Models (backend)
 # - Séquence : User → Frontend → Backend → DeepSeek → Jamendo
 # - ERD : Collections MongoDB (users, favorites, cached_tracks)
@@ -315,7 +315,7 @@ touch .github/workflows/integration-tests.yml
 # - Attendre healthchecks
 # - Exécuter tests API (requests)
 # - Vérifier MongoDB peuplé
-# - Vérifier Jaeger reçoit traces
+# - Vérifier Prometheus collecte métriques
 # - Arrêter stack
 
 # Exemple test :
@@ -328,7 +328,7 @@ def test_full_stack_integration():
     assert response.status_code == 200
     
     # Vérifier cache MongoDB
-    # Vérifier traces Jaeger
+    # Vérifier métriques Prometheus
 ```
 
 ---
@@ -405,7 +405,7 @@ touch docs/architecture/adr/001-migration-azure-vers-local.md
 touch docs/architecture/adr/002-choix-deepseek-llm.md
 touch docs/architecture/adr/003-mongodb-cache-strategy.md
 touch docs/architecture/adr/004-apscheduler-vs-celery.md
-touch docs/architecture/adr/005-jaeger-monitoring-local.md
+touch docs/architecture/adr/005-prometheus-monitoring-local.md
 
 # Format ADR :
 # - Contexte
@@ -521,7 +521,7 @@ touch docs/user-guide/troubleshooting.md
 ### E5 - Piloter l'Exploitation d'une Application IA
 
 **C20 - Surveiller**
-- [ ] ✅ Jaeger monitoring actif (traces HTTP, logs)
+- [ ] ✅ Prometheus/Grafana/Loki monitoring stack actif (metrics, dashboards, logs)
 - [ ] ✅ Health checks (`/health/`, `/health/scheduler`)
 - [ ] 🔴 Feedback loop MLOps documenté (API externe)
 - [ ] 🔴 Métriques LLM collectées (`llm_metrics.py`)
@@ -640,7 +640,7 @@ docs/architecture/
     ├── 002-choix-deepseek-llm.md      🟡 MOYEN
     ├── 003-mongodb-cache-strategy.md  🟡 MOYEN
     ├── 004-apscheduler-vs-celery.md   🟡 MOYEN
-    └── 005-jaeger-monitoring.md       🟡 MOYEN
+    └── 005-prometheus-monitoring.md   🟡 MOYEN
 ```
 
 ### Accessibilité

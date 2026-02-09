@@ -54,8 +54,7 @@
 ```txt
 openai==1.104.2  # DeepSeek (API compatible OpenAI)
 motor==3.7.1     # MongoDB async
-opentelemetry-*  # Monitoring (compétence C20)
-azure-monitor-opentelemetry-exporter  # [OPTIONNEL] remplaçable par Jaeger
+prometheus-client  # Monitoring (compétence C20) - exposition métriques /metrics
 ```
 
 ---
@@ -68,7 +67,9 @@ azure-monitor-opentelemetry-exporter  # [OPTIONNEL] remplaçable par Jaeger
 - ✅ **MongoDB 7.0** : Base de données + cache
 - ✅ **Backend FastAPI** : Avec hot reload
 - ✅ **Frontend Next.js** : Avec hot reload
-- 🔧 **Jaeger** (commenté) : Tracing distribué local
+- ✅ **Prometheus** : Collecte de métriques
+- ✅ **Grafana** : Dashboards de visualisation
+- ✅ **Loki** : Agrégation de logs
 - 🔧 **HashiCorp Vault** (commenté) : Gestion secrets locale
 
 **Fichier d'exemple :** [.env.example](.env.example)
@@ -142,9 +143,9 @@ npm run dev
    - Valider la connexion DeepSeek
 
 3. **Monitoring local** (optionnel mais recommandé pour C20)
-   - Décommenter Jaeger dans `docker-compose.yml`
-   - Adapter `telemetry.py` pour utiliser JaegerExporter
-   - Alternative : Prometheus + Grafana
+   - Stack Prometheus/Grafana/Loki déjà configurée dans `docker-compose.monitoring.yml`
+   - Démarrer avec : `python start_monitoring.py monitoring`
+   - Accès Grafana : http://localhost:19091
 
 4. **Nettoyage final**
    - Supprimer `azure_functions/` (dossier complet)
@@ -156,10 +157,11 @@ npm run dev
 ## 🔍 **Compétences validées**
 
 **C20 : Surveillance d'application IA**
-- ✅ OpenTelemetry conservé (traces + logs)
-- ✅ Monitoring automatique FastAPI
-- ✅ Logging structuré avec contexte de trace
-- 🔧 TODO : Migrer vers Jaeger (local)
+- ✅ Stack Prometheus/Grafana/Loki complète
+- ✅ Metrics endpoint `/metrics` exposé via prometheus_client
+- ✅ Dashboards Grafana pour visualisation
+- ✅ Logs centralisés via Loki + Promtail
+- ✅ Alertes Discord via AlertManager
 
 **C21 : Résolution d'incidents**
 - ✅ Documentation des changements
@@ -172,7 +174,7 @@ npm run dev
 
 1. **Blob Tools** : Le fichier `blob_tools.py` est toujours présent mais non utilisé. Peut être supprimé après validation.
 
-2. **Telemetry** : Azure Monitor est toujours présent pour la rétrocompatibilité. Pour un environnement 100% local, remplacer par Jaeger.
+2. **Monitoring** : Stack Prometheus/Grafana/Loki configurée dans `docker-compose.monitoring.yml`. Environnement 100% local sans dépendances cloud.
 
 3. **Key Vault** : La configuration supporte encore Azure Key Vault (optionnel). En local, utiliser `.env` uniquement.
 

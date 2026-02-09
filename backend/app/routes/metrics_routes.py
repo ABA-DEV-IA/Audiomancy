@@ -37,26 +37,28 @@ http_request_duration_seconds = Histogram(
 )
 
 # ============================================================================
-# System Metrics
+# System Metrics - DÉSACTIVÉ
 # ============================================================================
+# Ces métriques sont déjà collectées automatiquement par prometheus_client
+# Pas besoin de les redéfinir (évite DuplicatedTimeseries error)
 
-process_cpu_seconds_total = Counter(
-    "process_cpu_seconds_total",
-    "Total CPU time consumed by the process",
-    registry=REGISTRY
-)
+# process_cpu_seconds_total = Counter(
+#     "process_cpu_seconds_total",
+#     "Total CPU time consumed by the process",
+#     registry=REGISTRY
+# )
 
-process_resident_memory_bytes = Gauge(
-    "process_resident_memory_bytes",
-    "Resident memory size in bytes",
-    registry=REGISTRY
-)
+# process_resident_memory_bytes = Gauge(
+#     "process_resident_memory_bytes",
+#     "Resident memory size in bytes",
+#     registry=REGISTRY
+# )
 
-process_virtual_memory_bytes = Gauge(
-    "process_virtual_memory_bytes",
-    "Virtual memory size in bytes",
-    registry=REGISTRY
-)
+# process_virtual_memory_bytes = Gauge(
+#     "process_virtual_memory_bytes",
+#     "Virtual memory size in bytes",
+#     registry=REGISTRY
+# )
 
 # ============================================================================
 # MongoDB Cache Metrics
@@ -162,17 +164,17 @@ app_info.labels(version="1.0.0", service="audiomancy-backend").set(1)
 # ============================================================================
 
 def update_system_metrics():
-    """Update system metrics (CPU, memory)"""
-    process = psutil.Process()
+    """Update system metrics (CPU, memory) - DÉSACTIVÉ"""
+    # Ces métriques sont automatiquement collectées par prometheus_client
+    # Pas besoin de les mettre à jour manuellement
+    pass
 
-    # CPU time
-    cpu_times = process.cpu_times()
-    process_cpu_seconds_total.inc(cpu_times.user + cpu_times.system)
-
-    # Memory
-    memory_info = process.memory_info()
-    process_resident_memory_bytes.set(memory_info.rss)
-    process_virtual_memory_bytes.set(memory_info.vms)
+    # process = psutil.Process()
+    # cpu_times = process.cpu_times()
+    # process_cpu_seconds_total.inc(cpu_times.user + cpu_times.system)
+    # memory_info = process.memory_info()
+    # process_resident_memory_bytes.set(memory_info.rss)
+    # process_virtual_memory_bytes.set(memory_info.vms)
 
 
 # ============================================================================

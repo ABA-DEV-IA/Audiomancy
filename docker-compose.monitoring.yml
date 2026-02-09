@@ -1,0 +1,210 @@
+# ===================================================================
+# MONITORING STACK - Audiomancy
+# ===================================================================
+# Monitoring, logging and chaos engineering stack
+# Compatible with main docker-compose.yml via shared network
+#
+# Startup:
+#   docker-compose -f docker-compose.yml -f docker-compose.monitoring.yml up -d
+#
+# Monitoring only:
+#   docker-compose -f docker-compose.monitoring.yml up -d
+#
+# Services:
+#   - Prometheus (metrics)  : http://localhost:${PROMETHEUS_PORT:-19090}
+#   - Grafana (dashboards)  : http://localhost:${GRAFANA_PORT:-19091}
+#   - AlertManager (alerts) : http://localhost:${ALERTMANAGER_PORT:-19093}
+#   - Pushgateway (batch)   : http://localhost:${PUSHGATEWAY_PORT:-19092}
+#   - Loki (logs)           : http://localhost:${LOKI_PORT:-19100}
+#   - Chaosd UI (chaos)     : http://localhost:${CHAOSD_UI_PORT:-19096}
+# ===================================================================
+
+services:
+  # ===================================================================
+  # Prometheus - Metrics collection and storage
+  # ===================================================================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: audiomancy-monitoring-prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.listen-address=:9090'
+    ports:
+      - "${PROMETHEUS_PORT:-19090}:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus.local.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/prometheus/alert.rules.local.yml:/etc/prometheus/alert.rules.yml:ro
+      - prometheus-data:/prometheus
+    networks:
+      - audiomancy-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ===================================================================
+  # Grafana - Metrics and logs visualization
+  # ===================================================================
+  grafana:
+    image: grafana/grafana:latest
+    container_name: audiomancy-monitoring-grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_INSTALL_PLUGINS: ""
+      GF_SERVER_HTTP_PORT: ${GRAFANA_HTTP_PORT:-9091}
+    ports:
+      - "${GRAFANA_PORT:-19091}:${GRAFANA_HTTP_PORT:-9091}"
+    depends_on:
+      prometheus:
+        condition: service_healthy
+      loki:
+        condition: service_started
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning/datasources/local:/etc/grafana/provisioning/datasources:ro
+      - ./monitoring/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    networks:
+      - audiomancy-network
+    restart: unless-stopped
+
+  # ===================================================================
+  # Pushgateway - Push metrics receiver for batch jobs
+  # ===================================================================
+  pushgateway:
+    image: prom/pushgateway:latest
+    container_name: audiomancy-monitoring-pushgateway
+    command:
+      - '--web.listen-address=:9092'
+    ports:
+      - "${PUSHGATEWAY_PORT:-19092}:9092"
+    networks:
+      - audiomancy-network
+    restart: unless-stopped
+
+  # ===================================================================
+  # AlertManager - Alert management and routing
+  # ===================================================================
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: audiomancy-monitoring-alertmanager
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+    ports:
+      - "${ALERTMANAGER_PORT:-19093}:9093"
+    volumes:
+      - ./monitoring/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - alertmanager-data:/alertmanager
+    networks:
+      - audiomancy-network
+    restart: unless-stopped
+
+  # ===================================================================
+  # AlertManager Discord - Alert forwarding to Discord
+  # ===================================================================
+  alertmanager-discord:
+    build: ./monitoring/alertmanager-discord
+    container_name: audiomancy-monitoring-alertmanager-discord
+    environment:
+      DISCORD_WEBHOOK: ${DISCORD_WEBHOOK_URL:-}
+    ports:
+      - "${ALERTMANAGER_DISCORD_PORT:-19094}:9094"
+    networks:
+      - audiomancy-network
+    restart: unless-stopped
+
+  # ===================================================================
+  # Loki - Log aggregation and storage
+  # ===================================================================
+  loki:
+    image: grafana/loki:latest
+    container_name: audiomancy-monitoring-loki
+    ports:
+      - "${LOKI_PORT:-19100}:3100"
+    volumes:
+      - ./monitoring/loki/loki-config.yml:/etc/loki/local-config.yaml:ro
+      - loki-data:/loki
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - audiomancy-network
+    restart: unless-stopped
+
+  # ===================================================================
+  # Promtail - Log collection from Docker containers
+  # ===================================================================
+  promtail:
+    image: grafana/promtail:latest
+    container_name: audiomancy-monitoring-promtail
+    volumes:
+      - ./monitoring/promtail/promtail-config.yml:/etc/promtail/config.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command: -config.file=/etc/promtail/config.yml
+    depends_on:
+      - loki
+    networks:
+      - audiomancy-network
+    restart: unless-stopped
+
+  # ===================================================================
+  # Chaosd - Chaos engineering daemon for resilience testing
+  # ===================================================================
+  chaosd:
+    build: ./monitoring/chaosd-daemon
+    container_name: audiomancy-monitoring-chaosd
+    ports:
+      - "${CHAOSD_PORT:-19095}:31767"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+      - chaosd-data:/var/lib/chaosd
+    privileged: true
+    networks:
+      - audiomancy-network
+    restart: unless-stopped
+
+  # ===================================================================
+  # Chaosd UI - Web interface to trigger chaos tests
+  # ===================================================================
+  chaosd-ui:
+    build: ./monitoring/chaosd-ui
+    container_name: audiomancy-monitoring-chaosd-ui
+    ports:
+      - "${CHAOSD_UI_PORT:-19096}:8080"
+    environment:
+      CHAOSD_URL: "http://chaosd:31767"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - chaosd
+    networks:
+      - audiomancy-network
+    restart: unless-stopped
+
+# ===================================================================
+# Persistent volumes
+# ===================================================================
+volumes:
+  grafana-data:
+    name: audiomancy-monitoring-grafana-data
+  prometheus-data:
+    name: audiomancy-monitoring-prometheus-data
+  alertmanager-data:
+    name: audiomancy-monitoring-alertmanager-data
+  loki-data:
+    name: audiomancy-monitoring-loki-data
+  chaosd-data:
+    name: audiomancy-monitoring-chaosd-data
+
+# ===================================================================
+# Shared network with main application
+# ===================================================================
+networks:
+  audiomancy-network:
+    name: audiomancy_audiomancy-network
+    external: true

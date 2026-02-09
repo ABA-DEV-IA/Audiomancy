@@ -1,8 +1,8 @@
 """
 Main entry point for the Audiomancy API backend using FastAPI.
 
-This module configures the FastAPI application instance, including telemetry (Azure App Insights),
-CORS, custom exception handlers, API key security, and the various API route groups.
+This module configures the FastAPI application instance, including CORS,
+custom exception handlers, API key security, Prometheus monitoring, and the various API route groups.
 """
 
 from contextlib import asynccontextmanager
@@ -11,7 +11,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 
 from app.core.config import settings
-from app.core.telemetry import setup_telemetry
 from app.core.security import get_api_key
 from app.core.metrics_middleware import PrometheusMiddleware
 
@@ -22,7 +21,6 @@ from app.routes.favorite_routes import router as favorite_router
 from app.routes.health_routes import router as health_router
 from app.routes.metrics_routes import router as metrics_router
 from app.routes.gdpr_routes import router as gdpr_router
-# from app.routes.speech_token_routes import router as speech_router  # [DÉSACTIVÉ] Azure Speech TTS
 
 from app.errors.handlers import validation_exception_handler
 from app.utils.cache_tools import ensure_cache_indexes
@@ -56,7 +54,7 @@ async def lifespan(app: FastAPI):
 def create_app() -> FastAPI:
     """
     Create and configure the FastAPI application.
-    This ensures telemetry is initialized before the app starts handling requests.
+    Monitoring is handled by Prometheus/Grafana stack (see docker-compose.monitoring.yml).
     """
     fastapi_app = FastAPI(
         title="Audiomancy API",
@@ -64,25 +62,6 @@ def create_app() -> FastAPI:
         redoc_url=redoc_url,
         lifespan=lifespan
     )
-
-    # --- TELEMETRY INIT (Jaeger + OpenTelemetry) ---
-    # Compétence C20: Surveiller une application d'IA
-    # Monitoring local avec Jaeger (remplace Azure App Insights)
-    
-    # Toujours activer Jaeger en développement
-    setup_telemetry(
-        service_name="audiomancy-backend",
-        app=fastapi_app,
-        jaeger_endpoint=None  # Utilise JAEGER_ENDPOINT ou défaut Docker
-    )
-    
-    # [LEGACY] Support Azure App Insights si configuré (pour rétrocompatibilité)
-    # if settings.azure_appinsights_connection_string:
-    #     setup_telemetry(
-    #         connection_string=settings.azure_appinsights_connection_string,
-    #         service_name="audiomancy-backend",
-    #         app=fastapi_app
-    #     )
 
     # --- CORS ---
     fastapi_app.add_middleware(
@@ -111,7 +90,6 @@ def create_app() -> FastAPI:
     fastapi_app.include_router(ai_router, dependencies=protected)
     fastapi_app.include_router(user_router, dependencies=protected)
     fastapi_app.include_router(favorite_router, dependencies=protected)
-    # fastapi_app.include_router(speech_router, dependencies=protected)  # [DÉSACTIVÉ] Azure Speech TTS
 
     return fastapi_app
 

@@ -85,24 +85,10 @@ APScheduler==3.11.0
 
 # ---- Prometheus (métriques pour monitoring) ----
 prometheus-client==0.21.0
-psutil==7.0.1
+psutil==6.1.0  # Métriques système (CPU, RAM)
 
-# ---- OpenTelemetry (versions compatibles entre elles) ----
-# Conservé pour la compétence C20 (monitoring et journalisation)
-opentelemetry-api==1.28.0
-opentelemetry-sdk==1.28.0
-opentelemetry-instrumentation==0.49b0
-opentelemetry-instrumentation-fastapi==0.49b0
-opentelemetry-instrumentation-requests==0.49b0
-opentelemetry-instrumentation-system-metrics==0.49b0
-opentelemetry-instrumentation-asgi==0.49b0
-opentelemetry-instrumentation-logging==0.49b0
-
-# ---- Jaeger Exporter (monitoring local) ----
-opentelemetry-exporter-otlp-proto-grpc==1.28.0
-
-# ---- Azure Monitor Exporter ----
-# [OPTIONNEL] Remplacé par Jaeger pour monitoring local
-# azure-monitor-opentelemetry-exporter==1.0.0b23
+# ---- Monitoring ----
+# Monitoring is now handled by Prometheus + Grafana + Loki stack
+# See docker-compose.monitoring.yml for full monitoring infrastructure
 
 # Note: DeepSeek API est compatible OpenAI, utilise le SDK openai (voir ci-dessus)
