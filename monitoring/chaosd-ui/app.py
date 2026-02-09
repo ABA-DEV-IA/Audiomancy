@@ -15,7 +15,7 @@ experiments = {}
 def run_chaosd_command(cmd_args):
     """Execute a chaosd command via docker exec"""
     try:
-        container = docker_client.containers.get('orion_chaosd')
+        container = docker_client.containers.get('audiomancy-monitoring-chaosd')
         result = container.exec_run(['chaosd'] + cmd_args)
         return result.output.decode('utf-8'), result.exit_code
     except Exception as e:
