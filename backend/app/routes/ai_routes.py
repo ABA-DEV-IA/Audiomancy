@@ -13,6 +13,7 @@ Raises:
 
 from typing import List
 import logging
+import asyncio
 from fastapi import APIRouter, HTTPException
 from app.models.ai_models import PromptRequest, GeneratedTrack
 from app.services.ai.ai_executor import ai_executor
@@ -47,20 +48,21 @@ async def generate_playlist(prompt: PromptRequest):
 
     try:
         # Generate tags using AI executor (DeepSeek)
-        logger.debug(f"Calling AI executor with prompt: {prompt.prompt[:100]}...")
-        tags = ai_executor(prompt.prompt)
-        logger.info(f"AI executor returned tags: {tags}")
+        logger.debug("Calling AI executor with prompt: %s...", prompt.prompt[:100])
+        tags = await asyncio.to_thread(ai_executor, prompt.prompt)
+        logger.info("AI executor returned tags: %s", tags)
 
         # Fetch tracks from Jamendo
-        logger.debug(f"Fetching tracks from Jamendo with tags: {tags}")
+        logger.debug("Fetching tracks from Jamendo with tags: %s", tags)
         tracks = await get_tracks_for_reader(tags=tags, limit=prompt.limit)
-        logger.info(f"Successfully generated playlist with {len(tracks)} tracks")
+        logger.info("Successfully generated playlist with %d tracks", len(tracks))
 
         # Convert dict/JamendoTrackResponse to GeneratedTrack
         return [GeneratedTrack(**track) if isinstance(track, dict) else GeneratedTrack(**track.model_dump()) for track in tracks]
     except Exception as e:
         logger.error(
-            f"Error generating playlist: {str(e)}",
+            "Error generating playlist: %s",
+            str(e),
             extra={
                 "endpoint": "/generate/playlist",
                 "error_type": type(e).__name__,
@@ -68,4 +70,4 @@ async def generate_playlist(prompt: PromptRequest):
             },
             exc_info=True
         )
-        raise HTTPException(status_code=500, detail=str(e)) from e
+        raise HTTPException(status_code=500, detail="Erreur lors de la génération de la playlist") from e

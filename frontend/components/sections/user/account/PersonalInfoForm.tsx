@@ -9,23 +9,23 @@ interface PersonalInfoFormProps {
 
 export function PersonalInfoForm({ username, onChange }: PersonalInfoFormProps) {
   return (
-    <Card className="bg-[#2B2B2B]/90 border-[#A45EE5] backdrop-blur-sm">
+    <Card className="bg-ombre-occulte/90 border-amethyste-magique backdrop-blur-sm">
       <CardHeader>
         <CardTitle className="text-white flex items-center">
-          <User className="h-5 w-5 mr-2 text-[#D9B3FF]" />
+          <User className="h-5 w-5 mr-2 text-eclat-ether" />
           Informations Personnelles
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-2">
-          <label className="text-[#D9B3FF] text-sm font-medium">Nom d'utilisateur</label>
+          <label className="text-eclat-ether text-sm font-medium">Nom d'utilisateur</label>
           <div className="relative">
-            <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#A45EE5] h-5 w-5" />
+            <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-amethyste-magique h-5 w-5" />
             <Input
               type="text"
               value={username}
               onChange={(e) => onChange(e.target.value)}
-              className="pl-12 bg-[#301934] border-[#A45EE5] text-white placeholder:text-[#D9B3FF]/60 focus:border-[#6A0DAD] focus:ring-[#6A0DAD] transition-all duration-300"
+              className="pl-12 bg-brume-cosmique border-amethyste-magique text-white placeholder:text-eclat-ether/60 focus:border-encre-astrale focus:ring-encre-astrale transition-all duration-300"
               required
             />
           </div>

@@ -11,12 +11,12 @@ interface Props {
 
 export function AboutTechGrid({ technologies }: Props) {
   return (
-    <Card className="bg-[#301934] border-[#A3D5FF]">
+    <Card className="bg-brume-cosmique border-givre-astral">
       <CardContent className="p-8">
         <h2 className="text-2xl font-bold text-white text-center mb-6">Technologies Enchantées</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
           {technologies.map((tech, i) => (
-            <div key={i} className="p-3 rounded-lg bg-[#2B2B2B]">
+            <div key={i} className="p-3 rounded-lg bg-ombre-occulte">
               <span style={{ color: tech.color }} className="font-medium">{tech.name}</span>
             </div>
           ))}

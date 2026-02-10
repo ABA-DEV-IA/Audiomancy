@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import fs from "fs";
+import { promises as fs } from "fs";
 import path from "path";
 
 const categoriesPath = path.join(process.cwd(), "public", "categories", "categories.json");
@@ -15,22 +15,17 @@ function shuffleArray<T>(array: T[]): T[] {
 
 export async function GET(req: Request) {
 
-  // TO DO : SECURITE A CORRIGER SI POSSIBLE
+  // Vérification de la clé API pour sécuriser l'endpoint
+  const apiKey = req.headers.get("x-api-key")?.trim();
+  const expectedKey = process.env.CRON_SECRET_KEY?.trim();
 
-  // const apiKey = req.headers.get("x-api-key")?.trim();
-  // const expectedKey = process.env.CRON_SECRET_KEY?.trim();
-
-  // console.log("expectedKey =", expectedKey, typeof expectedKey, expectedKey?.length);
-  // console.log("apiKey =", apiKey, typeof apiKey, apiKey?.length);
-
-  // if (apiKey !== expectedKey) {
-  //   console.log("Unauthorized");
-  //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  // }
+  if (expectedKey && apiKey !== expectedKey) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
   try {
-    // Lire categories.json
-    const data = fs.readFileSync(categoriesPath, "utf-8");
+    // Lire categories.json (async)
+    const data = await fs.readFile(categoriesPath, "utf-8");
     const categories = JSON.parse(data);
 
     // Mélange
@@ -45,8 +40,8 @@ export async function GET(req: Request) {
       },
     };
 
-    // Écrire le nouveau fichier
-    fs.writeFileSync(
+    // Écrire le nouveau fichier (async)
+    await fs.writeFile(
       categoriesDuJourPath,
       JSON.stringify(categoriesDuJour, null, 2)
     );

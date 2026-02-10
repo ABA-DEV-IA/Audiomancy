@@ -54,15 +54,15 @@ export function LoginForm({ onLoginSuccess, onSwitchToRegister, onLoadingChange,
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Email */}
       <div className="space-y-2">
-        <label className="text-[#D9B3FF] text-sm font-medium">Email</label>
+        <label className="text-eclat-ether text-sm font-medium">Email</label>
         <div className="relative">
-          <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#A45EE5] h-5 w-5" />
+          <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-amethyste-magique h-5 w-5" />
           <Input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="ton-email@exemple.com"
-            className="pl-12 bg-[#301934] border-[#A45EE5] text-white placeholder:text-[#D9B3FF]/60 focus:border-[#6A0DAD] focus:ring-[#6A0DAD] transition-all duration-300"
+            className="pl-12 bg-brume-cosmique border-amethyste-magique text-white placeholder:text-eclat-ether/60 focus:border-encre-astrale focus:ring-encre-astrale transition-all duration-300"
             required
           />
         </div>
@@ -70,22 +70,22 @@ export function LoginForm({ onLoginSuccess, onSwitchToRegister, onLoadingChange,
 
       {/* Mot de passe */}
       <div className="space-y-2">
-        <label className="text-[#D9B3FF] text-sm font-medium">Mot de passe</label>
+        <label className="text-eclat-ether text-sm font-medium">Mot de passe</label>
         <div className="relative">
-          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#A45EE5] h-5 w-5" />
+          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-amethyste-magique h-5 w-5" />
           <Input
             type={showPassword ? "text" : "password"}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="••••••••"
-            className="pl-12 pr-12 bg-[#301934] border-[#A45EE5] text-white placeholder:text-[#D9B3FF]/60 focus:border-[#6A0DAD] focus:ring-[#6A0DAD] transition-all duration-300"
+            className="pl-12 pr-12 bg-brume-cosmique border-amethyste-magique text-white placeholder:text-eclat-ether/60 focus:border-encre-astrale focus:ring-encre-astrale transition-all duration-300"
             required
           />
           <Button
             type="button"
             variant="ghost"
             size="icon"
-            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-[#A45EE5] hover:text-[#6A0DAD] h-8 w-8"
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-amethyste-magique hover:text-encre-astrale h-8 w-8"
             onClick={() => setShowPassword(!showPassword)}
           >
             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -100,7 +100,7 @@ export function LoginForm({ onLoginSuccess, onSwitchToRegister, onLoadingChange,
       <Button
         type="submit"
         disabled={isLoading || !email || !password}
-        className="w-full bg-gradient-to-r from-[#6A0DAD] to-[#A45EE5] hover:from-[#A45EE5] hover:to-[#6A0DAD] text-white font-bold py-3 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-[#6A0DAD]/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+        className="w-full bg-gradient-to-r from-encre-astrale to-amethyste-magique hover:from-amethyste-magique hover:to-encre-astrale text-white font-bold py-3 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-encre-astrale/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
       >
         {isLoading ? (
           <div className="flex items-center">
@@ -116,11 +116,11 @@ export function LoginForm({ onLoginSuccess, onSwitchToRegister, onLoadingChange,
       </Button>
 
       {/* Lien inscription */}
-      <div className="mt-6 text-center text-[#D9B3FF] text-sm">
+      <div className="mt-6 text-center text-eclat-ether text-sm">
         Pas encore de compte ?{" "}
         <Button
           variant="link"
-          className="text-[#FF7BAC] hover:text-[#A45EE5] font-medium p-0 h-auto"
+          className="text-rose-alchimique hover:text-amethyste-magique font-medium p-0 h-auto"
           onClick={onSwitchToRegister}
         >
           Créer un compte

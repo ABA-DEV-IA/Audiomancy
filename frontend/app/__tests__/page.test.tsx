@@ -6,9 +6,12 @@ import Page from '../page';
 // Mock des composants enfants
 jest.mock('@/components/layout/sidebar', () => ({
   Sidebar: ({ onPageChange }: any) => (
-    <button data-testid="sidebar-btn" onClick={() => onPageChange('about')}>
-      Change Page
-    </button>
+    <div>
+      <button data-testid="sidebar-about" onClick={() => onPageChange('about')}>Go About</button>
+      <button data-testid="sidebar-login" onClick={() => onPageChange('login')}>Go Login</button>
+      <button data-testid="sidebar-register" onClick={() => onPageChange('register')}>Go Register</button>
+      <button data-testid="sidebar-account" onClick={() => onPageChange('account')}>Go Account</button>
+    </div>
   ),
 }));
 
@@ -48,10 +51,10 @@ jest.mock('@/components/sections/generation/GenerationSection', () => ({
   ),
 }));
 
-jest.mock('@/components/sections/user/ConnexionSection', () => ({
-  LoginPage: ({ onLoginSuccess }: any) => (
+jest.mock('@/components/sections/user/AuthSection', () => ({
+  AuthPage: ({ onLoginSuccess }: any) => (
     <div>
-      LoginPage
+      AuthPage
       <button data-testid="login-success-btn" onClick={onLoginSuccess}>
         LoginSuccess
       </button>
@@ -70,20 +73,24 @@ jest.mock('@/components/sections/user/RegisterSection', () => ({
   ),
 }));
 
-jest.mock('@/components/sections/user/AcountSection', () => ({
-  AcountPage: () => <div>AcountPage</div>,
+jest.mock('@/components/sections/user/AccountSection', () => ({
+  AccountPage: () => <div>AccountPage</div>,
+}));
+
+jest.mock('@/components/sections/favorite/favorites-container', () => ({
+  FavoritesContainer: () => <div>FavoritesContainer</div>,
 }));
 
 describe('Page component', () => {
   it('doit rendre la page initiale et sidebar', () => {
     render(<Page />);
     expect(screen.getByText('HomePage')).toBeInTheDocument();
-    expect(screen.getByTestId('sidebar-btn')).toBeInTheDocument();
+    expect(screen.getByTestId('sidebar-about')).toBeInTheDocument();
   });
 
   it('doit changer de page via sidebar', () => {
     render(<Page />);
-    fireEvent.click(screen.getByTestId('sidebar-btn'));
+    fireEvent.click(screen.getByTestId('sidebar-about'));
     expect(screen.getByText('AboutPage')).toBeInTheDocument();
   });
 
@@ -102,7 +109,7 @@ describe('Page component', () => {
     const { getByTestId } = screen;
 
     // Clique back
-    fireEvent.click(getByTestId('sidebar-btn')); // ici mock simplifié → AboutPage
+    fireEvent.click(getByTestId('sidebar-about')); // ici mock simplifié → AboutPage
     expect(screen.getByText('AboutPage')).toBeInTheDocument();
 
     // Si tu veux tester back/complete dans GenerationPage, tu peux créer un test isolé
@@ -116,23 +123,27 @@ describe('Page component', () => {
     fireEvent.click(screen.getByTestId('complete-btn'));
   });
 
-  // it('doit gérer LoginPage', () => {
-  //   render(<Page />);
-  //   // Forcer currentPage = login
-  //   // Ici on simule le rendu mocké LoginPage
-  //   render(<LoginPage onLoginSuccess={() => console.log('Login success')} />);
-  //   fireEvent.click(screen.getByTestId('login-success-btn'));
-  // });
+  it('doit naviguer vers AuthPage et gérer le login', () => {
+    render(<Page />);
+    fireEvent.click(screen.getByTestId('sidebar-login'));
+    expect(screen.getByText('AuthPage')).toBeInTheDocument();
+    // Login success ramène à categories (HomePage)
+    fireEvent.click(screen.getByTestId('login-success-btn'));
+    expect(screen.getByText('HomePage')).toBeInTheDocument();
+  });
 
-  // it('doit gérer RegisterPage', () => {
-  //   render(<Page />);
-  //   render(<RegisterPage onRegisterSuccess={() => console.log('Register success')} />);
-  //   fireEvent.click(screen.getByTestId('register-success-btn'));
-  // });
+  it('doit naviguer vers RegisterPage et gérer l\'inscription', () => {
+    render(<Page />);
+    fireEvent.click(screen.getByTestId('sidebar-register'));
+    expect(screen.getByText('RegisterPage')).toBeInTheDocument();
+    // Register success ramène à categories (HomePage)
+    fireEvent.click(screen.getByTestId('register-success-btn'));
+    expect(screen.getByText('HomePage')).toBeInTheDocument();
+  });
 
-  // it('doit gérer AcountPage', () => {
-  //   render(<Page />);
-  //   render(<AcountPage />);
-  //   expect(screen.getByText('AcountPage')).toBeInTheDocument();
-  // });
+  it('doit naviguer vers AccountPage', () => {
+    render(<Page />);
+    fireEvent.click(screen.getByTestId('sidebar-account'));
+    expect(screen.getByText('AccountPage')).toBeInTheDocument();
+  });
 });

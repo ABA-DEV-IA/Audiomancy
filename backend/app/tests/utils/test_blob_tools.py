@@ -1,5 +1,11 @@
+# ⚠️ DEPRECATED - azure_only_no_longer_usable_in_localhost
+# Tests pour blob_tools.py (Azure Blob Storage) - module désactivé
+# Cache migré vers MongoDB local (voir test_cache_tools.py si créé)
+
 import pytest
 from unittest.mock import patch, MagicMock
+
+azure_core = pytest.importorskip("azure.core", reason="Azure SDK non installé — tests Azure skippés")
 from azure.core.exceptions import ResourceNotFoundError, ResourceExistsError
 from app.utils import blob_tools
 

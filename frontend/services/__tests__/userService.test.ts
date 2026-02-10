@@ -33,7 +33,7 @@ describe('User Service', () => {
     const user = await login('test@example.com', 'password123');
 
     expect(fetch).toHaveBeenCalledWith(
-      '/api/user/proxyConnexion',
+      '/api/user/proxyLogin',
       expect.objectContaining({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

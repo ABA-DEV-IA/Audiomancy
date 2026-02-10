@@ -6,17 +6,22 @@ values. It supports:
 
 - Loading configuration from environment variables (via a `.env` file)
   for local development.
-- Overriding configuration values with secrets stored in Azure Key Vault
-  in production environments.
-- In-memory caching of secrets to avoid repeated calls to Azure Key Vault.
+- Overriding configuration values with secrets stored in HashiCorp Vault
+  in localhost/production environments.
+- In-memory caching of secrets to avoid repeated calls to HashiCorp Vault.
 
 This design allows the application to remain cloud-agnostic while ensuring
 secure secret management and clean separation of concerns.
+
+Note: Azure Key Vault support was removed in favor of HashiCorp Vault (local).
 """
 
 from typing import Optional, List
 from pydantic_settings import BaseSettings, SettingsConfigDict
+import logging
 import requests
+
+logger = logging.getLogger(__name__)
 
 
 class Settings(BaseSettings):
@@ -27,9 +32,9 @@ class Settings(BaseSettings):
     Values are loaded in the following order:
 
     1. Environment variables (via `.env` file in development).
-    2. Azure Key Vault secrets (if `azure_key_vault_url` is provided).
+    2. HashiCorp Vault secrets (if `vault_url` is provided).
 
-    Secrets loaded from Azure Key Vault are cached in memory to avoid
+    Secrets loaded from HashiCorp Vault are cached in memory to avoid
     unnecessary network calls during the application's lifetime.
     """
 
@@ -97,7 +102,9 @@ class Settings(BaseSettings):
     # ------------------------------------------------------------------
     # 📊 OBSERVABILITY / MONITORING
     # ------------------------------------------------------------------
-    azure_appinsights_connection_string: Optional[str] = None
+    # ⚠️ DEPRECATED - azure_only_no_longer_usable_in_localhost
+    # Remplacé par Prometheus/Grafana/Loki (voir docker-compose.monitoring.yml)
+    # azure_appinsights_connection_string: Optional[str] = None
 
     # ------------------------------------------------------------------
     # 🔐 API SECURITY & DOCUMENTATION
@@ -126,7 +133,7 @@ class Settings(BaseSettings):
     mongo_db_name: Optional[str] = None
 
     # ------------------------------------------------------------------
-    # 🔒 INTERNAL CACHE (KEY VAULT SECRETS)
+    # 🔒 INTERNAL CACHE (HASHICORP VAULT SECRETS)
     # ------------------------------------------------------------------
     _secrets_cache: dict = {}
 
@@ -156,13 +163,13 @@ class Settings(BaseSettings):
         """
 
         if not self.vault_url or not self.vault_token:
-            print("[INFO] No Vault URL or token provided. Using .env values only.")
+            logger.info("No Vault URL or token provided. Using .env values only.")
             return
 
         if self._secrets_cache and not force_reload:
             for key, value in self._secrets_cache.items():
                 setattr(self, key, value)
-            print("[INFO] Configuration loaded from Vault cache.")
+            logger.info("Configuration loaded from Vault cache.")
             return
 
         try:
@@ -223,23 +230,23 @@ class Settings(BaseSettings):
                                 value = secret_data[vault_key]
                                 setattr(self, settings_attr, value)
                                 new_cache[settings_attr] = value
-                                print(f"[INFO] Loaded '{secret_name}.{vault_key}' → '{settings_attr}'")
+                                logger.info("Loaded '%s.%s' → '%s'", secret_name, vault_key, settings_attr)
                             elif vault_key not in secret_data:
-                                print(f"[WARNING] Key '{vault_key}' not found in secret '{secret_name}'")
+                                logger.warning("Key '%s' not found in secret '%s'", vault_key, secret_name)
 
                     elif response.status_code == 404:
-                        print(f"[WARNING] Secret '{secret_name}' not found in Vault")
+                        logger.warning("Secret '%s' not found in Vault", secret_name)
                     else:
-                        print(f"[WARNING] Failed to load '{secret_name}': HTTP {response.status_code}")
+                        logger.warning("Failed to load '%s': HTTP %d", secret_name, response.status_code)
 
                 except Exception as error:
-                    print(f"[WARNING] Failed to load secret '{secret_name}': {error}")
+                    logger.warning("Failed to load secret '%s': %s", secret_name, error)
 
             self._secrets_cache = new_cache
-            print(f"[INFO] Configuration successfully loaded from HashiCorp Vault ({len(new_cache)} secrets).")
+            logger.info("Configuration successfully loaded from HashiCorp Vault (%d secrets).", len(new_cache))
 
         except Exception as error:
-            print(f"[WARNING] Failed to connect to HashiCorp Vault: {error}")
+            logger.warning("Failed to connect to HashiCorp Vault: %s", error)
 
     @property
     def cors_origins(self) -> List[str]:

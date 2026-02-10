@@ -1,4 +1,6 @@
 """
+⚠️ DEPRECATED - azure_only_no_longer_usable_in_localhost
+
 [OBSOLÈTE] Module Azure OpenAI - Remplacé par DeepSeek
 
 Ce fichier n'est plus utilisé. L'application utilise maintenant DeepSeek

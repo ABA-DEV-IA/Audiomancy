@@ -2,6 +2,8 @@
 
 Guide de dépannage rapide pour les incidents techniques récurrents.
 
+⚠️ **Note importante**: Ce guide concerne uniquement l'environnement localhost. Les services Azure (Azure Speech, Azure Blob Storage, Azure Functions, Azure OpenAI, Cosmos DB) ont été dépréciés et remplacés par des solutions locales (MongoDB, DeepSeek, APScheduler).
+
 ---
 
 ## 🚨 Problème 1 : DeepSeek API Timeout

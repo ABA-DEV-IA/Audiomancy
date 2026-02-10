@@ -23,6 +23,8 @@
 
 ### 2️⃣ **Services Azure désactivés**
 
+⚠️ DEPRECATED - azure_only_no_longer_usable_in_localhost
+
 #### **Azure Speech TTS** ❌ MASQUÉ
 - [backend/app/routes/speech_token_routes.py](backend/app/routes/speech_token_routes.py) : Code commenté
 - [backend/app/main.py](backend/app/main.py) : Route désactivée
@@ -132,7 +134,7 @@ npm run dev
 
 ### **Phase suivante suggérée :**
 
-1. **APScheduler pour les tâches cron** (remplace Azure Functions)
+1. **APScheduler pour les tâches cron** (remplace Azure Functions) ⚠️ DEPRECATED - azure_only_no_longer_usable_in_localhost
    - Créer `backend/app/scheduler.py`
    - Appeler `/api/dailycategories` à minuit
    - Intégrer dans `main.py` avec `@app.on_event("startup")`
@@ -147,10 +149,10 @@ npm run dev
    - Démarrer avec : `python start_monitoring.py monitoring`
    - Accès Grafana : http://localhost:19091
 
-4. **Nettoyage final**
+4. **Nettoyage final** ⚠️ DEPRECATED - azure_only_no_longer_usable_in_localhost
    - Supprimer `azure_functions/` (dossier complet)
    - Supprimer `blob_tools.py` si plus utilisé
-   - Nettoyer les tests obsolètes
+   - Nettoyer les tests obsolètes Azure (test_speech_token.py, test_blob_tools.py)
 
 ---
 
@@ -176,13 +178,11 @@ npm run dev
 
 2. **Monitoring** : Stack Prometheus/Grafana/Loki configurée dans `docker-compose.monitoring.yml`. Environnement 100% local sans dépendances cloud.
 
-3. **Key Vault** : La configuration supporte encore Azure Key Vault (optionnel). En local, utiliser `.env` uniquement.
+3. **Key Vault** : ⚠️ DEPRECATED - azure_only_no_longer_usable_in_localhost. La configuration supportait Azure Key Vault (optionnel). En local, utiliser `.env` uniquement.
 
-4. **Tests** : Certains tests font référence à Azure (`test_speech_token.py`, `test_blob_tools.py`). À adapter ou désactiver.
+4. **Tests** : ⚠️ DEPRECATED - azure_only_no_longer_usable_in_localhost. Certains tests font référence à Azure (`test_speech_token.py`, `test_blob_tools.py`). À désactiver ou supprimer.
 
-5. **MongoDB vs Cosmos DB** : La connexion supporte les deux :
-   - **Local** : `mongodb://localhost:27017`
-   - **Cosmos DB** : Avec auth et `replicaSet=globaldb`
+5. **MongoDB vs Cosmos DB** : ⚠️ DEPRECATED - azure_only_no_longer_usable_in_localhost. La connexion supportait Cosmos DB avec auth et `replicaSet=globaldb`. En local, utiliser uniquement MongoDB : `mongodb://localhost:27017`
 
 ---
 

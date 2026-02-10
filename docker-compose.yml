@@ -24,7 +24,7 @@ services:
   # Backend FastAPI
   # ===================================================================
   backend:
-    image: python:3.11-slim
+    image: python:3.13-slim
     container_name: audiomancy-backend
     restart: unless-stopped
     working_dir: /app
@@ -58,7 +58,10 @@ services:
     env_file:
       - ./frontend/.env.local
     environment:
-      NEXT_PUBLIC_API_URL: http://backend:8000
+      # NEXT_PUBLIC_ = exposé au navigateur → doit pointer vers localhost
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+      # Variables serveur Next.js → résolution interne Docker
+      FASTAPI_URL: http://backend:8000
       NODE_ENV: ${NODE_ENV:-development}
     depends_on:
       - backend
@@ -68,7 +71,7 @@ services:
       - ./frontend:/app
       - /app/node_modules
       - /app/.next
-    command: sh -c "npm install && npm run dev"
+    command: sh -c "corepack enable && corepack prepare pnpm@latest --activate && pnpm install && pnpm dev"
 
   # ===================================================================
   # MONITORING STACK

@@ -1,15 +1,21 @@
+"""
+Tests for the application configuration module.
+
+Covers:
+- CORS origin parsing (with and without allowed_origins)
+- HashiCorp Vault loading (no URL, cached, success, failure)
+"""
+
+import logging
 import pytest
 from unittest.mock import patch, MagicMock
-from azure.core.exceptions import AzureError
-from app.core.config import Settings, to_snake_case
+
+from app.core.config import Settings
 
 
-def test_to_snake_case():
-    """Test conversion of Key Vault names to snake_case."""
-    assert to_snake_case("AZURE-OPENAI-API-KEY") == "azure_openai_api_key"
-    assert to_snake_case("Already_Snake") == "already_snake"
-    assert to_snake_case("") == ""
-
+# ============================================================================
+# CORS origin tests
+# ============================================================================
 
 def test_cors_origins_with_allowed_origins():
     """If allowed_origins is defined, it should be split correctly."""
@@ -24,49 +30,71 @@ def test_cors_origins_without_allowed_origins():
     assert "http://127.0.0.1:3000" in settings.cors_origins
 
 
-def test_load_from_key_vault_no_url(capfd):
-    """Should not try to load secrets if azure_key_vault_url is missing."""
-    settings = Settings(azure_key_vault_url=None)
-    settings.load_from_key_vault()
-    out, _ = capfd.readouterr()
-    assert "No Key Vault URL provided" in out
+def test_cors_origins_single_origin():
+    """A single origin is returned as a one-element list."""
+    settings = Settings(allowed_origins="https://myapp.example.com")
+    assert settings.cors_origins == ["https://myapp.example.com"]
 
 
-def test_load_from_key_vault_with_cache():
-    """Should load secrets from cache if available and force_reload=False."""
-    settings = Settings(azure_key_vault_url="https://fake-vault.vault.azure.net/")
+# ============================================================================
+# HashiCorp Vault loading tests
+# ============================================================================
+
+def test_load_from_vault_no_url(caplog):
+    """Should skip vault loading when vault_url is not set."""
+    with caplog.at_level(logging.INFO, logger="app.core.config"):
+        settings = Settings(vault_url=None, vault_token=None)
+        settings.load_from_vault()
+    assert "No Vault URL" in caplog.text or "Using .env values only" in caplog.text
+
+
+def test_load_from_vault_no_token(caplog):
+    """Should skip vault loading when vault_token is not set."""
+    with caplog.at_level(logging.INFO, logger="app.core.config"):
+        settings = Settings(vault_url="http://vault:8200", vault_token=None)
+        settings.load_from_vault()
+    assert "No Vault URL" in caplog.text or "Using .env values only" in caplog.text
+
+
+def test_load_from_vault_uses_cache(caplog):
+    """Should load secrets from in-memory cache when available."""
+    settings = Settings(vault_url="http://vault:8200", vault_token="test-token")
     settings._secrets_cache = {"jamendo_client_id": "cached123"}
-    settings.load_from_key_vault(force_reload=False)
+    with caplog.at_level(logging.INFO, logger="app.core.config"):
+        settings.load_from_vault(force_reload=False)
     assert settings.jamendo_client_id == "cached123"
+    assert "cache" in caplog.text.lower()
 
 
-@patch("app.core.config.SecretClient")
-@patch("app.core.config.DefaultAzureCredential")
-def test_load_from_key_vault_success(mock_credential, mock_secret_client):
-    """Should load secrets from Key Vault when available."""
-    # Create a mock secret with a real .name attribute
-    secret_mock = MagicMock()
-    secret_mock.name = "AZURE-OPENAI-API-KEY"
-    fake_secret_props = [secret_mock]
+@patch("app.core.config.requests.get")
+def test_load_from_vault_success(mock_get, capfd):
+    """Should load secrets from HashiCorp Vault when configured."""
+    mock_response = MagicMock()
+    mock_response.status_code = 200
+    mock_response.json.return_value = {
+        "data": {
+            "data": {
+                "client_id": "test_jamendo_id",
+                "url": "https://api.jamendo.com/v3.0/tracks",
+            }
+        }
+    }
+    mock_get.return_value = mock_response
 
-    fake_client = MagicMock()
-    fake_client.list_properties_of_secrets.return_value = fake_secret_props
-    fake_client.get_secret.return_value.value = "supersecret"
+    settings = Settings(vault_url="http://vault:8200", vault_token="test-token")
+    settings.load_from_vault(force_reload=True)
 
-    mock_secret_client.return_value = fake_client
-
-    settings = Settings(azure_key_vault_url="https://fake-vault.vault.azure.net/")
-    settings.load_from_key_vault(force_reload=True)
-
-    assert settings.azure_openai_api_key == "supersecret"
-    assert "azure_openai_api_key" in settings._secrets_cache
+    assert settings.jamendo_client_id == "test_jamendo_id"
+    assert "jamendo_client_id" in settings._secrets_cache
 
 
-@patch("app.core.config.SecretClient", side_effect=AzureError("boom"))
-@patch("app.core.config.DefaultAzureCredential")
-def test_load_from_key_vault_failure(mock_credential, mock_secret_client, capfd):
-    """Should catch AzureError and log a warning instead of crashing."""
-    settings = Settings(azure_key_vault_url="https://fake-vault.vault.azure.net/")
-    settings.load_from_key_vault(force_reload=True)
-    out, _ = capfd.readouterr()
-    assert "Could not load secrets from Key Vault" in out
+@patch("app.core.config.requests.get")
+def test_load_from_vault_failure(mock_get, caplog):
+    """Should handle vault connection failure gracefully."""
+    mock_get.side_effect = Exception("Connection refused")
+
+    settings = Settings(vault_url="http://vault:8200", vault_token="test-token")
+    with caplog.at_level(logging.WARNING, logger="app.core.config"):
+        settings.load_from_vault(force_reload=True)
+
+    assert "Failed" in caplog.text or "Connection refused" in caplog.text

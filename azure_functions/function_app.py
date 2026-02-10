@@ -1,3 +1,8 @@
+# ⚠️ DEPRECATED - azure_only_no_longer_usable_in_localhost
+# Ce fichier Azure Functions n'est plus utilisable en environnement localhost.
+# Migré vers backend FastAPI + scheduler APScheduler (voir backend/app/core/scheduler.py)
+# Voir azure_functions/DEPRECATED.md pour plus de détails.
+
 import azure.functions as func
 import datetime
 import json

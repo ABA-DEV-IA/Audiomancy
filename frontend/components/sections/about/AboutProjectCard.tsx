@@ -19,16 +19,16 @@ interface Props {
 
 export function AboutProjectCard({ project }: Props) {
   return (
-    <Card className="border border-[#A45EE5] bg-[#301934]">
+    <Card className="border border-amethyste-magique bg-brume-cosmique">
       <CardContent className="p-8">
         <div className="text-center mb-6">
-          <div className="w-16 h-16 bg-[#6A0DAD] rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-encre-astrale rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-3xl">🔮</span>
           </div>
           <h2 className="text-2xl font-bold text-white mb-4">{project.name}</h2>
         </div>
 
-        <div className="text-[#D9B3FF] space-y-4 text-center">
+        <div className="text-eclat-ether space-y-4 text-center">
           <p className="text-lg italic">"{project.tagline}"</p>
           {project.description.map((text, i) => (
             <p key={i}>{text}</p>
@@ -36,7 +36,7 @@ export function AboutProjectCard({ project }: Props) {
         </div>
 
 
-    <div className="flex flex-wrap justify-center mt-6 gap-6 text-[#FF934F]">
+    <div className="flex flex-wrap justify-center mt-6 gap-6 text-feu-anciens">
       {project.features.map((feature, i) => {
         const Icons = { Star, Heart, Code };
         const IconComponent = Icons[feature.icon];

@@ -57,19 +57,19 @@ export function EditPlaylistModal({ isOpen, playlist, onClose, onSave }: EditPla
 
       {/* Modal Content */}
       <div className="relative z-10 w-full max-w-md mx-4">
-        <Card className="bg-[#2B2B2B] border-[#A45EE5] shadow-2xl">
+        <Card className="bg-ombre-occulte border-amethyste-magique shadow-2xl">
           <CardContent className="p-8">
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center">
-                <div className="w-12 h-12 bg-gradient-to-br from-[#FF934F] to-[#FF7BAC] rounded-full flex items-center justify-center mr-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-feu-anciens to-rose-alchimique rounded-full flex items-center justify-center mr-4">
                   <Music className="h-6 w-6 text-white" />
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold text-white flex items-center">
                     Modifier Playlist
                   </h2>
-                  <p className="text-[#D9B3FF] text-sm">Renomme ta collection mystique</p>
+                  <p className="text-eclat-ether text-sm">Renomme ta collection mystique</p>
                 </div>
               </div>
               <Button
@@ -87,23 +87,23 @@ export function EditPlaylistModal({ isOpen, playlist, onClose, onSave }: EditPla
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Nom de la playlist */}
               <div className="space-y-3">
-                <label className="text-[#D9B3FF] text-lg font-medium">
-                  Nouveau nom <span className="text-[#FF7BAC]">*</span>
+                <label className="text-eclat-ether text-lg font-medium">
+                  Nouveau nom <span className="text-rose-alchimique">*</span>
                 </label>
                 <div className="relative">
-                  <Music className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#A45EE5] h-5 w-5" />
+                  <Music className="absolute left-4 top-1/2 transform -translate-y-1/2 text-amethyste-magique h-5 w-5" />
                   <Input
                     type="text"
                     value={playlistName}
                     onChange={(e) => setPlaylistName(e.target.value)}
                     placeholder="Nouveau nom de playlist..."
-                    className="pl-14 pr-4 py-4 text-lg bg-[#301934] border-2 border-[#A45EE5] text-white placeholder:text-[#D9B3FF]/60 focus:border-[#6A0DAD] focus:ring-[#6A0DAD] transition-all duration-300 rounded-lg"
+                    className="pl-14 pr-4 py-4 text-lg bg-brume-cosmique border-2 border-amethyste-magique text-white placeholder:text-eclat-ether/60 focus:border-encre-astrale focus:ring-encre-astrale transition-all duration-300 rounded-lg"
                     required
                     disabled={isLoading}
                     maxLength={50}
                   />
                 </div>
-                <p className="text-[#D9B3FF]/80 text-sm text-right">{playlistName.length}/50 caractères</p>
+                <p className="text-eclat-ether/80 text-sm text-right">{playlistName.length}/50 caractères</p>
               </div>
 
               {/* Boutons */}
@@ -112,7 +112,7 @@ export function EditPlaylistModal({ isOpen, playlist, onClose, onSave }: EditPla
                   type="button"
                   variant="outline"
                   onClick={handleClose}
-                  className="flex-1 py-3 bg-transparent border-2 border-[#A45EE5] text-[#A45EE5] hover:bg-[#A45EE5] hover:text-white transition-all duration-300 rounded-lg"
+                  className="flex-1 py-3 bg-transparent border-2 border-amethyste-magique text-amethyste-magique hover:bg-amethyste-magique hover:text-white transition-all duration-300 rounded-lg"
                   disabled={isLoading}
                 >
                   Annuler
@@ -120,11 +120,11 @@ export function EditPlaylistModal({ isOpen, playlist, onClose, onSave }: EditPla
                 <Button
                   type="submit"
                   disabled={isLoading || !playlistName.trim()}
-                  className="flex-1 py-3 bg-[#4CE0B3] hover:bg-[#4CE0B3]/80 text-[#2B2B2B] font-bold transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-[#4CE0B3]/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 rounded-lg"
+                  className="flex-1 py-3 bg-vert-dragon hover:bg-vert-dragon/80 text-ombre-occulte font-bold transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-vert-dragon/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 rounded-lg"
                 >
                   {isLoading ? (
                     <div className="flex items-center">
-                      <div className="w-5 h-5 border-2 border-[#2B2B2B]/30 border-t-[#2B2B2B] rounded-full animate-spin mr-2" />
+                      <div className="w-5 h-5 border-2 border-ombre-occulte/30 border-t-ombre-occulte rounded-full animate-spin mr-2" />
                       Modification...
                     </div>
                   ) : (
@@ -138,8 +138,8 @@ export function EditPlaylistModal({ isOpen, playlist, onClose, onSave }: EditPla
             </form>
 
             {/* Message d'aide */}
-            <div className="mt-6 p-4 bg-[#FF934F]/20 rounded-lg border border-[#FF934F]/30">
-              <p className="text-[#D9B3FF] text-sm text-center">
+            <div className="mt-6 p-4 bg-feu-anciens/20 rounded-lg border border-feu-anciens/30">
+              <p className="text-eclat-ether text-sm text-center">
                 ✨ Les modifications seront appliquées à ta playlist favorite
               </p>
             </div>

@@ -59,7 +59,7 @@ def format_jamendo_track(track: Dict[str, Any]) -> Dict[str, Any]:
         "duration": track.get("duration"),
         "license_name": license_name,
         "license_url": display_url,
-        "tags": track.get("musicinfo", {}).get("tags", {}).get("vartags", []),
+        "tags": (track.get("musicinfo") or {}).get("tags", {}).get("vartags", []),
         "image": track.get("album_image"),
     }
 

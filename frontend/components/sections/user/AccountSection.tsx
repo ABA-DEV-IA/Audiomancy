@@ -9,7 +9,7 @@ import { ErrorMessage } from "./account/ErrorMessage"
 import { PersonalInfoForm } from "./account/PersonalInfoForm"
 import { PasswordForm } from "./account/PasswordForm"
 import { SaveButton } from "./account/SaveButton"
-import { generateParticles, doPasswordsMatch } from "@/utils/user/acount"
+import { generateParticles, doPasswordsMatch } from "@/utils/user/account"
 
 interface ProfilePageProps {
   onSave?: () => void
@@ -77,13 +77,13 @@ export function AccountPage({ onSave }: ProfilePageProps) {
   }
 
   return (
-    <div className="h-full bg-gradient-to-br from-[#2B2B2B] via-[#301934] to-[#6A0DAD] p-6 overflow-y-auto relative">
+    <div className="h-full bg-gradient-to-br from-ombre-occulte via-brume-cosmique to-encre-astrale p-6 overflow-y-auto relative">
       {/* Particules magiques */}
       <div className="absolute inset-0 pointer-events-none">
         {Array.from({ length: 12 }).map((_, i) => (
           <div
             key={i}
-            className="absolute w-2 h-2 bg-[#D9B3FF] rounded-full animate-ping opacity-20"
+            className="absolute w-2 h-2 bg-eclat-ether rounded-full animate-ping opacity-20"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
@@ -100,7 +100,7 @@ export function AccountPage({ onSave }: ProfilePageProps) {
           {particles.map((particle) => (
             <div
               key={particle.id}
-              className="absolute w-3 h-3 bg-[#4CE0B3] rounded-full animate-ping opacity-70"
+              className="absolute w-3 h-3 bg-vert-dragon rounded-full animate-ping opacity-70"
               style={{
                 left: `${particle.x}%`,
                 top: `${particle.y}%`,

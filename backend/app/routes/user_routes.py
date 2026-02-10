@@ -43,11 +43,12 @@ async def create_user(request: UserCreateRequest) -> UserResponse:
 
     try:
         result = await create_user_service(request)
-        logger.info(f"User created successfully: {request.email}")
+        logger.info("User created successfully: %s", request.email)
         return result
     except Exception as e:
         logger.error(
-            f"Error creating user: {str(e)}",
+            "Error creating user: %s",
+            str(e),
             extra={"endpoint": "/user/create", "email": request.email},
             exc_info=True
         )
@@ -74,13 +75,15 @@ async def login_user(request: UserLoginRequest) -> UserResponse:
         result = await login_user_service(request)
         # Successful login
         auth_attempts_total.labels(result="success").inc()
-        logger.info(f"User logged in successfully: {request.email}")
+        logger.info("User logged in successfully: %s", request.email)
         return result
     except Exception as e:
         # Failed login
         auth_attempts_total.labels(result="failure").inc()
         logger.warning(
-            f"Login failed for user: {request.email} - {str(e)}",
+            "Login failed for user: %s - %s",
+            request.email,
+            str(e),
             extra={"endpoint": "/user/login", "email": request.email}
         )
         raise

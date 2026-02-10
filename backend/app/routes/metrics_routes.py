@@ -13,8 +13,6 @@ from prometheus_client import (
     CollectorRegistry,
     REGISTRY,
 )
-import psutil
-import time
 
 router = APIRouter(tags=["Metrics"])
 

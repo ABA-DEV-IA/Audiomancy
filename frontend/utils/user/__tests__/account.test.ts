@@ -1,5 +1,5 @@
 // saveProfile.test.ts
-import { saveProfile } from '@/utils/user/acount';
+import { saveProfile } from '@/utils/user/account';
 import { modify as modifyService } from '@/services/userService';
 
 // Mock du service

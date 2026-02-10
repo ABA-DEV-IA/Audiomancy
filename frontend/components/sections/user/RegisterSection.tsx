@@ -51,13 +51,13 @@ export function RegisterPage({ onRegisterSuccess, onSwitchToLogin }: RegisterPag
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#2B2B2B] via-[#301934] to-[#6A0DAD] flex items-center justify-center relative overflow-hidden p-4">
+    <div className="min-h-screen bg-gradient-to-br from-ombre-occulte via-brume-cosmique to-encre-astrale flex items-center justify-center relative overflow-hidden p-4">
       {/* Particules décoratives */}
       <div className="absolute inset-0 pointer-events-none">
         {Array.from({ length: 10 }).map((_, i) => (
           <div
             key={i}
-            className="absolute w-2 h-2 bg-[#D9B3FF] rounded-full animate-ping opacity-30"
+            className="absolute w-2 h-2 bg-eclat-ether rounded-full animate-ping opacity-30"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
@@ -74,7 +74,7 @@ export function RegisterPage({ onRegisterSuccess, onSwitchToLogin }: RegisterPag
           {particles.map((particle) => (
             <div
               key={particle.id}
-              className="absolute w-3 h-3 bg-[#4CE0B3] rounded-full animate-ping opacity-80"
+              className="absolute w-3 h-3 bg-vert-dragon rounded-full animate-ping opacity-80"
               style={{
                 left: `${particle.x}%`,
                 top: `${particle.y}%`,
@@ -86,19 +86,19 @@ export function RegisterPage({ onRegisterSuccess, onSwitchToLogin }: RegisterPag
         </div>
       )}
 
-      <Card className="w-full max-w-md bg-[#2B2B2B]/90 border-[#A45EE5] relative z-20">
+      <Card className="w-full max-w-md bg-ombre-occulte/90 border-amethyste-magique relative z-20">
         <CardContent className="p-8">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="w-20 h-20 bg-gradient-to-br from-[#6A0DAD] to-[#A45EE5] rounded-full flex items-center justify-center mx-auto mb-4 shadow-2xl">
+            <div className="w-20 h-20 bg-gradient-to-br from-encre-astrale to-amethyste-magique rounded-full flex items-center justify-center mx-auto mb-4 shadow-2xl">
               <span className="text-3xl">🔮</span>
             </div>
             <h1 className="text-3xl font-bold text-white mb-2 flex items-center justify-center">
-              <Sparkles className="h-6 w-6 mr-2 text-[#D9B3FF]" />
+              <Sparkles className="h-6 w-6 mr-2 text-eclat-ether" />
               AUDIOMANCY
-              <Sparkles className="h-6 w-6 ml-2 text-[#D9B3FF]" />
+              <Sparkles className="h-6 w-6 ml-2 text-eclat-ether" />
             </h1>
-            <p className="text-[#D9B3FF] italic">Rejoins la communauté magique</p>
+            <p className="text-eclat-ether italic">Rejoins la communauté magique</p>
           </div>
 
           {/* Formulaire */}
@@ -113,9 +113,9 @@ export function RegisterPage({ onRegisterSuccess, onSwitchToLogin }: RegisterPag
           />
 
           {/* Switch to login */}
-          <div className="mt-6 text-center text-[#D9B3FF] text-sm">
+          <div className="mt-6 text-center text-eclat-ether text-sm">
             Déjà un compte ?{" "}
-            <Button variant="link" className="text-[#FF7BAC] p-0 h-auto" onClick={onSwitchToLogin}>
+            <Button variant="link" className="text-rose-alchimique p-0 h-auto" onClick={onSwitchToLogin}>
               Se connecter
             </Button>
           </div>

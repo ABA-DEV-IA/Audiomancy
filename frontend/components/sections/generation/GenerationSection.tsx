@@ -30,7 +30,7 @@ export function GenerationPage({ onBack }: { onBack?: () => void }) {
   };
 
   return (
-    <div className="h-full flex flex-col relative overflow-hidden bg-[#2B2B2B] p-8">
+    <div className="h-full flex flex-col relative overflow-hidden bg-ombre-occulte p-8">
   <div
     className={`flex flex-1 justify-center items-center transition-all duration-700 ${
       isTransitioning ? 'opacity-0 scale-95 blur-sm' : 'opacity-100 scale-100 blur-0'

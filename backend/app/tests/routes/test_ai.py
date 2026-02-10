@@ -36,4 +36,4 @@ def test_generate_playlist_ai_failure(api_client):
     with patch("app.routes.ai_routes.ai_executor", side_effect=Exception("AI crashed")):
         response = api_client.post("/generate/playlist", json={"prompt": "Test", "limit": 10})
         assert response.status_code == 500
-        assert "AI crashed" in response.json()["detail"]
+        assert "Erreur lors de la génération de la playlist" in response.json()["detail"]

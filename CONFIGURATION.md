@@ -216,7 +216,7 @@ MONGO_USERNAME=prod_user
 MONGO_PASSWORD=strong_password
 SWAGGER_ON=false
 ALLOWED_ORIGINS=https://yourdomain.com
-AZURE_KEY_VAULT_URL=https://your-vault.vault.azure.net/  # Optionnel
+# AZURE_KEY_VAULT_URL=https://your-vault.vault.azure.net/  # ⚠️ DEPRECATED - azure_only_no_longer_usable_in_localhost
 ```
 
 ---
@@ -252,7 +252,9 @@ curl http://localhost:8000/
 ```
 
 ### **"Missing Azure Speech config"**
-✅ **Normal** : La fonctionnalité TTS Azure est désactivée. Cette erreur n'empêche pas l'application de fonctionner.
+⚠️ DEPRECATED - azure_only_no_longer_usable_in_localhost
+
+✅ **Normal** : La fonctionnalité TTS Azure a été désactivée (remplacée par solutions locales). Cette erreur n'empêche pas l'application de fonctionner.
 
 ---
 
@@ -295,7 +297,7 @@ curl http://localhost:8000/
 1. Utiliser des clés API différentes par environnement
 2. Régénérer `API_KEY` régulièrement
 3. Ne jamais exposer les clés dans les logs
-4. Utiliser Azure Key Vault ou HashiCorp Vault en production
+4. Utiliser HashiCorp Vault en production pour la gestion des secrets
 
 ---
 

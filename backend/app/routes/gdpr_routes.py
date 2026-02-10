@@ -8,9 +8,11 @@ Endpoints for user data rights compliance:
 """
 
 import logging
-from typing import Dict, Any
+from datetime import datetime, timezone
+from typing import Dict, Any, List
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, EmailStr
+from app.core.db import users_collection, favorite_collection, cache_collection
 from app.routes.metrics_routes import personal_data_access_total
 
 logger = logging.getLogger(__name__)
@@ -56,45 +58,61 @@ async def export_user_data(request: DataExportRequest) -> Dict[str, Any]:
     personal_data_access_total.labels(operation="export").inc()
 
     try:
-        # TODO: Implement actual data retrieval from MongoDB
-        # This is a placeholder response
+        # Récupérer le profil utilisateur depuis MongoDB
+        user_doc = await users_collection.find_one({"email": request.email})
+        if not user_doc:
+            raise HTTPException(
+                status_code=404,
+                detail="Utilisateur introuvable."
+            )
+
+        user_id = str(user_doc["_id"])
+
+        # Récupérer les favoris de l'utilisateur
+        favorites_cursor = favorite_collection.find({"user_id": user_id})
+        favorites: List[Dict[str, Any]] = []
+        async for fav in favorites_cursor:
+            fav["_id"] = str(fav["_id"])
+            favorites.append(fav)
+
+        # Construire la réponse RGPD
+        now = datetime.now(timezone.utc).isoformat()
         user_data = {
             "gdpr_request_type": "data_export",
             "email": request.email,
             "data": {
                 "profile": {
-                    "email": request.email,
-                    "created_at": "2025-01-01T00:00:00Z",
-                    "last_login": "2025-02-04T12:00:00Z"
+                    "email": user_doc.get("email"),
+                    "username": user_doc.get("username"),
+                    "created_at": str(user_doc.get("created_at", "")),
                 },
-                "favorites": [],
-                "playlists_generated": [],
-                "consents": {
-                    "marketing": False,
-                    "analytics": True
-                }
+                "favorites": favorites,
+                "favorites_count": len(favorites),
             },
-            "export_date": "2025-02-04T12:00:00Z",
+            "export_date": now,
             "retention_policy": "Data is retained for 2 years after last activity"
         }
 
-        logger.info(f"Data export completed for user: {request.email}")
+        logger.info("Data export completed for user: %s", request.email)
         return user_data
 
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(
-            f"Error exporting user data: {str(e)}",
+            "Error exporting user data: %s",
+            str(e),
             extra={"endpoint": "/gdpr/data-export", "email": request.email},
             exc_info=True
         )
         raise HTTPException(
             status_code=500,
-            detail=f"Failed to export user data: {str(e)}"
+            detail="Erreur lors de l'export des données utilisateur"
         ) from e
 
 
 @router.delete("/account", status_code=status.HTTP_200_OK)
-async def delete_user_account(request: AccountDeletionRequest) -> Dict[str, str]:
+async def delete_user_account(request: AccountDeletionRequest) -> Dict[str, Any]:
     """
     Delete user account and all associated data (GDPR Article 17 - Right to Erasure).
 
@@ -119,38 +137,66 @@ async def delete_user_account(request: AccountDeletionRequest) -> Dict[str, str]
 
     # Require explicit confirmation
     if request.confirmation != "DELETE":
-        logger.warning(f"Invalid deletion confirmation for user: {request.email}")
+        logger.warning("Invalid deletion confirmation for user: %s", request.email)
         raise HTTPException(
             status_code=400,
             detail="Invalid confirmation. Please type 'DELETE' to confirm account deletion."
         )
 
     try:
-        # TODO: Implement actual account deletion from MongoDB
-        # Steps:
-        # 1. Delete user profile
-        # 2. Delete all favorites
-        # 3. Delete all playlists
-        # 4. Delete all logs containing user email (or anonymize)
-        # 5. Remove from cache
+        # 1. Trouver l'utilisateur par email
+        user_doc = await users_collection.find_one({"email": request.email})
+        if not user_doc:
+            raise HTTPException(
+                status_code=404,
+                detail="Utilisateur introuvable."
+            )
 
-        logger.info(f"Account deletion completed for user: {request.email}")
+        user_id = str(user_doc["_id"])
+
+        # 2. Supprimer tous les favoris de l'utilisateur
+        favorites_result = await favorite_collection.delete_many({"user_id": user_id})
+        logger.info(
+            "Deleted %d favorites for user: %s",
+            favorites_result.deleted_count, request.email
+        )
+
+        # 3. Supprimer les entrées de cache liées (optionnel)
+        cache_result = await cache_collection.delete_many({"user_id": user_id})
+        logger.info(
+            "Deleted %d cache entries for user: %s",
+            cache_result.deleted_count, request.email
+        )
+
+        # 4. Supprimer le profil utilisateur
+        await users_collection.delete_one({"_id": user_doc["_id"]})
+
+        now = datetime.now(timezone.utc).isoformat()
+        logger.info("Account deletion completed for user: %s", request.email)
 
         return {
             "status": "success",
             "message": f"Account and all associated data for {request.email} has been permanently deleted.",
-            "deleted_at": "2025-02-04T12:00:00Z"
+            "deleted_at": now,
+            "deleted_items": {
+                "favorites": favorites_result.deleted_count,
+                "cache_entries": cache_result.deleted_count,
+                "user_profile": 1
+            }
         }
 
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(
-            f"Error deleting user account: {str(e)}",
+            "Error deleting user account: %s",
+            str(e),
             extra={"endpoint": "/gdpr/account", "email": request.email},
             exc_info=True
         )
         raise HTTPException(
             status_code=500,
-            detail=f"Failed to delete account: {str(e)}"
+            detail="Erreur lors de la suppression du compte"
         ) from e
 
 

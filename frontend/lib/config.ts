@@ -41,7 +41,11 @@ function getEnvVar(name: string, required = true): string {
  */
 export function getConfig(): Config {
   return {
-    fastApiUrl: getEnvVar("NEXT_PUBLIC_API_URL") || getEnvVar("FASTAPI_URL", false),
+    // FASTAPI_URL = variable serveur (réseau Docker interne, ex: http://backend:8000)
+    // NEXT_PUBLIC_API_URL = fallback (dev local, ex: http://localhost:8000)
+    fastApiUrl: getEnvVar("FASTAPI_URL", false) !== "dummy"
+      ? getEnvVar("FASTAPI_URL", false)
+      : getEnvVar("NEXT_PUBLIC_API_URL"),
     fastApiKey: getEnvVar("FASTAPI_API_KEY"),
   };
 }

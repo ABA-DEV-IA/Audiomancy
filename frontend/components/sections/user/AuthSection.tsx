@@ -17,22 +17,22 @@ export function AuthPage({ onLoginSuccess, onSwitchToRegister }: LoginPageProps)
   const [isLoading, setIsLoading] = useState(false)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#2B2B2B] via-[#301934] to-[#6A0DAD] flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-ombre-occulte via-brume-cosmique to-encre-astrale flex items-center justify-center p-4 relative overflow-hidden">
       <BackgroundParticles particles={particles} isLoading={isLoading} />
 
-      <Card className="w-full max-w-md bg-[#2B2B2B]/90 border-[#A45EE5] backdrop-blur-sm relative z-20">
+      <Card className="w-full max-w-md bg-ombre-occulte/90 border-amethyste-magique backdrop-blur-sm relative z-20">
         <CardContent className="p-8">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="w-20 h-20 bg-gradient-to-br from-[#6A0DAD] to-[#A45EE5] rounded-full flex items-center justify-center mx-auto mb-4 shadow-2xl">
+            <div className="w-20 h-20 bg-gradient-to-br from-encre-astrale to-amethyste-magique rounded-full flex items-center justify-center mx-auto mb-4 shadow-2xl">
               <span className="text-3xl">🔮</span>
             </div>
             <h1 className="text-3xl font-bold text-white mb-2 flex items-center justify-center">
-              <Sparkles className="h-6 w-6 mr-2 text-[#D9B3FF]" />
+              <Sparkles className="h-6 w-6 mr-2 text-eclat-ether" />
               AUDIOMANCY
-              <Sparkles className="h-6 w-6 ml-2 text-[#D9B3FF]" />
+              <Sparkles className="h-6 w-6 ml-2 text-eclat-ether" />
             </h1>
-            <p className="text-[#D9B3FF] italic">Connecte-toi à la magie</p>
+            <p className="text-eclat-ether italic">Connecte-toi à la magie</p>
           </div>
 
           {/* Formulaire */}

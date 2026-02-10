@@ -96,10 +96,10 @@ export default function PlayerPage({
 
 
   return (
-    <div className="flex min-h-screen flex-col justify-between bg-[#2B2B2B] text-white">
+    <div className="flex min-h-screen flex-col justify-between bg-ombre-occulte text-white">
       <div className="flex flex-grow flex-col p-6">
         {/* HEADER */}
-        <div className="mb-6 rounded bg-[#6A0DAD] p-6 text-white">
+        <div className="mb-6 rounded bg-encre-astrale p-6 text-white">
           <h1 className="text-2xl font-bold">Lecture</h1>
           <p className="mt-2">Playlist : {playlistId}</p>
           
@@ -109,7 +109,7 @@ export default function PlayerPage({
               <button
                 type="button"
                 onClick={openModal}
-                className="rounded bg-gradient-to-r from-[#4CE0B3] to-[#3AB68B] px-4 py-2 font-semibold text-black hover:scale-105"
+                className="rounded bg-gradient-to-r from-vert-dragon to-emeraude-sombre px-4 py-2 font-semibold text-black hover:scale-105"
               >
                 Ajouter aux favoris
               </button>
@@ -118,7 +118,7 @@ export default function PlayerPage({
             <button
               type="button"
               onClick={() => router.push('/')}
-              className="rounded bg-gradient-to-r from-[#6A0DAD] to-[#A45EE5] px-4 py-2 font-semibold text-white hover:scale-105"
+              className="rounded bg-gradient-to-r from-encre-astrale to-amethyste-magique px-4 py-2 font-semibold text-white hover:scale-105"
             >
               ← Retour
             </button>
@@ -131,7 +131,7 @@ export default function PlayerPage({
                 showMessage ? "opacity-100" : "opacity-0"
               } ${
                 messageType === "success"
-                  ? "bg-gradient-to-r from-[#4CE0B3] to-[#3AB68B]"
+                  ? "bg-gradient-to-r from-vert-dragon to-emeraude-sombre"
                   : "bg-red-700 text-red-100"
               }`}
             >
@@ -141,7 +141,7 @@ export default function PlayerPage({
         </div>
 
         {/* PLAYER */}
-        <div className="mx-auto mb-6 flex w-full max-w-4xl flex-col items-center rounded-lg bg-[#301934] p-8 text-white shadow-lg">
+        <div className="mx-auto mb-6 flex w-full max-w-4xl flex-col items-center rounded-lg bg-brume-cosmique p-8 text-white shadow-lg">
           <img
             src={currentTrack.image}
             alt={currentTrack.title}
@@ -153,7 +153,7 @@ export default function PlayerPage({
             }}
           />
           <h2 className="mb-2 text-2xl font-bold">{currentTrack.title}</h2>
-          <p className="mb-4 text-lg text-[#D9B3FF]">{currentTrack.artist}</p>
+          <p className="mb-4 text-lg text-eclat-ether">{currentTrack.artist}</p>
 
           <audio
             ref={audioRef}
@@ -172,7 +172,7 @@ export default function PlayerPage({
               {currentTrack.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="rounded-full bg-[#3A1E5F] px-3 py-1 text-xs font-semibold text-[#D9B3FF]"
+                  className="rounded-full bg-nuit-profonde px-3 py-1 text-xs font-semibold text-eclat-ether"
                 >
                   #{tag}
                 </span>
@@ -187,7 +187,7 @@ export default function PlayerPage({
                 href={currentTrack.license_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="underline text-[#FF934F]"
+                className="underline text-feu-anciens"
               >
                 {currentTrack.license_name}
               </a>
@@ -196,7 +196,7 @@ export default function PlayerPage({
         </div>
 
         {/* TRACK LIST */}
-        <div className="rounded bg-[#301934] p-4">
+        <div className="rounded bg-brume-cosmique p-4">
           <h3 className="mb-4 text-lg font-semibold text-white">Morceaux</h3>
           <ul className="space-y-2">
             {tracks.map((track, index) => (
@@ -206,8 +206,8 @@ export default function PlayerPage({
                 tabIndex={0}
                 className={`cursor-pointer rounded p-2 ${
                   index === currentTrackIndex
-                    ? 'bg-[#6A0DAD] text-white'
-                    : 'hover:bg-[#4B2A7B] hover:text-white'
+                    ? 'bg-encre-astrale text-white'
+                    : 'hover:bg-crepuscule-royal hover:text-white'
                 }`}
                 onClick={() => onSelectTrack(index)}
                 onKeyDown={(e) => { if (e.key === 'Enter') onSelectTrack(index); }}

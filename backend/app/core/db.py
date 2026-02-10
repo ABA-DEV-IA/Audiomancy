@@ -7,19 +7,20 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.errors import PyMongoError
 from app.core.config import settings
 
-MONGO_HOST = settings.mongo_host
-MONGO_PORT = settings.mongo_port
+MONGO_HOST = settings.mongo_host or "localhost"
+MONGO_PORT = settings.mongo_port or "27017"
 MONGO_USERNAME = settings.mongo_username
 MONGO_PASSWORD = settings.mongo_password
-MONGO_DBNAME = settings.mongo_db_name
+MONGO_DBNAME = settings.mongo_db_name or "audiomancy"
 
 if MONGO_USERNAME and MONGO_PASSWORD:
     # URL-encode username and password to handle special characters
     username_encoded = quote_plus(MONGO_USERNAME)
     password_encoded = quote_plus(MONGO_PASSWORD)
 
+    # ⚠️ DEPRECATED - azure_only_no_longer_usable_in_localhost
     # Détection automatique : Cosmos DB si le host contient "cosmos.azure.com"
-    if "cosmos.azure.com" in MONGO_HOST:
+    if MONGO_HOST and "cosmos.azure.com" in MONGO_HOST:
         # Mode production (Azure Cosmos DB avec SSL)
         MONGO_URL = (
             f"mongodb://{username_encoded}:{password_encoded}"
@@ -40,7 +41,7 @@ db = client[MONGO_DBNAME]
 # Collections
 users_collection = db["user"]
 favorite_collection = db["favorite"]
-cache_collection = db["cache"]  # Cache MongoDB (remplace Azure Blob Storage)
+cache_collection = db["cache"]  # Cache MongoDB local (remplacement d'Azure Blob Storage)
 
 async def check_connection() -> bool:
     """

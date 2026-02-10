@@ -79,17 +79,19 @@ jobs:
           echo "Web App status: $STATUS"
           echo "status=$STATUS" >> $GITHUB_OUTPUT
 
-      # Redémarrage de la Web App seulement si elle est en cours d'exécution
-      - name: Restart Web App
-        if: steps.check_status.outputs.status == 'Running'
-        run: |
-          echo "Web App is running, restarting..."
-          az webapp restart \
-            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-            --name ${{ secrets.AZURE_WEBAPP_NAME }}
+      # ⚠️ DEPRECATED - azure_only_no_longer_usable_in_localhost
+      # Redémarrage de la Web App Azure (désactivé pour déploiement localhost)
+      # - name: Restart Web App
+      #   if: steps.check_status.outputs.status == 'Running'
+      #   run: |
+      #     echo "Web App is running, restarting..."
+      #     az webapp restart \
+      #       --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+      #       --name ${{ secrets.AZURE_WEBAPP_NAME }}
 
-      # Message si la Web App n'est pas en cours d'exécution
-      - name: Web App not running
-        if: steps.check_status.outputs.status != 'Running'
-        run: |
-          echo "Web App is not running (status: ${{ steps.check_status.outputs.status }}). Skipping restart."
+      # ⚠️ DEPRECATED - azure_only_no_longer_usable_in_localhost
+      # Message si la Web App Azure n'est pas en cours d'exécution
+      # - name: Web App not running
+      #   if: steps.check_status.outputs.status != 'Running'
+      #   run: |
+      #     echo "Web App is not running (status: ${{ steps.check_status.outputs.status }}). Skipping restart."

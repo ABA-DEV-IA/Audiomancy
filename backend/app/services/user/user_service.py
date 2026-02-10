@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from typing import Dict, Any
 
 from bson import ObjectId
+from bson.errors import InvalidId
 from fastapi import HTTPException
 from passlib.context import CryptContext
 
@@ -12,6 +13,7 @@ from app.models.user import (
     UserUpdateRequest,
     UserCreate,
     User,
+    UserPublic,
     UserResponse,
 )
 
@@ -59,6 +61,19 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 
+def _user_to_public(doc: dict) -> UserPublic:
+    """
+    Convert a MongoDB user document to a UserPublic model (no password_hash).
+    """
+    user_doc = mongo_to_user_doc(doc)
+    return UserPublic(
+        id=user_doc["id"],
+        email=user_doc["email"],
+        username=user_doc["username"],
+        created_at=user_doc.get("created_at", datetime.now(timezone.utc)),
+    )
+
+
 async def create_user_service(request: UserCreateRequest) -> UserResponse:
     """
     Create a new user in MongoDB.
@@ -87,12 +102,12 @@ async def create_user_service(request: UserCreateRequest) -> UserResponse:
     )
 
     result = await users_collection.insert_one(user.model_dump())
-    doc = mongo_to_user_doc({**user.model_dump(), "_id": result.inserted_id})
+    doc = {**user.model_dump(), "_id": result.inserted_id}
 
     return UserResponse(
         success=True,
         message="User successfully created",
-        user=User(**doc).model_dump(by_alias=True),
+        user=_user_to_public(doc),
     )
 
 
@@ -119,12 +134,10 @@ async def login_user_service(request: UserLoginRequest) -> UserResponse:
     if not verify_password(request.password, existing["password_hash"]):
         raise HTTPException(status_code=400, detail="mot de passe invalide")
 
-    doc = mongo_to_user_doc(existing)
-
     return UserResponse(
         success=True,
         message="Login successful",
-        user=User(**doc),
+        user=_user_to_public(existing),
     )
 
 
@@ -144,7 +157,12 @@ async def update_user_service(request: UserUpdateRequest) -> UserResponse:
     if not await check_connection():
         raise HTTPException(status_code=503, detail="impossible de se connecter au serveur")
     
-    existing = await users_collection.find_one({"_id": ObjectId(request.id)})
+    try:
+        oid = ObjectId(request.id)
+    except (InvalidId, Exception):
+        raise HTTPException(status_code=400, detail="ID utilisateur invalide")
+
+    existing = await users_collection.find_one({"_id": oid})
     if not existing:
         raise HTTPException(status_code=404, detail="Utilisateur introuvable")
 
@@ -160,7 +178,7 @@ async def update_user_service(request: UserUpdateRequest) -> UserResponse:
         raise HTTPException(status_code=400, detail="Aucun champ valide à mettre à jour")
 
     result = await users_collection.update_one(
-        {"_id": ObjectId(request.id)}, {"$set": update_data}
+        {"_id": oid}, {"$set": update_data}
     )
 
     if result.modified_count == 0:
@@ -170,11 +188,10 @@ async def update_user_service(request: UserUpdateRequest) -> UserResponse:
             user=None,
         )
 
-    updated_user = await users_collection.find_one({"_id": ObjectId(request.id)})
-    doc = mongo_to_user_doc(updated_user)
+    updated_user = await users_collection.find_one({"_id": oid})
 
     return UserResponse(
         success=True,
         message="L'utilisateur a été mis à jour avec succès",
-        user=User(**doc),
+        user=_user_to_public(updated_user),
     )

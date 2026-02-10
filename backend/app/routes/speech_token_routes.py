@@ -1,4 +1,6 @@
 """
+⚠️ DEPRECATED - azure_only_no_longer_usable_in_localhost
+
 [DÉSACTIVÉ] Module de token Azure Speech (TTS).
 
 Ce module était utilisé pour générer des tokens temporaires pour Azure Speech Services.

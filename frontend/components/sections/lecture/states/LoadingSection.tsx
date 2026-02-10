@@ -5,16 +5,16 @@ export default function LoadingPage() {
   const router = useRouter();
 
   return (
-    <div className="flex flex-col justify-between min-h-screen bg-[#2B2B2B] text-white">
+    <div className="flex flex-col justify-between min-h-screen bg-ombre-occulte text-white">
       <div className="flex flex-col flex-grow p-6">
         {/* HEADER */}
-        <div className="bg-[#6A0DAD] text-white p-6 mb-6 rounded">
+        <div className="bg-encre-astrale text-white p-6 mb-6 rounded">
           <h1 className="text-2xl font-bold">Chargement en cours</h1>
           <p className="mt-2">Récupération des pistes de la playlist...</p>
           <button
             onClick={() => router.push('/')}
             aria-label="Retour à l'accueil"
-            className="bg-white text-[#6A0DAD] font-semibold px-4 py-2 mt-4 rounded hover:bg-gray-100 transition"
+            className="bg-white text-encre-astrale font-semibold px-4 py-2 mt-4 rounded hover:bg-gray-100 transition"
           >
             ← Retour à l&apos;accueil
           </button>

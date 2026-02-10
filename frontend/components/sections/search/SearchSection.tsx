@@ -29,24 +29,24 @@ export function SearchPage() {
   const filteredActivity = filterCategories(ActivityCategories);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#2B2B2B] text-white overflow-y-auto">
+    <div className="min-h-screen flex flex-col bg-ombre-occulte text-white overflow-y-auto">
       {/* Header */}
-      <div className="sticky top-0 z-50 bg-[#6A0DAD] text-white p-4 sm:p-8 text-center">
+      <div className="sticky top-0 z-50 bg-encre-astrale text-white p-4 sm:p-8 text-center">
         <h1 className="text-2xl sm:text-4xl font-bold mb-2 tracking-wider">RECHERCHE</h1>
-        <p className="text-[#D9B3FF] italic text-sm sm:text-base">~ Trouver vos envies ~</p>
+        <p className="text-eclat-ether italic text-sm sm:text-base">~ Trouver vos envies ~</p>
       </div>
 
       {/* Search bar */}
-      <div className="bg-[#2B2B2B] p-6">
+      <div className="bg-ombre-occulte p-6">
         <h2 className="text-xl font-semibold text-white mb-4 max-w-2xl mx-auto">Recherche</h2>
         <div className="max-w-2xl mx-auto">
           <Input
             placeholder="Recherche de la médiathèque - contenu thématique"
             className="w-full 
-                        bg-[#301934] 
+                        bg-brume-cosmique 
                         text-white 
-                        placeholder-[#D9B3FF] 
-                        border border-[#A45EE5] 
+                        placeholder-eclat-ether 
+                        border border-amethyste-magique 
                         rounded-lg 
                         px-4 py-2 
                         transition-colors"            
@@ -65,7 +65,7 @@ export function SearchPage() {
             filteredMood.map((result) => (
               <Card
                 key={result.id}
-                className="bg-[#301934] border-[#A45EE5] hover:bg-[#A45EE5] hover:bg-opacity-20 transition-colors cursor-pointer"
+                className="bg-brume-cosmique border-amethyste-magique hover:bg-amethyste-magique hover:bg-opacity-20 transition-colors cursor-pointer"
                 onClick={() => handleClick(result.id)}
               >
                 <CardContent className="p-4 flex items-center justify-between">
@@ -80,8 +80,8 @@ export function SearchPage() {
                   />
                   <div className="flex flex-col">
                     <h3 className="text-white font-medium">{result.title}</h3>
-                    <p className="text-[#D9B3FF] text-sm">{result.description}</p>
-                    <span className="text-[#FF934F] text-sm mt-1">{result.subtitle}</span>
+                    <p className="text-eclat-ether text-sm">{result.description}</p>
+                    <span className="text-feu-anciens text-sm mt-1">{result.subtitle}</span>
                   </div>
                 </div>
                 </CardContent>
@@ -99,7 +99,7 @@ export function SearchPage() {
             filteredActivity.map((result) => (
               <Card
                 key={result.id}
-                className="bg-[#301934] border-[#A45EE5] hover:bg-[#A45EE5] hover:bg-opacity-20 transition-colors cursor-pointer"
+                className="bg-brume-cosmique border-amethyste-magique hover:bg-amethyste-magique hover:bg-opacity-20 transition-colors cursor-pointer"
                 onClick={() => handleClick(result.id)}
               >
                 <CardContent className="p-4 flex items-center justify-between">
@@ -114,8 +114,8 @@ export function SearchPage() {
                   />
                   <div className="flex flex-col">
                     <h3 className="text-white font-medium">{result.title}</h3>
-                    <p className="text-[#D9B3FF] text-sm">{result.description}</p>
-                    <span className="text-[#FF934F] text-sm mt-1">{result.subtitle}</span>
+                    <p className="text-eclat-ether text-sm">{result.description}</p>
+                    <span className="text-feu-anciens text-sm mt-1">{result.subtitle}</span>
                   </div>
                 </div>
                 </CardContent>

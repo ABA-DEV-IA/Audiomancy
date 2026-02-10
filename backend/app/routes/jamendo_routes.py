@@ -67,11 +67,12 @@ async def get_jamendo_tracks(request: JamendoTrackRequest):
             limit=request.limit,
             track_id=request.track_id
         )
-        logger.info(f"Successfully retrieved {len(tracks)} tracks from Jamendo")
+        logger.info("Successfully retrieved %d tracks from Jamendo", len(tracks))
         return tracks
     except Exception as e:
         logger.error(
-            f"Error fetching Jamendo tracks: {str(e)}",
+            "Error fetching Jamendo tracks: %s",
+            str(e),
             extra={
                 "endpoint": "/jamendo/tracks",
                 "error_type": type(e).__name__

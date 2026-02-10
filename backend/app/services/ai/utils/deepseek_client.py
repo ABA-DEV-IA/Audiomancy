@@ -79,7 +79,7 @@ class DeepSeekClient:
         logger.debug("Sending messages to DeepSeek API:")
         for msg in messages:
             snippet = msg['content'][:500] + ("..." if len(msg['content']) > 500 else "")
-            logger.debug(f" - {msg['role']}: {snippet}")
+            logger.debug(" - %s: %s", msg['role'], snippet)
 
         try:
             # Use OpenAI SDK's chat completion API (compatible with DeepSeek)
@@ -120,11 +120,13 @@ class DeepSeekClient:
 
             # 🔹 Debug log of the incoming response
             snippet = content[:500] + ("..." if len(content) > 500 else "")
-            logger.debug(f"Received response from DeepSeek:\n{snippet}\n")
-            logger.info(f"DeepSeek API call completed in {latency:.2f}s")
+            logger.debug("Received response from DeepSeek:\n%s", snippet)
+            logger.info("DeepSeek API call completed in %.2fs", latency)
 
             return content.strip()
 
+        except RuntimeError:
+            raise  # Re-raise intentional RuntimeErrors (empty response, no content)
         except Exception as exc:
             # Record failed request
             deepseek_requests_total.labels(status="error").inc()
@@ -132,7 +134,8 @@ class DeepSeekClient:
             deepseek_errors_total.labels(error_type=error_type).inc()
 
             logger.error(
-                f"DeepSeek API call failed: {exc}",
+                "DeepSeek API call failed: %s",
+                exc,
                 extra={"error_type": error_type},
                 exc_info=True
             )

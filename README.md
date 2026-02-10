@@ -4,11 +4,10 @@
 
 ![background_readme.png](img_readme/background_readme.png)
 
-**Audiomancy** est une plateforme web basée sur l’IA pour la génération, la gestion et la lecture de playlists musicales. Elle combine :
+**Audiomancy** est une plateforme web basée sur l'IA pour la génération, la gestion et la lecture de playlists musicales. Elle combine :
 
 - un **backend Python FastAPI** pour la logique métier et les intégrations IA,
-- un **frontend Next.js/React/TypeScript** pour l’expérience utilisateur,
-- des **fonctions serverless Azure** pour la gestion des tokens et services cloud.
+- un **frontend Next.js/React/TypeScript** pour l'expérience utilisateur.
 
 Audiomancy permet de créer automatiquement des playlists adaptées à un thème ou une ambiance, de rechercher des morceaux libres de droits via Jamendo, et d’offrir une expérience de lecture fluide et moderne.
 
@@ -33,9 +32,7 @@ Audiomancy permet de créer automatiquement des playlists adaptées à un thème
 - Recherche et lecture de morceaux libres de droits (API Jamendo)
 - Gestion des favoris utilisateurs
 - Authentification et sessions sécurisées
-- Intégration avec **Azure Speech** pour synthèse et reconnaissance vocale
 - Interface moderne et responsive (mobile & desktop)
-- Intégration et Déploiement continu sur Azure Container Registry
 
 * * *
 
@@ -44,7 +41,6 @@ Audiomancy permet de créer automatiquement des playlists adaptées à un thème
 ```bash
 .
 ├── LICENSE
-├── azure_functions/    # Fonctions serverless Azure
 ├── backend/            # API FastAPI + logique métier
 ├── frontend/           # Application Next.js/React
 ├── img_readme/         # Images pour le README
@@ -61,9 +57,9 @@ Audiomancy permet de créer automatiquement des playlists adaptées à un thème
     - `core/` : configuration, logging, sécurité
     - `models/` : modèles Pydantic pour validation & documentation
     - `routes/` : endpoints API
-    - `services/` : IA, Jamendo, Azure
-    - `utils/` : utilitaires, formatage, licences
-    - `tests/` : tests unitaires et d’intégration
+    - `services/` : IA, Jamendo
+    - `utils/` : utilitaires, formatage, licences, cache
+    - `tests/` : tests unitaires et d'intégration
 
 ### Frontend (`frontend/`)
 
@@ -71,11 +67,11 @@ Audiomancy permet de créer automatiquement des playlists adaptées à un thème
 - Gestion des états, appels API, composants réutilisables
 - Organisation : `components/`, `pages/`, `contexts/`, `services/`, `tests/`
 
+### ⚠️ DEPRECATED - azure_only_no_longer_usable_in_localhost
+
 ### Azure Functions (`azure_functions/`)
 
-- Fonctions serverless pour services cloud et tokens
-- Exemple : génération de token pour Azure Speech, synchronisation playlists
-- Dépendances gérées via `requirements.txt`
+**HISTORIQUE**: Ce dossier contenait des fonctions serverless Azure pour services cloud et tokens (génération de token pour Azure Speech, synchronisation playlists). Ces fonctions ont été remplacées par des solutions locales (MongoDB cache, APScheduler).
 
 * * *
 
@@ -83,13 +79,12 @@ Audiomancy permet de créer automatiquement des playlists adaptées à un thème
 
 ### Prérequis
 
-- Python 3.13+  
-- Node.js 22+  
-- Docker (optionnel)  
-- Azure CLI (optionnel)  
+- Python 3.13+
+- Node.js 22+
+- Docker (optionnel)
 - Fichiers `.env` pour frontend et backend (développement local)
 
-⚠️ Des fichiers `.env.example` sont fournis dans `backend/` et `frontend/`. Copiez-les en `.env` et complétez les clés nécessaires (Jamendo, OpenAI, Azure, etc.).
+⚠️ Des fichiers `.env.example` sont fournis dans `backend/` et `frontend/`. Copiez-les en `.env` et complétez les clés nécessaires (Jamendo, DeepSeek, etc.).
 
 ### Backend
 
@@ -105,15 +100,6 @@ pip install -r requirements.txt
 ```bash
 cd frontend
 npm install  # ou pnpm install
-```
-
-### Azure Functions
-
-```bash
-cd azure_functions
-pip install -r requirements.txt
-npm install -g azurite
-npm install -g azure-functions-core-tools@4 --unsafe-perm true
 ```
 
 ---
@@ -142,25 +128,7 @@ npm run dev
 
 - Application disponible : [http://localhost:3000](http://localhost:3000)
 
-### 3. Lancer l’émulateur Azure Storage (Azurite)
-
-```bash
-cd azure_functions
-azurite
-```
-
-- Service accessible par défaut : [http://127.0.0.1:10000](http://127.0.0.1:10000)
-
-### 4. Lancer les Azure Functions
-
-```bash
-cd azure_functions
-func start
-```
-
-- Les fonctions seront exécutées localement et prêtes à interagir avec le backend et le stockage émulé
-
-⚡ Une fois ces quatre services en route, Audiomancy sera pleinement fonctionnelle.
+⚡ Une fois ces deux services en route, Audiomancy sera pleinement fonctionnelle.
 
 * * *
 ## Tests

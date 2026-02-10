@@ -96,19 +96,5 @@
     "tailwindcss": "^3.4.17",
     "ts-jest": "^29.4.1",
     "typescript": "^5.9.2"
-  },
-  "extends": "airbnb",
-  "env": {
-    "browser": true,
-    "es2021": true,
-    "node": true
-  },
-  "parserOptions": {
-    "ecmaFeatures": {
-      "jsx": true
-    },
-    "ecmaVersion": 12,
-    "sourceType": "module"
-  },
-  "rules": {}
+  }
 }

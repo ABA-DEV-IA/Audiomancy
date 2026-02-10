@@ -2,7 +2,7 @@
 cache_tools.py
 
 Utilities for caching track data in MongoDB.
-Replaces Azure Blob Storage with MongoDB collections for better integration.
+Local MongoDB cache (replacement for Azure Blob Storage - azure_only_no_longer_usable_in_localhost).
 
 Key functions:
 - generate_cache_key: Create safe cache keys for categories or moods.
@@ -16,16 +16,12 @@ All cache entries support automatic expiration using MongoDB TTL indexes.
 
 import logging
 from typing import Optional, List, Any
-from datetime import datetime, timedelta
-from motor.motor_asyncio import AsyncIOMotorClient
+from datetime import datetime, timedelta, timezone
 from pymongo.errors import PyMongoError
 
-from app.core.db import db
+from app.core.db import cache_collection
 
 logger = logging.getLogger(__name__)
-
-# Cache collection
-cache_collection = db["cache"]
 
 # --- Internal prefix for cache keys ---
 CACHE_PREFIX = "cache/"
@@ -44,7 +40,7 @@ async def ensure_cache_indexes() -> None:
         await cache_collection.create_index("expires_at", expireAfterSeconds=0)
         logger.info("Cache TTL index ensured.")
     except PyMongoError as e:
-        logger.warning(f"Failed to create cache TTL index: {e}")
+        logger.warning("Failed to create cache TTL index: %s", e)
 
 
 def generate_cache_key(category: str) -> str:
@@ -86,12 +82,12 @@ async def save_cache(
         - MongoDB TTL index automatically deletes expired entries.
     """
     try:
-        expires_at = datetime.utcnow() + timedelta(days=ttl_days)
+        expires_at = datetime.now(timezone.utc) + timedelta(days=ttl_days)
         
         cache_entry = {
             "cache_key": cache_key,
             "data": data,
-            "created_at": datetime.utcnow(),
+            "created_at": datetime.now(timezone.utc),
             "expires_at": expires_at
         }
         
@@ -102,11 +98,11 @@ async def save_cache(
             upsert=True
         )
         
-        logger.info(f"Cache '{cache_key}' saved successfully (expires in {ttl_days} days).")
+        logger.info("Cache '%s' saved successfully (expires in %d days).", cache_key, ttl_days)
         return True
         
     except PyMongoError as e:
-        logger.error(f"Failed to save cache '{cache_key}': {e}")
+        logger.error("Failed to save cache '%s': %s", cache_key, e)
         return False
 
 
@@ -128,19 +124,19 @@ async def get_cache(cache_key: str) -> Optional[Any]:
         cache_entry = await cache_collection.find_one({"cache_key": cache_key})
         
         if not cache_entry:
-            logger.info(f"Cache '{cache_key}' not found.")
+            logger.info("Cache '%s' not found.", cache_key)
             return None
         
         # Check if expired (defense in depth, TTL index should handle this)
-        if cache_entry.get("expires_at") and cache_entry["expires_at"] < datetime.utcnow():
-            logger.info(f"Cache '{cache_key}' is expired.")
+        if cache_entry.get("expires_at") and cache_entry["expires_at"].replace(tzinfo=timezone.utc) < datetime.now(timezone.utc):
+            logger.info("Cache '%s' is expired.", cache_key)
             return None
         
-        logger.info(f"Cache '{cache_key}' retrieved successfully.")
+        logger.info("Cache '%s' retrieved successfully.", cache_key)
         return cache_entry.get("data")
         
     except PyMongoError as e:
-        logger.error(f"Failed to retrieve cache '{cache_key}': {e}")
+        logger.error("Failed to retrieve cache '%s': %s", cache_key, e)
         return None
 
 
@@ -161,14 +157,14 @@ async def delete_cache(cache_key: str) -> bool:
         result = await cache_collection.delete_one({"cache_key": cache_key})
         
         if result.deleted_count > 0:
-            logger.info(f"Cache '{cache_key}' deleted.")
+            logger.info("Cache '%s' deleted.", cache_key)
             return True
         else:
-            logger.info(f"Cache '{cache_key}' not found for deletion.")
+            logger.info("Cache '%s' not found for deletion.", cache_key)
             return False
             
     except PyMongoError as e:
-        logger.error(f"Failed to delete cache '{cache_key}': {e}")
+        logger.error("Failed to delete cache '%s': %s", cache_key, e)
         return False
 
 
@@ -193,11 +189,11 @@ async def list_caches(prefix: Optional[str] = None) -> List[str]:
         cursor = cache_collection.find(query, {"cache_key": 1, "_id": 0})
         cache_keys = [doc["cache_key"] async for doc in cursor]
         
-        logger.info(f"Found {len(cache_keys)} cache entries.")
+        logger.info("Found %d cache entries.", len(cache_keys))
         return cache_keys
         
     except PyMongoError as e:
-        logger.error(f"Failed to list caches: {e}")
+        logger.error("Failed to list caches: %s", e)
         return []
 
 
@@ -213,12 +209,12 @@ async def clear_expired_caches() -> int:
     """
     try:
         result = await cache_collection.delete_many({
-            "expires_at": {"$lt": datetime.utcnow()}
+            "expires_at": {"$lt": datetime.now(timezone.utc)}
         })
         
-        logger.info(f"Cleared {result.deleted_count} expired cache entries.")
+        logger.info("Cleared %d expired cache entries.", result.deleted_count)
         return result.deleted_count
         
     except PyMongoError as e:
-        logger.error(f"Failed to clear expired caches: {e}")
+        logger.error("Failed to clear expired caches: %s", e)
         return 0

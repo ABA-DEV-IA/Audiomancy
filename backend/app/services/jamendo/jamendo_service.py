@@ -14,6 +14,7 @@ Functions:
 
 import json
 import logging
+import asyncio
 from typing import List, Optional
 
 from app.models.jamendo import JamendoTrackResponse
@@ -84,7 +85,7 @@ async def get_tracks_for_reader(
     }
     logger.debug("Fetching from Jamendo with params: %s", params)
 
-    response_data = fetch_tracks(params)
+    response_data = await asyncio.to_thread(fetch_tracks, params)
     if "results" not in response_data:
         logger.warning("Jamendo response did not contain 'results'")
         return []

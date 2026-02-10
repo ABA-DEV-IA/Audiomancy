@@ -10,9 +10,9 @@ export function AboutPage() {
   const { project, creators, github, technologies } = aboutConfig;
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#2B2B2B] text-white overflow-x-hidden overflow-y-auto">
+    <div className="min-h-screen flex flex-col bg-ombre-occulte text-white overflow-x-hidden overflow-y-auto">
       {/* Header */}
-      <div className="sticky top-0 z-50 bg-[#6A0DAD] text-white p-4 sm:p-8 text-center">
+      <div className="sticky top-0 z-50 bg-encre-astrale text-white p-4 sm:p-8 text-center">
         <h1 className="text-2xl sm:text-4xl font-bold mb-2 tracking-wider">
           À PROPOS
         </h1>

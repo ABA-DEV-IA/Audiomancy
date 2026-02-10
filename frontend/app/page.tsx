@@ -15,7 +15,7 @@ import { RegisterPage } from '@/components/sections/user/RegisterSection';
 import { FavoritesContainer } from '@/components/sections/favorite/favorites-container';
 
 
-type PageKey = 'categories' | 'generation' | 'favorites' | 'recherches' | 'about' | 'lecture' | 'login' | 'register' | 'acount';
+type PageKey = 'categories' | 'generation' | 'favorites' | 'recherches' | 'about' | 'lecture' | 'login' | 'register' | 'account';
 
 export default function Page() {
   const [currentPage, setCurrentPage] = useState<PageKey>('categories');
@@ -72,7 +72,7 @@ export default function Page() {
       lecture: <HomePage onCategoryClick={() => goToLecture('default')} />,
       login: <AuthPage onLoginSuccess={() => setCurrentPage('categories')} onSwitchToRegister={() => setCurrentPage('register')} />,
       register: <RegisterPage onRegisterSuccess={() => setCurrentPage('categories')} onSwitchToLogin={() => setCurrentPage('login')} />,
-      acount: <AccountPage />
+      account: <AccountPage />
     };
 
     return pages[currentPage];

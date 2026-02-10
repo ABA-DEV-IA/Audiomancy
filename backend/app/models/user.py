@@ -1,6 +1,5 @@
-from datetime import datetime
-from typing import Optional
 from datetime import datetime, timezone
+from typing import Optional
 from pydantic import BaseModel, Field, EmailStr, ConfigDict
 
 
@@ -12,7 +11,7 @@ class User(BaseModel):
     email: EmailStr
     username: str
     password_hash: str
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     model_config = ConfigDict(populate_by_name=True)
 
@@ -54,10 +53,21 @@ class UserUpdateRequest(BaseModel):
     password: Optional[str] = None
 
 
+class UserPublic(BaseModel):
+    """
+    Public user model without sensitive fields (password_hash).
+    Used in API responses to avoid leaking credentials.
+    """
+    id: str
+    email: EmailStr
+    username: str
+    created_at: datetime
+
+
 class UserResponse(BaseModel):
     """
     Standard response model for user operations.
     """
     success: bool
     message: str
-    user: Optional[User]
+    user: Optional[UserPublic] = None

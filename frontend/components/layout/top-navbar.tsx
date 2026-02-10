@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 
 export function TopNavbar() {
   return (
-    <div className="bg-[#2B2B2B] text-white p-4 flex items-center justify-between">
+    <div className="bg-ombre-occulte text-white p-4 flex items-center justify-between">
       {/* Logo */}
       <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
         <span className="text-black text-sm font-bold">🔮</span>
@@ -16,7 +16,7 @@ export function TopNavbar() {
 
       {/* User Icon */}
       <div className="flex items-center">
-        {/* <Button variant="ghost" size="icon" className="text-[#A3D5FF]">
+        {/* <Button variant="ghost" size="icon" className="text-givre-astral">
           <User className="h-5 w-5" />
         </Button> */}
       </div>

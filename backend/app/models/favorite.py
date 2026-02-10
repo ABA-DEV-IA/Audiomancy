@@ -1,6 +1,6 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 from .jamendo import JamendoTrackResponse
 
 
@@ -9,10 +9,9 @@ class Favorite(BaseModel):
     user_id: str
     name: str
     track_list: List[JamendoTrackResponse] = []
-    saved_at: datetime = Field(default_factory=datetime.utcnow)
+    saved_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-    class Config:
-        populate_by_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     
 class FavoriteResponse(BaseModel):
@@ -30,7 +29,6 @@ class FavoriteCreateRequest(BaseModel):
     user_id: str
     name: str
     track_list: List[JamendoTrackResponse] = []
-    saved_at: datetime = Field(default_factory=datetime.utcnow)
+    saved_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-    class Config:
-        populate_by_name = True
+    model_config = ConfigDict(populate_by_name=True)

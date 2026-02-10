@@ -37,7 +37,7 @@ export function Sidebar({
   ]
 
   const userItems = [
-    { id: "acount", label: "Mon profil", icon: User }
+    { id: "account", label: "Mon profil", icon: User }
   ]
 
   const handleLogout = () => {
@@ -47,7 +47,7 @@ export function Sidebar({
 
   return (
     <div
-      className={`fixed top-0 left-0 h-full bg-[#F2E9E4] border-r border-gray-300 transition-all duration-300
+      className={`fixed top-0 left-0 h-full bg-lune-voilee border-r border-gray-300 transition-all duration-300
         ${isOpen ? 'w-64' : 'w-16'} flex flex-col z-[9999]`}
     >
       <div className="p-4">
@@ -58,11 +58,11 @@ export function Sidebar({
         {isOpen && (
           <div className="mb-8">
             {isAuthenticated ? (
-              <h1 className="text-xl font-bold text-[#2B2B2B] mb-2">
+              <h1 className="text-xl font-bold text-ombre-occulte mb-2">
                 Bonjour {user?.username} 👋
               </h1>
             ) : (
-              <h1 className="text-xl font-bold text-[#2B2B2B] mb-2">Bonjour !</h1>
+              <h1 className="text-xl font-bold text-ombre-occulte mb-2">Bonjour !</h1>
             )}
           </div>
         )}
@@ -75,8 +75,8 @@ export function Sidebar({
             <Button
               key={item.id}
               variant={currentPage === item.id ? 'secondary' : 'ghost'}
-              className={`w-full justify-start mb-2 text-[#2B2B2B] hover:bg-[#D9B3FF] hover:text-[#6A0DAD] ${!isOpen ? 'px-2' : ''
-                } ${currentPage === item.id ? 'bg-[#D9B3FF] text-[#6A0DAD]' : ''}`}
+              className={`w-full justify-start mb-2 text-ombre-occulte hover:bg-eclat-ether hover:text-encre-astrale ${!isOpen ? 'px-2' : ''
+                } ${currentPage === item.id ? 'bg-eclat-ether text-encre-astrale' : ''}`}
               onClick={() => onPageChange(item.id)}
             >
               <Icon className="h-5 w-5" />
@@ -89,7 +89,7 @@ export function Sidebar({
       <span className="p-2 border-t border-gray-300"></span>
 
         {isOpen && (
-          <h3 className="text-sm font-medium text-[#6A0DAD] px-3 mb-2">Compte</h3>
+          <h3 className="text-sm font-medium text-encre-astrale px-3 mb-2">Compte</h3>
         )}
 
         {isAuthenticated ? (
@@ -100,8 +100,8 @@ export function Sidebar({
                 <Button
                   key={item.id}
                   variant={currentPage === item.id ? 'secondary' : 'ghost'}
-                  className={`w-full justify-start mb-2 text-[#2B2B2B] hover:bg-[#D9B3FF] hover:text-[#6A0DAD] ${!isOpen ? 'px-2' : ''
-                    } ${currentPage === item.id ? 'bg-[#D9B3FF] text-[#6A0DAD]' : ''}`}
+                  className={`w-full justify-start mb-2 text-ombre-occulte hover:bg-eclat-ether hover:text-encre-astrale ${!isOpen ? 'px-2' : ''
+                    } ${currentPage === item.id ? 'bg-eclat-ether text-encre-astrale' : ''}`}
                   onClick={() => onPageChange(item.id)}
                 >
                   <Icon className="h-5 w-5" />
@@ -127,8 +127,8 @@ export function Sidebar({
                 <Button
                   key={item.id}
                   variant={currentPage === item.id ? 'secondary' : 'ghost'}
-                  className={`w-full justify-start mb-2 text-[#2B2B2B] hover:bg-[#D9B3FF] hover:text-[#6A0DAD] ${!isOpen ? 'px-2' : ''
-                    } ${currentPage === item.id ? 'bg-[#D9B3FF] text-[#6A0DAD]' : ''}`}
+                  className={`w-full justify-start mb-2 text-ombre-occulte hover:bg-eclat-ether hover:text-encre-astrale ${!isOpen ? 'px-2' : ''
+                    } ${currentPage === item.id ? 'bg-eclat-ether text-encre-astrale' : ''}`}
                   onClick={() => onPageChange(item.id)}
                 >
                   <Icon className="h-5 w-5" />

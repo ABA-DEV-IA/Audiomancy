@@ -22,26 +22,26 @@ interface FavoritesPageProps {
 export function FavoritesPage({ favorites, onEdit, onDelete, onPlay }: FavoritesPageProps) {
   return (
     <div className="h-full flex flex-col text-base sm:text-sm">
-      <div className="bg-[#6A0DAD] text-white p-8 text-center">
+      <div className="bg-encre-astrale text-white p-8 text-center">
         <div className="flex items-center justify-center mb-4">
           <Heart className="h-8 w-8 mr-3 text-white" />
           <h1 className="text-4xl font-bold tracking-wider">MES FAVORIS</h1>
           <Heart className="h-8 w-8 ml-3 text-white" />
         </div>
-        <p className="text-[#D9B3FF] italic">~ Tes playlists mystiques préférées ~</p>
+        <p className="text-eclat-ether italic">~ Tes playlists mystiques préférées ~</p>
       </div>
 
-      <div className="flex-1 bg-[#2B2B2B] p-8">
+      <div className="flex-1 bg-ombre-occulte p-8">
         {favorites.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center">
-            <div className="w-24 h-24 bg-[#301934] rounded-full flex items-center justify-center mb-6">
-              <Heart className="h-12 w-12 text-[#A45EE5]" />
+            <div className="w-24 h-24 bg-brume-cosmique rounded-full flex items-center justify-center mb-6">
+              <Heart className="h-12 w-12 text-amethyste-magique" />
             </div>
             <h2 className="text-2xl font-bold text-white mb-4">Aucun favori pour le moment</h2>
-            <p className="text-[#D9B3FF] text-lg mb-8 max-w-md">
+            <p className="text-eclat-ether text-lg mb-8 max-w-md">
               Ajoute tes playlists préférées en favoris pour les retrouver facilement ici !
             </p>
-            <div className="flex items-center text-[#FF934F] text-sm">
+            <div className="flex items-center text-feu-anciens text-sm">
               <span className="mr-2">💡</span>
               <span>Astuce : Utilise le bouton dédié sur une playlist pour l'ajouter à tes favoris</span>
             </div>
@@ -51,12 +51,12 @@ export function FavoritesPage({ favorites, onEdit, onDelete, onPlay }: Favorites
           <div className="max-w-4xl mx-auto">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 space-y-2 md:space-y-0">
               <div className="flex items-center">
-                <Music className="h-6 w-6 text-[#A45EE5] mr-3" />
+                <Music className="h-6 w-6 text-amethyste-magique mr-3" />
                 <h2 className="text-2xl font-bold text-white">
                   {favorites.length} playlist{favorites.length > 1 ? "s" : ""} favorite{favorites.length > 1 ? "s" : ""}
                 </h2>
               </div>
-              <div className="text-[#D9B3FF] text-sm">
+              <div className="text-eclat-ether text-sm">
                 Dernière mise à jour : {new Date().toLocaleDateString("fr-FR")}
               </div>
             </div>
@@ -65,13 +65,13 @@ export function FavoritesPage({ favorites, onEdit, onDelete, onPlay }: Favorites
               {favorites.map((playlist) => (
                 <Card
                   key={playlist.id}
-                  className="relative bg-[#301934] border-[#A45EE5] hover:bg-[#A45EE5]/10 transition-all duration-300 group cursor-pointer"
+                  className="relative bg-brume-cosmique border-amethyste-magique hover:bg-amethyste-magique/10 transition-all duration-300 group cursor-pointer"
                   onClick={() => onPlay(playlist.name, playlist.tracks)}
                 >
                   <CardContent className="p-6 pb-16">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center flex-1 min-w-0">
-                        <div className="w-12 h-12 bg-gradient-to-br from-[#6A0DAD] to-[#A45EE5] rounded-full flex items-center justify-center mr-3 flex-shrink-0">
+                        <div className="w-12 h-12 bg-gradient-to-br from-encre-astrale to-amethyste-magique rounded-full flex items-center justify-center mr-3 flex-shrink-0">
                           <Music className="h-6 w-6 text-white" />
                         </div>
                         <div className="min-w-0 flex-1 flex items-center">
@@ -86,7 +86,7 @@ export function FavoritesPage({ favorites, onEdit, onDelete, onPlay }: Favorites
                     </div>
 
                     <div className="mb-6">
-                      <div className="flex items-center text-[#D9B3FF] text-sm mb-2">
+                      <div className="flex items-center text-eclat-ether text-sm mb-2">
                         <span className="mr-2">📅</span>
                         <span>Ajouté le {playlist.createdAt}</span>
                       </div>
@@ -100,7 +100,7 @@ export function FavoritesPage({ favorites, onEdit, onDelete, onPlay }: Favorites
                         e.stopPropagation()
                         onEdit(playlist)
                       }}
-                      className="w-10 h-10 bg-[#A45EE5] hover:bg-[#6A0DAD] text-white rounded-full transition-all duration-300 hover:scale-110"
+                      className="w-10 h-10 bg-amethyste-magique hover:bg-encre-astrale text-white rounded-full transition-all duration-300 hover:scale-110"
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
@@ -110,7 +110,7 @@ export function FavoritesPage({ favorites, onEdit, onDelete, onPlay }: Favorites
                         e.stopPropagation()
                         onDelete(playlist)
                       }}
-                      className="w-10 h-10 border border-[#FF934F] text-[#FF934F] hover:bg-[#FF934F] hover:text-white rounded-full transition-all duration-300 hover:scale-110"
+                      className="w-10 h-10 border border-feu-anciens text-feu-anciens hover:bg-feu-anciens hover:text-white rounded-full transition-all duration-300 hover:scale-110"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

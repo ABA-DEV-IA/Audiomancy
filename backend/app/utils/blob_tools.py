@@ -1,6 +1,11 @@
 """
 blob_tools.py
 
+⚠️ DEPRECATED - azure_only_no_longer_usable_in_localhost
+
+Ce module Azure Blob Storage n'est plus utilisable en environnement localhost.
+Le cache a été migré vers MongoDB local (voir cache_tools.py).
+
 Utilities for interacting with Azure Blob Storage for caching track data.
 Provides safe filenames, optional overwrite control, and robust error handling.
 All blobs are stored under a "cache/" prefix to allow lifecycle management.
@@ -17,28 +22,57 @@ Key functions:
 import logging
 from typing import Optional, List
 
-from azure.storage.blob import BlobServiceClient, ContainerClient, BlobClient
-from azure.core.exceptions import ResourceExistsError, ResourceNotFoundError
-
-from app.core.config import settings
-
 logger = logging.getLogger(__name__)
 
-# --- Configuration ---
-cache_blob_name = settings.cache_blob_name
-azure_storage_connection_string = settings.azure_storage_connection_string
+# ============================================================================
+# ⚠️ AZURE BLOB STORAGE — DÉSACTIVÉ (localhost uniquement)
+# ============================================================================
+# Ce module est désactivé en environnement localhost.
+# Le cache utilise MongoDB local (voir cache_tools.py).
+# Ce fichier sera supprimé dans une branche git dédiée au nettoyage Azure.
+# ============================================================================
 
-if not azure_storage_connection_string:
-    raise ValueError("AZURE_STORAGE_CONNECTION_STRING environment variable is not set")
+_AZURE_AVAILABLE = False
+cache_blob_name = None
+azure_storage_connection_string = None
+
+try:
+    from azure.storage.blob import BlobServiceClient, ContainerClient, BlobClient
+    from azure.core.exceptions import ResourceExistsError, ResourceNotFoundError
+    from app.core.config import settings
+
+    cache_blob_name = getattr(settings, 'cache_blob_name', None)
+    azure_storage_connection_string = getattr(settings, 'azure_storage_connection_string', None)
+
+    if azure_storage_connection_string and cache_blob_name:
+        _AZURE_AVAILABLE = True
+        logger.info("[DEPRECATED] Azure Blob Storage available but deprecated. Use cache_tools.py.")
+    else:
+        logger.info("[DEPRECATED] Azure Blob Storage disabled (no connection string).")
+except ImportError:
+    logger.info("[DEPRECATED] Azure Blob Storage SDK not installed. Module disabled.")
 
 
-def get_blob_service_client() -> BlobServiceClient:
+def _check_azure() -> None:
+    """Guard: vérifie que Azure Blob Storage est disponible. Lève RuntimeError sinon."""
+    if not _AZURE_AVAILABLE:
+        raise RuntimeError(
+            "Azure Blob Storage est désactivé en localhost. "
+            "Utilisez cache_tools.py (MongoDB) à la place."
+        )
+
+
+def get_blob_service_client():
     """
     Return a new instance of BlobServiceClient from the connection string.
 
     Returns:
         BlobServiceClient: Client to interact with Azure Blob Storage.
+
+    Raises:
+        RuntimeError: If Azure Blob Storage is not available.
     """
+    _check_azure()
     return BlobServiceClient.from_connection_string(azure_storage_connection_string)
 
 
@@ -46,7 +80,12 @@ def get_blob_service_client() -> BlobServiceClient:
 CACHE_PREFIX = "cache/"
 
 
-def create_container_if_not_exists(container_name: str = cache_blob_name) -> ContainerClient:
+def create_container_if_not_exists(container_name: str = None):
+    _check_azure()
+    if container_name is None:
+        container_name = cache_blob_name
+    # Original signature preserved below
+    # def create_container_if_not_exists(container_name: str = cache_blob_name) -> ContainerClient:
     """
     Ensure the specified container exists; create it if it does not.
 
@@ -90,9 +129,12 @@ def generate_cache_filename(category: str) -> str:
 def upload_blob(
     blob_name: str,
     data: str,
-    container_name: str = cache_blob_name,
+    container_name: str = None,
     overwrite: bool = False
 ) -> None:
+    _check_azure()
+    if container_name is None:
+        container_name = cache_blob_name
     """
     Upload string data to a blob in the specified container.
 
@@ -118,7 +160,10 @@ def upload_blob(
             raise
 
 
-def download_blob(blob_name: str, container_name: str = cache_blob_name) -> Optional[str]:
+def download_blob(blob_name: str, container_name: str = None) -> Optional[str]:
+    _check_azure()
+    if container_name is None:
+        container_name = cache_blob_name
     """
     Download blob content as a string.
 
@@ -140,7 +185,10 @@ def download_blob(blob_name: str, container_name: str = cache_blob_name) -> Opti
     return data.decode("utf-8")
 
 
-def delete_blob(blob_name: str, container_name: str = cache_blob_name) -> None:
+def delete_blob(blob_name: str, container_name: str = None) -> None:
+    _check_azure()
+    if container_name is None:
+        container_name = cache_blob_name
     """
     Delete a blob if it exists.
 
@@ -159,7 +207,10 @@ def delete_blob(blob_name: str, container_name: str = cache_blob_name) -> None:
         logger.info("Blob '%s' deleted.", blob_name)
 
 
-def list_blobs(container_name: str = cache_blob_name) -> List[str]:
+def list_blobs(container_name: str = None) -> List[str]:
+    _check_azure()
+    if container_name is None:
+        container_name = cache_blob_name
     """
     List all blob names in a container.
 

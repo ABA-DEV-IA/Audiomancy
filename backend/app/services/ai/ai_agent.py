@@ -25,7 +25,7 @@ from app.services.ai.utils.filter_final_answer import filter_final_answer
 MAX_WEB_SEARCH = 3
 MAX_ITERATIONS = 5
 
-SYSTEM_PROMPT_PATH = Path("app/services/ai/utils/system_prompt.txt")
+SYSTEM_PROMPT_PATH = Path(__file__).parent / "utils" / "system_prompt.txt"
 
 
 # ---------------------------------------------------------------------
@@ -120,7 +120,11 @@ class AIAgent:
                 web_search_count += 1
                 self._log(f"[web_search #{web_search_count}] Query: {query}")
 
-                observation = web_search(query)
+                try:
+                    observation = web_search(query)
+                except Exception as exc:
+                    self._log(f"[web_search error] {exc}")
+                    observation = "Web search failed, no result available."
                 self._log(f"[web_search #{web_search_count}] Observation: {observation}")
 
                 scratchpad += f"""

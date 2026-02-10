@@ -77,13 +77,13 @@ export function HomePage({ onCategoryClick }: HomePageProps = {}) {
   if (!categories) return <div>Chargement...</div>;
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#2B2B2B] text-white overflow-y-auto">
+    <div className="min-h-screen flex flex-col bg-ombre-occulte text-white overflow-y-auto">
       <div
         className="sticky top-0 z-50 text-white p-4 sm:p-8 text-center transition-all duration-500"
         style={headerStyle}
       >
         <h1 className="text-2xl sm:text-4xl font-bold mb-2 tracking-wider">{header.title}</h1>
-        <p className="text-[#D9B3FF] italic text-sm sm:text-base">{header.subtitle}</p>
+        <p className="text-eclat-ether italic text-sm sm:text-base">{header.subtitle}</p>
       </div>
 
       <div className="flex-1 p-4 sm:p-8">

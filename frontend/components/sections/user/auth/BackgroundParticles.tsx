@@ -15,7 +15,7 @@ export function BackgroundParticles({ particles = [], isLoading = false }: Backg
         {Array.from({ length: 8 }).map((_, i) => (
           <div
             key={i}
-            className="absolute w-2 h-2 bg-[#D9B3FF] rounded-full animate-ping opacity-30"
+            className="absolute w-2 h-2 bg-eclat-ether rounded-full animate-ping opacity-30"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
@@ -32,7 +32,7 @@ export function BackgroundParticles({ particles = [], isLoading = false }: Backg
           {particles.map((particle) => (
             <div
               key={particle.id}
-              className="absolute w-3 h-3 bg-[#4CE0B3] rounded-full animate-ping opacity-80"
+              className="absolute w-3 h-3 bg-vert-dragon rounded-full animate-ping opacity-80"
               style={{
                 left: `${particle.x}%`,
                 top: `${particle.y}%`,

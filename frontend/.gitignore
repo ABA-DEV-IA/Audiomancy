@@ -54,4 +54,4 @@ storybook-static/
 # Lint and formatting
 .eslintcache
 
-public/config.json
+public/config.json.pnpm-store/

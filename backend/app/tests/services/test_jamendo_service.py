@@ -10,8 +10,9 @@ from unittest.mock import patch
 from app.services.jamendo.jamendo_service import get_tracks_for_reader
 
 
+@pytest.mark.asyncio
 @patch("app.services.jamendo.jamendo_service.fetch_tracks")
-def test_get_tracks_for_reader_returns_formatted(mock_fetch):
+async def test_get_tracks_for_reader_returns_formatted(mock_fetch):
     """
     Ensure that get_tracks_for_reader returns a properly formatted list
     when Jamendo API returns results.
@@ -31,18 +32,19 @@ def test_get_tracks_for_reader_returns_formatted(mock_fetch):
         ]
     }
 
-    results = get_tracks_for_reader("cinematic", 180, 300, 1)
+    results = await get_tracks_for_reader("cinematic", 180, 300, 1)
     assert len(results) == 1
     assert results[0]["title"] == "Test Song"
     assert results[0]["tags"] == ["cinematic"]
 
 
+@pytest.mark.asyncio
 @patch("app.services.jamendo.jamendo_service.fetch_tracks")
-def test_get_tracks_for_reader_empty_results(mock_fetch):
+async def test_get_tracks_for_reader_empty_results(mock_fetch):
     """
     Ensure that get_tracks_for_reader returns an empty list when
     Jamendo API returns no results.
     """
     mock_fetch.return_value = {"results": []}
-    results = get_tracks_for_reader("cinematic", 180, 300, 1)
+    results = await get_tracks_for_reader("cinematic", 180, 300, 1)
     assert results == []

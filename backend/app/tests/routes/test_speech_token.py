@@ -1,10 +1,15 @@
 """
+⚠️ DEPRECATED - azure_only_no_longer_usable_in_localhost
+
 Tests for the /speech-token endpoint using the shared api_client fixture.
+Ce test concerne Azure Speech Services (TTS) qui a été désactivé.
 """
 
 import pytest
 from unittest.mock import patch, MagicMock
 from requests.exceptions import RequestException
+
+pytestmark = pytest.mark.skip(reason="Azure Speech désactivé — tests non applicables en localhost")
 
 def test_get_speech_token_success(api_client):
     """✅ Returns token and region if config is valid and Azure responds."""

@@ -50,14 +50,14 @@ export function CategoryCard({ category, onClick }: CategoryCardProps) {
                 {category.title}
               </h3>
               {category.description && (
-                <p className="text-[#D9B3FF] text-sm font-medium drop-shadow-md">
+                <p className="text-eclat-ether text-sm font-medium drop-shadow-md">
                   {category.description}
                 </p>
               )}
             </div>
           </div>
           {category.subtitle && (
-            <p className="text-sm text-[#FF934F] italic font-medium drop-shadow-md">
+            <p className="text-sm text-feu-anciens italic font-medium drop-shadow-md">
               {category.subtitle}
             </p>
           )}

@@ -75,17 +75,19 @@ jobs:
           echo "🔗 View at: https://github.com/${{ github.repository }}/pkgs/container/backend"
           echo "status=$STATUS" >> $GITHUB_OUTPUT
 
-      # Redémarrage du conteneur seulement s'il est en cours d'exécution
-      - name: Restart Container Instance
-        if: steps.check_status.outputs.status == 'Running' || steps.check_status.outputs.status == 'Succeeded'
-        run: |
-          echo "Container is running, restarting..."
-          az container restart \
-            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-            --name ${{ secrets.AZURE_CONTAINER_NAME }}
+      # ⚠️ DEPRECATED - azure_only_no_longer_usable_in_localhost
+      # Redémarrage du conteneur Azure (désactivé pour déploiement localhost)
+      # - name: Restart Container Instance
+      #   if: steps.check_status.outputs.status == 'Running' || steps.check_status.outputs.status == 'Succeeded'
+      #   run: |
+      #     echo "Container is running, restarting..."
+      #     az container restart \
+      #       --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+      #       --name ${{ secrets.AZURE_CONTAINER_NAME }}
 
-      # Message si le conteneur n'est pas en cours d'exécution
-      - name: Container not running
-        if: steps.check_status.outputs.status != 'Running' && steps.check_status.outputs.status != 'Succeeded'
-        run: |
-          echo "Container is not running (status: ${{ steps.check_status.outputs.status }}). Skipping restart."
+      # ⚠️ DEPRECATED - azure_only_no_longer_usable_in_localhost
+      # Message si le conteneur Azure n'est pas en cours d'exécution
+      # - name: Container not running
+      #   if: steps.check_status.outputs.status != 'Running' && steps.check_status.outputs.status != 'Succeeded'
+      #   run: |
+      #     echo "Container is not running (status: ${{ steps.check_status.outputs.status }}). Skipping restart."

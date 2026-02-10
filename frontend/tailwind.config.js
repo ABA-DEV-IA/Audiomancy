@@ -37,8 +37,11 @@ module.exports = {
         'vert-dragon': '#4CE0B3',
         'lune-voilee': '#F2E9E4',
         'ombre-occulte': '#2B2B2B',
+        'nuit-profonde': '#3A1E5F',
         'feu-anciens': '#FF934F',
         'givre-astral': '#A3D5FF',
+        'emeraude-sombre': '#3AB68B',
+        'crepuscule-royal': '#4B2A7B',
       },
       borderRadius: {
         lg: 'var(--radius)',

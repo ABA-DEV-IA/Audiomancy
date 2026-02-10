@@ -17,11 +17,14 @@ def web_search(query: str) -> str:
             If no results are found, returns "NO RESULT".
     """
 
-    with DDGS() as ddgs:
-        results = ddgs.text(query, max_results=1)
-        for r in results:
-            source = r.get("href", "unknown")
-            text = r.get("body", "")
-            return f"{text}\n\n(Source: {source})"
+    try:
+        with DDGS() as ddgs:
+            results = ddgs.text(query, max_results=1)
+            for r in results:
+                source = r.get("href", "unknown")
+                text = r.get("body", "")
+                return f"{text}\n\n(Source: {source})"
+    except Exception:
+        return "NO RESULT"
 
     return "NO RESULT"

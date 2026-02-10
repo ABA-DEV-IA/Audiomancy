@@ -198,3 +198,7 @@ __marimo__/
 # Others
 celerybeat-schedule
 celerybeat.pid
+
+# pnpm store cache
+.pnpm-store/
+frontend/.pnpm-store/

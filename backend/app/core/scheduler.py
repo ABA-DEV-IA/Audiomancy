@@ -1,6 +1,9 @@
 """
 APScheduler configuration for periodic background tasks.
 
+⚠️ Note: Azure Functions mentions are historical context only (azure_only_no_longer_usable_in_localhost).
+This module is the local replacement for Azure Functions.
+
 This module replaces Azure Functions with a local scheduler implementation,
 providing equivalent functionality for:
 - Daily category updates: Refreshes music categories at midnight
@@ -32,7 +35,7 @@ References:
 """
 
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 import requests
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -96,7 +99,7 @@ def update_daily_categories(run_date: Optional[datetime] = None) -> None:
         - Competency C18: Automated task scheduling
     """
     # Detect late execution (equivalent to Azure Functions past_due)
-    now = datetime.now()
+    now = datetime.now(timezone.utc)
     if run_date:
         delay = (now - run_date).total_seconds()
         if delay > 60:  # More than 1 minute late

@@ -9,7 +9,6 @@ Functions:
 """
 
 import requests
-from app.core.config import settings
 from typing import Dict, Any
 from app.core.config import settings
 
@@ -37,4 +36,4 @@ def fetch_tracks(params: Dict[str, Any]) -> Dict[str, Any]:
         response.raise_for_status()
         return response.json()
     except requests.RequestException as e:
-        raise RuntimeError(f"Error fetching tracks from Jamendo API: {e}")
+        raise RuntimeError(f"Error fetching tracks from Jamendo API: {e}") from e

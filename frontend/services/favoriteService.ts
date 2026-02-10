@@ -1,7 +1,23 @@
+/**
+ * Service de gestion des favoris utilisateur.
+ *
+ * Fournit les opérations CRUD (create, read, delete, rename) sur les
+ * playlists sauvegardées via les routes proxy Next.js → FastAPI.
+ * @module favoriteService
+ */
 import { Track } from "@/types/track";
-import { Favorite } from "@/types/favorite"; // à créer
+import { Favorite } from "@/types/favorite";
 
 
+/**
+ * Effectue une requête POST générique et parse la réponse JSON.
+ *
+ * @template T - Le type attendu de la réponse JSON.
+ * @param url - URL de l'endpoint à appeler.
+ * @param body - Corps de la requête (optionnel).
+ * @returns La réponse parsée en tant que T.
+ * @throws {Error} Si la réponse HTTP est en erreur ou si le JSON est invalide.
+ */
 async function fetchJson<T>(url: string, body: Record<string, unknown> = {}): Promise<T> {
   const response = await fetch(url, {
     method: "POST",
@@ -44,6 +60,14 @@ interface FavoriteResponse {
 }
 
 
+/**
+ * Crée un nouveau favori (playlist sauvegardée).
+ *
+ * @param user_id - Identifiant de l'utilisateur.
+ * @param name - Nom du favori.
+ * @param track_list - Liste des pistes à inclure.
+ * @returns Le favori créé.
+ */
 export async function createFavorite(user_id: string, name: string, track_list: Track[]): Promise<Favorite> {
   const data = await fetchJson<FavoriteResponse>("/api/favorite/create", {
     user_id,
@@ -54,6 +78,12 @@ export async function createFavorite(user_id: string, name: string, track_list: 
   return data.favorite as Favorite;
 }
 
+/**
+ * Récupère la liste de tous les favoris d'un utilisateur.
+ *
+ * @param user_id - Identifiant de l'utilisateur.
+ * @returns Tableau des favoris (vide si aucun ou si 404).
+ */
 export async function listFavorites(user_id: string): Promise<Favorite[]> {
   const response = await fetch(`/api/favorite/list?user_id=${user_id}`);
   
@@ -68,6 +98,13 @@ export async function listFavorites(user_id: string): Promise<Favorite[]> {
 }
 
 
+/**
+ * Supprime un favori par son identifiant.
+ *
+ * @param favorite_id - Identifiant du favori à supprimer.
+ * @param user_id - Identifiant du propriétaire.
+ * @throws {Error} Si la suppression échoue côté serveur.
+ */
 export async function deleteFavorite(favorite_id: string, user_id: string): Promise<void> {
   const response = await fetch(`/api/favorite/delete/${favorite_id}?user_id=${user_id}`, {
     method: "DELETE",
@@ -79,6 +116,15 @@ export async function deleteFavorite(favorite_id: string, user_id: string): Prom
   }
 }
 
+/**
+ * Renomme un favori existant.
+ *
+ * @param favoriteId - Identifiant du favori à renommer.
+ * @param userId - Identifiant du propriétaire.
+ * @param newName - Nouveau nom du favori.
+ * @returns Les données de réponse du serveur.
+ * @throws {Error} Si le renommage échoue côté serveur.
+ */
 export async function renameFavorite(favoriteId: string, userId: string, newName: string) {
   const res = await fetch("/api/favorite/rename", {
     method: "PUT",
