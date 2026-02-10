@@ -183,6 +183,6 @@ class TestRetentionPolicy:
         assert data["policy_version"] == "1.0"
 
     def test_retention_policy_no_api_key(self):
-        """Retention policy is public and returns 200 without API key."""
+        """Retention policy is protected and returns 403 without API key."""
         response = client.get("/gdpr/data-retention-policy")
-        assert response.status_code == 200
+        assert response.status_code == 403

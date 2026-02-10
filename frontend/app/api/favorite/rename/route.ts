@@ -3,7 +3,6 @@ import { getConfig } from "@/lib/config";
 
 
 export async function PUT(request: Request) {
-  const body = await request.json();
   const { fastApiUrl, fastApiKey } = getConfig();
 
   if (!fastApiUrl || !fastApiKey) {
@@ -11,6 +10,7 @@ export async function PUT(request: Request) {
   }
 
   try {
+    const body = await request.json();
     const res = await fetch(`${fastApiUrl}/favorite/rename`, {
       method: "PUT",
       headers: {

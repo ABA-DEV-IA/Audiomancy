@@ -162,15 +162,15 @@ class TestAIAgent:
 
     @patch("app.services.ai.ai_agent.DeepSeekClient")
     def test_handles_deepseek_error_gracefully(self, MockClient):
-        """Should return empty string on DeepSeek API error."""
+        """Should raise RuntimeError on DeepSeek API error."""
         mock_instance = MockClient.return_value
         mock_instance.generate.side_effect = RuntimeError("API error")
 
         agent = AIAgent(verbose=False)
         agent.deepseek = mock_instance
-        result = agent.run("test prompt")
 
-        assert result == ""
+        with pytest.raises(RuntimeError, match="DeepSeek generation failed"):
+            agent.run("test prompt")
 
 
 # ============================================================================
@@ -182,18 +182,18 @@ class TestAIExecutor:
 
     @patch("app.services.ai.ai_executor.AI_AGENT")
     def test_returns_filtered_tags(self, mock_agent):
-        """Should return filtered tags from the agent response."""
+        """Should return tags from the agent response (already filtered by agent)."""
         mock_agent.run.return_value = (
-            "Final Answer: rock blues jazz funk soul indie pop"
+            "rock blues jazz funk soul indie pop"
         )
         result = ai_executor("I want rock music")
         assert result == "rock blues jazz funk soul indie pop"
 
     @patch("app.services.ai.ai_executor.AI_AGENT")
     def test_truncates_excess_tags(self, mock_agent):
-        """Should truncate to 7 tags if agent returns more."""
+        """Should pass through tags from agent (agent handles truncation)."""
         mock_agent.run.return_value = (
-            "Final Answer: tag1 tag2 tag3 tag4 tag5 tag6 tag7 tag8 tag9"
+            "tag1 tag2 tag3 tag4 tag5 tag6 tag7"
         )
         result = ai_executor("whatever")
         tags = result.split()

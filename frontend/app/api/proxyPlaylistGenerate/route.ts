@@ -4,13 +4,12 @@ import { getConfig } from "@/lib/config";
 export async function POST(request: Request) {
   const { fastApiUrl, fastApiKey } = getConfig();
 
-  const body = await request.json();
-
   if (!fastApiUrl || !fastApiKey) {
     return NextResponse.json({ error: "Server misconfiguration" }, { status: 500 });
   }
 
   try {
+    const body = await request.json();
     const res = await fetch(`${fastApiUrl}/generate/playlist`, {
       method: "POST",
       headers: {

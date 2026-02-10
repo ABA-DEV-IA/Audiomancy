@@ -7,8 +7,8 @@
 # Startup:
 #   docker-compose -f docker-compose.yml -f docker-compose.monitoring.yml up -d
 #
-# Monitoring only:
-#   docker-compose -f docker-compose.monitoring.yml up -d
+# Note: The monitoring stack requires the main application network.
+# It cannot be started standalone without the main docker-compose.yml.
 #
 # Services:
 #   - Prometheus (metrics)  : http://localhost:${PROMETHEUS_PORT:-19090}
@@ -145,6 +145,7 @@ services:
     volumes:
       - ./monitoring/promtail/promtail-config.yml:/etc/promtail/config.yml:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - promtail-positions:/positions
     command: -config.file=/etc/promtail/config.yml
     depends_on:
       - loki
@@ -200,6 +201,8 @@ volumes:
     name: audiomancy-monitoring-loki-data
   chaosd-data:
     name: audiomancy-monitoring-chaosd-data
+  promtail-positions:
+    name: audiomancy-monitoring-promtail-positions
 
 # ===================================================================
 # Shared network with main application

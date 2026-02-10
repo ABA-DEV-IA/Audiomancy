@@ -161,14 +161,7 @@ async def delete_user_account(request: AccountDeletionRequest) -> Dict[str, Any]
             favorites_result.deleted_count, request.email
         )
 
-        # 3. Supprimer les entrées de cache liées (optionnel)
-        cache_result = await cache_collection.delete_many({"user_id": user_id})
-        logger.info(
-            "Deleted %d cache entries for user: %s",
-            cache_result.deleted_count, request.email
-        )
-
-        # 4. Supprimer le profil utilisateur
+        # 3. Supprimer le profil utilisateur
         await users_collection.delete_one({"_id": user_doc["_id"]})
 
         now = datetime.now(timezone.utc).isoformat()
@@ -180,7 +173,6 @@ async def delete_user_account(request: AccountDeletionRequest) -> Dict[str, Any]
             "deleted_at": now,
             "deleted_items": {
                 "favorites": favorites_result.deleted_count,
-                "cache_entries": cache_result.deleted_count,
                 "user_profile": 1
             }
         }

@@ -82,7 +82,6 @@ def create_app() -> FastAPI:
     # Public routes (no authentication required)
     fastapi_app.include_router(health_router)
     fastapi_app.include_router(metrics_router)  # Prometheus metrics (C20)
-    fastapi_app.include_router(gdpr_router)  # GDPR/RGPD compliance (C20)
 
     # Protected routes
     protected = [Depends(get_api_key)]
@@ -90,6 +89,7 @@ def create_app() -> FastAPI:
     fastapi_app.include_router(ai_router, dependencies=protected)
     fastapi_app.include_router(user_router, dependencies=protected)
     fastapi_app.include_router(favorite_router, dependencies=protected)
+    fastapi_app.include_router(gdpr_router, dependencies=protected)  # GDPR/RGPD compliance (C20)
 
     return fastapi_app
 

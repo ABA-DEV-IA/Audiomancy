@@ -8,7 +8,6 @@ Orchestre le flux complet :  prompt utilisateur → agent ReAct (DeepSeek)
 import logging
 
 from app.services.ai.ai_agent import AIAgent
-from app.services.ai.utils.filter_final_answer import filter_final_answer
 
 logger = logging.getLogger(__name__)
 
@@ -26,8 +25,7 @@ def ai_executor(prompt: str) -> str:
         envoyée à l'API Jamendo.
     """
     response = AI_AGENT.run(prompt)
-    filtered_response = filter_final_answer(response)
 
-    logger.info("Returning tags to Jamendo: '%s'", filtered_response)
+    logger.info("Returning tags to Jamendo: '%s'", response)
 
-    return filtered_response
+    return response

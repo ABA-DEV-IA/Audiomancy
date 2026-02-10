@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { getConfig } from "@/lib/config";
 
 export async function POST(request: Request) {
-  const body = await request.json();
   const { fastApiUrl, fastApiKey } = getConfig();
 
   if (!fastApiUrl || !fastApiKey) {
@@ -10,6 +9,7 @@ export async function POST(request: Request) {
   }
 
   try {
+    const body = await request.json();
     const res = await fetch(`${fastApiUrl}/user/create`, {
       method: "POST",
       headers: {

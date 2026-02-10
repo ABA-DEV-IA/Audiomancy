@@ -43,9 +43,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = (userData: User) => {
-    setUser(userData);
+    // Strip any sensitive fields that shouldn't be on the client
+    const { password_hash, ...safeUser } = userData as User & { password_hash?: string };
+    setUser(safeUser as User);
     try {
-      sessionStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userData));
+      sessionStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(safeUser));
     } catch { /* quota exceeded — ignore */ }
   };
 

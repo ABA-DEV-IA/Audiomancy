@@ -75,7 +75,11 @@ export async function createFavorite(user_id: string, name: string, track_list: 
     track_list
   });
 
-  return data.favorite as Favorite;
+  if (!data.favorite) {
+    throw new Error("Le serveur n'a pas retourné de favori.");
+  }
+
+  return data.favorite;
 }
 
 /**

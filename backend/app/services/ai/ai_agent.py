@@ -92,7 +92,7 @@ class AIAgent:
                 response = self.deepseek.generate(llm_input)
             except Exception as exc:
                 self._log(f"[DeepSeek error] {exc}")
-                return ""
+                raise RuntimeError(f"DeepSeek generation failed: {exc}") from exc
 
             self._log(f"[DeepSeek Response]\n{response[:1000]}{'...' if len(response) > 1000 else ''}\n")
 

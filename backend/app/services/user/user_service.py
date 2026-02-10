@@ -129,10 +129,10 @@ async def login_user_service(request: UserLoginRequest) -> UserResponse:
     
     existing = await users_collection.find_one({"email": request.email})
     if not existing:
-        raise HTTPException(status_code=400, detail="email inconnu")
+        raise HTTPException(status_code=400, detail="Email ou mot de passe invalide")
 
     if not verify_password(request.password, existing["password_hash"]):
-        raise HTTPException(status_code=400, detail="mot de passe invalide")
+        raise HTTPException(status_code=400, detail="Email ou mot de passe invalide")
 
     return UserResponse(
         success=True,
