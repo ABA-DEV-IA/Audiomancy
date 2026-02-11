@@ -2,7 +2,6 @@
 
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-// import VoiceInput from './VoiceInput';  // ⚠️ DEPRECATED - azure_only_no_longer_usable_in_localhost
 
 interface StepWishProps {
   wish: string;
@@ -29,9 +28,6 @@ export function StepWish({ wish, setWish, onNext }: StepWishProps) {
           rows={6}
           className="mb-8 bg-brume-cosmique border-2 border-amethyste-magique text-white placeholder:text-eclat-ether text-lg p-6 min-h-32 transition-all duration-300 focus:border-encre-astrale focus:shadow-2xl focus:shadow-amethyste-magique/30 focus:scale-105"
         />
-
-        {/* ⚠️ DEPRECATED - azure_only_no_longer_usable_in_localhost */}
-        {/* <VoiceInput onResult={(text) => setWish(text)} /> */}
 
         <div className="flex flex-col sm:flex-row w-full gap-4 mt-6">
           <Button

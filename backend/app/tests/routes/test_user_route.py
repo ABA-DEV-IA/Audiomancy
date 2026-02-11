@@ -7,7 +7,7 @@ with mocked services to ensure responses are correct without hitting the databas
 
 import pytest
 from fastapi.testclient import TestClient
-from app.main import app  # ton FastAPI instance
+from app.main import app
 from app.models.user import UserCreateRequest, UserLoginRequest, UserUpdateRequest, UserResponse
 from app.core.config import settings
 

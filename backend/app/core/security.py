@@ -13,16 +13,11 @@ from app.core.config import settings
 api_key_header = APIKeyHeader(name="X-API-KEY", auto_error=True)
 
 def get_api_key(api_key: str = Security(api_key_header)):
-    """
-    Vérifie la clé API. Lève une erreur si invalide.
-    Utilise hmac.compare_digest pour éviter les timing attacks.
-    """
+    """Validate the API key using constant-time comparison."""
     if not settings.api_key or not hmac.compare_digest(api_key, settings.api_key):
         raise HTTPException(status_code=403, detail="Invalid API Key")
     return api_key
 
 def swagger_enabled() -> bool:
-    """
-    Retourne True si Swagger doit être activé.
-    """
+    """Check whether Swagger UI is enabled in settings."""
     return settings.swagger_on

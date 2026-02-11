@@ -14,10 +14,6 @@ HEADERS = {"X-API-KEY": settings.api_key}
 client = TestClient(app)
 
 
-# ---------------------------------------------------------------------------
-# GET /metrics
-# ---------------------------------------------------------------------------
-
 def test_metrics_endpoint():
     """Metrics endpoint returns 200 with Prometheus text format."""
     response = client.get("/metrics", headers=HEADERS)

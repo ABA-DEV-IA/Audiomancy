@@ -216,7 +216,6 @@ MONGO_USERNAME=prod_user
 MONGO_PASSWORD=strong_password
 SWAGGER_ON=false
 ALLOWED_ORIGINS=https://yourdomain.com
-# AZURE_KEY_VAULT_URL=https://your-vault.vault.azure.net/  # ⚠️ DEPRECATED - azure_only_no_longer_usable_in_localhost
 ```
 
 ---
@@ -250,11 +249,6 @@ cat frontend/.env.local | grep NEXT_PUBLIC
 # Tester l'URL du backend
 curl http://localhost:8000/
 ```
-
-### **"Missing Azure Speech config"**
-⚠️ DEPRECATED - azure_only_no_longer_usable_in_localhost
-
-✅ **Normal** : La fonctionnalité TTS Azure a été désactivée (remplacée par solutions locales). Cette erreur n'empêche pas l'application de fonctionner.
 
 ---
 

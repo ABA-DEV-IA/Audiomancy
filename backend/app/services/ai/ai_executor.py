@@ -1,8 +1,6 @@
-"""
-AI Executor — point d'entrée haut niveau du pipeline IA.
+"""AI Executor — top-level entry point for the AI pipeline.
 
-Orchestre le flux complet :  prompt utilisateur → agent ReAct (DeepSeek)
-→ filtrage des tags → résultat prêt pour Jamendo.
+Orchestrates: user prompt -> ReAct agent (DeepSeek) -> tag filtering -> Jamendo-ready result.
 """
 
 import logging
@@ -15,17 +13,7 @@ AI_AGENT = AIAgent()
 
 
 def ai_executor(prompt: str) -> str:
-    """Exécute le pipeline IA complet et retourne les tags musicaux filtrés.
-
-    Args:
-        prompt: Description libre de l'ambiance ou du style musical souhaité.
-
-    Returns:
-        Chaîne de tags séparés par des espaces (max 7), prête à être
-        envoyée à l'API Jamendo.
-    """
+    """Run the full AI pipeline and return filtered music tags."""
     response = AI_AGENT.run(prompt)
-
     logger.info("Returning tags to Jamendo: '%s'", response)
-
     return response

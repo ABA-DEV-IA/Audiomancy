@@ -1,18 +1,11 @@
-"""
-RGPD/GDPR compliance routes.
-
-Endpoints for user data rights compliance:
-- Right to access (Article 15)
-- Right to erasure/be forgotten (Article 17)
-- Right to data portability (Article 20)
-"""
+"""GDPR compliance routes (data export, account deletion, retention policy)."""
 
 import logging
 from datetime import datetime, timezone
 from typing import Dict, Any, List
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, EmailStr
-from app.core.db import users_collection, favorite_collection, cache_collection
+from app.core.db import users_collection, favorite_collection
 from app.routes.metrics_routes import personal_data_access_total
 
 logger = logging.getLogger(__name__)
@@ -32,25 +25,7 @@ class AccountDeletionRequest(BaseModel):
 
 @router.post("/data-export", status_code=status.HTTP_200_OK)
 async def export_user_data(request: DataExportRequest) -> Dict[str, Any]:
-    """
-    Export all personal data for a user (GDPR Article 15 - Right to Access).
-
-    This endpoint allows users to download all their personal data
-    stored in the system in a machine-readable format (JSON).
-
-    Args:
-        request (DataExportRequest): User email to export data for
-
-    Returns:
-        Dict containing all user data:
-        - profile: User profile information
-        - favorites: List of favorite tracks
-        - playlists: Generated playlists history
-        - metadata: Account creation date, last login, etc.
-
-    Raises:
-        HTTPException(404): If user not found
-    """
+    """Export all personal data for a user (GDPR Article 15)."""
     logger.info(
         "GDPR data export request received",
         extra={"endpoint": "/gdpr/data-export", "email": request.email}
@@ -58,7 +33,7 @@ async def export_user_data(request: DataExportRequest) -> Dict[str, Any]:
     personal_data_access_total.labels(operation="export").inc()
 
     try:
-        # Récupérer le profil utilisateur depuis MongoDB
+        # Find user by email
         user_doc = await users_collection.find_one({"email": request.email})
         if not user_doc:
             raise HTTPException(
@@ -68,14 +43,14 @@ async def export_user_data(request: DataExportRequest) -> Dict[str, Any]:
 
         user_id = str(user_doc["_id"])
 
-        # Récupérer les favoris de l'utilisateur
+        # Fetch user's favorites
         favorites_cursor = favorite_collection.find({"user_id": user_id})
         favorites: List[Dict[str, Any]] = []
         async for fav in favorites_cursor:
             fav["_id"] = str(fav["_id"])
             favorites.append(fav)
 
-        # Construire la réponse RGPD
+        # Build GDPR-compliant response
         now = datetime.now(timezone.utc).isoformat()
         user_data = {
             "gdpr_request_type": "data_export",
@@ -113,22 +88,7 @@ async def export_user_data(request: DataExportRequest) -> Dict[str, Any]:
 
 @router.delete("/account", status_code=status.HTTP_200_OK)
 async def delete_user_account(request: AccountDeletionRequest) -> Dict[str, Any]:
-    """
-    Delete user account and all associated data (GDPR Article 17 - Right to Erasure).
-
-    This endpoint permanently deletes all user data from the system.
-    This action is irreversible.
-
-    Args:
-        request (AccountDeletionRequest): User email and confirmation
-
-    Returns:
-        Dict with deletion confirmation message
-
-    Raises:
-        HTTPException(400): If confirmation is invalid
-        HTTPException(404): If user not found
-    """
+    """Permanently delete a user account and all associated data (GDPR Article 17)."""
     logger.warning(
         "GDPR account deletion request received",
         extra={"endpoint": "/gdpr/account", "email": request.email}
@@ -144,7 +104,7 @@ async def delete_user_account(request: AccountDeletionRequest) -> Dict[str, Any]
         )
 
     try:
-        # 1. Trouver l'utilisateur par email
+        # 1. Find user
         user_doc = await users_collection.find_one({"email": request.email})
         if not user_doc:
             raise HTTPException(
@@ -154,14 +114,14 @@ async def delete_user_account(request: AccountDeletionRequest) -> Dict[str, Any]
 
         user_id = str(user_doc["_id"])
 
-        # 2. Supprimer tous les favoris de l'utilisateur
+        # 2. Delete all user favorites
         favorites_result = await favorite_collection.delete_many({"user_id": user_id})
         logger.info(
             "Deleted %d favorites for user: %s",
             favorites_result.deleted_count, request.email
         )
 
-        # 3. Supprimer le profil utilisateur
+        # 3. Delete user profile
         await users_collection.delete_one({"_id": user_doc["_id"]})
 
         now = datetime.now(timezone.utc).isoformat()
@@ -194,12 +154,7 @@ async def delete_user_account(request: AccountDeletionRequest) -> Dict[str, Any]
 
 @router.get("/data-retention-policy", status_code=status.HTTP_200_OK)
 async def get_data_retention_policy() -> Dict[str, Any]:
-    """
-    Get the data retention policy (GDPR Article 13 - Information to be provided).
-
-    Returns:
-        Dict containing data retention policy details
-    """
+    """Return the data retention policy (GDPR Article 13)."""
     logger.info("Data retention policy requested")
 
     return {

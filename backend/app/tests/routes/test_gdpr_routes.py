@@ -25,10 +25,6 @@ FAKE_USER = {
 }
 
 
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
-
 class FakeAsyncCursor:
     """Simulates an async MongoDB cursor."""
 
@@ -53,10 +49,6 @@ class FakeDeleteResult:
     def __init__(self, deleted_count: int):
         self.deleted_count = deleted_count
 
-
-# ---------------------------------------------------------------------------
-# POST /gdpr/data-export
-# ---------------------------------------------------------------------------
 
 class TestDataExport:
 
@@ -116,21 +108,15 @@ class TestDataExport:
         assert data["data"]["favorites_count"] == 1
 
 
-# ---------------------------------------------------------------------------
-# DELETE /gdpr/account
-# ---------------------------------------------------------------------------
-
 class TestAccountDeletion:
 
-    @patch("app.routes.gdpr_routes.cache_collection")
     @patch("app.routes.gdpr_routes.favorite_collection")
     @patch("app.routes.gdpr_routes.users_collection")
-    def test_delete_account_success(self, mock_users, mock_favorites, mock_cache):
+    def test_delete_account_success(self, mock_users, mock_favorites):
         """Deleting an account with valid confirmation returns success."""
         mock_users.find_one = AsyncMock(return_value=FAKE_USER)
         mock_users.delete_one = AsyncMock()
         mock_favorites.delete_many = AsyncMock(return_value=FakeDeleteResult(3))
-        mock_cache.delete_many = AsyncMock(return_value=FakeDeleteResult(1))
 
         response = client.request(
             "DELETE",
@@ -165,10 +151,6 @@ class TestAccountDeletion:
         )
         assert response.status_code == 404
 
-
-# ---------------------------------------------------------------------------
-# GET /gdpr/data-retention-policy
-# ---------------------------------------------------------------------------
 
 class TestRetentionPolicy:
 

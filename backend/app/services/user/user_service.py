@@ -22,42 +22,17 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def mongo_to_user_doc(document: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Convert a MongoDB document into a dictionary compatible with the User model.
-
-    Args:
-        document (dict): The MongoDB document.
-
-    Returns:
-        dict: A dictionary with "_id" converted to string as "id".
-    """
+    """Convert a MongoDB document to a dict with string 'id' field."""
     return {**document, "id": str(document["_id"])} if "_id" in document else document
 
 
 def hash_password(password: str) -> str:
-    """
-    Hash a plain-text password.
-
-    Args:
-        password (str): Plain-text password.
-
-    Returns:
-        str: Hashed password.
-    """
+    """Hash a plain-text password with bcrypt."""
     return pwd_context.hash(password)
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """
-    Verify that a plain-text password matches a hashed password.
-
-    Args:
-        plain_password (str): Input password.
-        hashed_password (str): Hashed password from DB.
-
-    Returns:
-        bool: True if passwords match, False otherwise.
-    """
+    """Check a plain-text password against a bcrypt hash."""
     return pwd_context.verify(plain_password, hashed_password)
 
 
@@ -75,18 +50,7 @@ def _user_to_public(doc: dict) -> UserPublic:
 
 
 async def create_user_service(request: UserCreateRequest) -> UserResponse:
-    """
-    Create a new user in MongoDB.
-
-    Args:
-        request (UserCreateRequest): The user creation request.
-
-    Raises:
-        HTTPException: If the email is already registered.
-
-    Returns:
-        UserResponse: Response with user data.
-    """
+    """Create a new user. Raises 400 if email already registered."""
     if not await check_connection():
         raise HTTPException(status_code=503, detail="impossible de se connecter au serveur")
     
@@ -112,18 +76,7 @@ async def create_user_service(request: UserCreateRequest) -> UserResponse:
 
 
 async def login_user_service(request: UserLoginRequest) -> UserResponse:
-    """
-    Authenticate a user with email and password.
-
-    Args:
-        request (UserLoginRequest): The login request.
-
-    Raises:
-        HTTPException: If user is not found or password is incorrect.
-
-    Returns:
-        UserResponse: Response with authenticated user data.
-    """
+    """Authenticate a user with email and password."""
     if not await check_connection():
         raise HTTPException(status_code=503, detail="impossible de se connecter au serveur")
     
@@ -142,18 +95,7 @@ async def login_user_service(request: UserLoginRequest) -> UserResponse:
 
 
 async def update_user_service(request: UserUpdateRequest) -> UserResponse:
-    """
-    Update an existing user's information in MongoDB.
-
-    Args:
-        request (UserUpdateRequest): The update request containing fields to update.
-
-    Raises:
-        HTTPException: If user is not found or no valid fields are provided.
-
-    Returns:
-        UserResponse: Response with updated user data.
-    """
+    """Update a user's username or password."""
     if not await check_connection():
         raise HTTPException(status_code=503, detail="impossible de se connecter au serveur")
     

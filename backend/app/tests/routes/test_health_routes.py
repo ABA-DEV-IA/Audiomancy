@@ -14,10 +14,6 @@ HEADERS = {"X-API-KEY": settings.api_key}
 client = TestClient(app)
 
 
-# ---------------------------------------------------------------------------
-# GET /health/
-# ---------------------------------------------------------------------------
-
 def test_health_check():
     """Basic health check returns 200 with healthy status."""
     response = client.get("/health/", headers=HEADERS)
@@ -32,10 +28,6 @@ def test_health_check_no_api_key():
     response = client.get("/health/")
     assert response.status_code == 200
 
-
-# ---------------------------------------------------------------------------
-# GET /health/scheduler
-# ---------------------------------------------------------------------------
 
 @patch("app.routes.health_routes.scheduler")
 def test_scheduler_status_active(mock_scheduler):

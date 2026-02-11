@@ -210,4 +210,3 @@ volumes:
 networks:
   audiomancy-network:
     name: audiomancy_audiomancy-network
-    external: true

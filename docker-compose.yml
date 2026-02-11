@@ -1,7 +1,6 @@
 services:
   # ===================================================================
   # MongoDB - Base de données principale + Cache
-  # Remplace Azure Cosmos DB et Azure Blob Storage
   # ===================================================================
   mongodb:
     image: mongo:7.0
@@ -58,11 +57,10 @@ services:
     env_file:
       - ./frontend/.env.local
     environment:
-      # NEXT_PUBLIC_ = exposé au navigateur → doit pointer vers localhost
       NEXT_PUBLIC_API_URL: http://localhost:8000
-      # Variables serveur Next.js → résolution interne Docker
       FASTAPI_URL: http://backend:8000
-      NODE_ENV: ${NODE_ENV:-development}
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: "3000"
     depends_on:
       - backend
     networks:
@@ -71,7 +69,9 @@ services:
       - ./frontend:/app
       - /app/node_modules
       - /app/.next
-    command: sh -c "corepack enable && corepack prepare pnpm@latest --activate && pnpm install && pnpm dev"
+    command: >
+      sh -c "corepack enable && corepack prepare pnpm@latest --activate && pnpm install &&
+      if [ \"$$NODE_ENV\" = 'production' ]; then pnpm build && pnpm start; else pnpm dev; fi"
 
   # ===================================================================
   # MONITORING STACK

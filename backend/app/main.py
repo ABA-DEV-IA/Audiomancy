@@ -1,9 +1,4 @@
-"""
-Main entry point for the Audiomancy API backend using FastAPI.
-
-This module configures the FastAPI application instance, including CORS,
-custom exception handlers, API key security, Prometheus monitoring, and the various API route groups.
-"""
+"""Main entry point for the Audiomancy FastAPI backend."""
 
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends
@@ -36,26 +31,21 @@ redoc_url = "/redoc" if settings.swagger_on else None
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Lifespan context manager for startup and shutdown events"""
-    # Startup
-    logger.info("🚀 Starting Audiomancy Backend...")
+    """Lifespan context manager for startup and shutdown events."""
+    logger.info("Starting Audiomancy Backend...")
     await ensure_cache_indexes()
     start_scheduler()
-    logger.info("✅ Startup complete")
-    
+    logger.info("Startup complete")
+
     yield
-    
-    # Shutdown
-    logger.info("🛑 Shutting down Audiomancy Backend...")
+
+    logger.info("Shutting down...")
     stop_scheduler()
-    logger.info("✅ Shutdown complete")
+    logger.info("Shutdown complete")
 
 
 def create_app() -> FastAPI:
-    """
-    Create and configure the FastAPI application.
-    Monitoring is handled by Prometheus/Grafana stack (see docker-compose.monitoring.yml).
-    """
+    """Build and configure the FastAPI application."""
     fastapi_app = FastAPI(
         title="Audiomancy API",
         docs_url=docs_url,
@@ -63,7 +53,6 @@ def create_app() -> FastAPI:
         lifespan=lifespan
     )
 
-    # --- CORS ---
     fastapi_app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
@@ -71,25 +60,20 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
-
-    # --- Prometheus Metrics Middleware (C20) ---
     fastapi_app.add_middleware(PrometheusMiddleware)
-
-    # --- Custom Exceptions ---
     fastapi_app.add_exception_handler(RequestValidationError, validation_exception_handler)
 
-    # --- ROUTERS ---
-    # Public routes (no authentication required)
+    # Public routes
     fastapi_app.include_router(health_router)
-    fastapi_app.include_router(metrics_router)  # Prometheus metrics (C20)
+    fastapi_app.include_router(metrics_router)
 
-    # Protected routes
+    # Protected routes (require API key)
     protected = [Depends(get_api_key)]
     fastapi_app.include_router(jamendo_router, dependencies=protected)
     fastapi_app.include_router(ai_router, dependencies=protected)
     fastapi_app.include_router(user_router, dependencies=protected)
     fastapi_app.include_router(favorite_router, dependencies=protected)
-    fastapi_app.include_router(gdpr_router, dependencies=protected)  # GDPR/RGPD compliance (C20)
+    fastapi_app.include_router(gdpr_router, dependencies=protected)
 
     return fastapi_app
 

@@ -16,10 +16,6 @@ from app.services.ai.ai_agent import AIAgent, MAX_ITERATIONS, MAX_WEB_SEARCH
 from app.services.ai.ai_executor import ai_executor
 
 
-# ============================================================================
-# filter_final_answer tests
-# ============================================================================
-
 class TestFilterFinalAnswer:
     """Tests for the filter_final_answer utility."""
 
@@ -80,10 +76,6 @@ class TestFilterFinalAnswer:
         assert "fantasy" in result
         assert "Some extra text" not in result
 
-
-# ============================================================================
-# AIAgent tests
-# ============================================================================
 
 class TestAIAgent:
     """Tests for the AIAgent ReAct loop."""
@@ -172,10 +164,6 @@ class TestAIAgent:
         with pytest.raises(RuntimeError, match="DeepSeek generation failed"):
             agent.run("test prompt")
 
-
-# ============================================================================
-# ai_executor tests
-# ============================================================================
 
 class TestAIExecutor:
     """Tests for the ai_executor function."""

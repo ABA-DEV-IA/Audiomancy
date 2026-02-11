@@ -13,10 +13,6 @@ from unittest.mock import patch, MagicMock
 from app.core.config import Settings
 
 
-# ============================================================================
-# CORS origin tests
-# ============================================================================
-
 def test_cors_origins_with_allowed_origins():
     """If allowed_origins is defined, it should be split correctly."""
     settings = Settings(allowed_origins="http://foo.com,http://bar.com")
@@ -35,10 +31,6 @@ def test_cors_origins_single_origin():
     settings = Settings(allowed_origins="https://myapp.example.com")
     assert settings.cors_origins == ["https://myapp.example.com"]
 
-
-# ============================================================================
-# HashiCorp Vault loading tests
-# ============================================================================
 
 def test_load_from_vault_no_url(caplog):
     """Should skip vault loading when vault_url is not set."""

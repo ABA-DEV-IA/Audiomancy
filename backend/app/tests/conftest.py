@@ -1,21 +1,12 @@
 import os
 from dotenv import load_dotenv
 
-# ============================================
-# 1) Charger automatiquement le .env.test
-# ============================================
-
-# Si on est en mode test → charger .env.test avant les imports de l'app
+# Load .env.test before app imports so test settings take effect
 env_test_path = os.path.join(os.getcwd(), ".env.test")
 if os.path.exists(env_test_path):
     load_dotenv(env_test_path)
 else:
-    # Sécurité : éviter que les tests plantent si .env.test manquant
-    print("⚠️ WARNING: .env.test not found. Falling back to system env.")
-
-# ============================================
-# 2) Imports une fois les variables chargées
-# ============================================
+    print("WARNING: .env.test not found. Falling back to system env.")
 
 import pytest
 from fastapi.testclient import TestClient

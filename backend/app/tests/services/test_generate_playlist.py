@@ -2,10 +2,10 @@
 Integration tests for the AI-powered playlist generation route.
 
 Tests the POST /generate/playlist endpoint with different scenarios:
-- ✅ Normal case: agent generates tags and Jamendo returns a valid playlist.
-- ⚠️ Edge case: Jamendo returns no tracks for the given tags.
-- ❌ Failure case: the AI agent crashes, and the API responds with a 500 error.
-- 🚫 Validation case: invalid limit triggers 422 Unprocessable Entity.
+- Normal case: agent generates tags and Jamendo returns a valid playlist.
+- Edge case: Jamendo returns no tracks for the given tags.
+- Failure case: the AI agent crashes, and the API responds with a 500 error.
+- Validation case: invalid limit triggers 422 Unprocessable Entity.
 """
 
 import pytest
@@ -31,7 +31,7 @@ def fake_tracks():
 
 
 def test_generate_playlist_success(api_client, fake_tracks):
-    """✅ Normal case : agent generates tags and Jamendo returns a playlist"""
+    """Normal case: agent generates tags and Jamendo returns a playlist."""
     with patch("app.routes.ai_routes.ai_executor", return_value="calm,study"), \
          patch("app.routes.ai_routes.get_tracks_for_reader", return_value=fake_tracks):
 
@@ -48,7 +48,7 @@ def test_generate_playlist_success(api_client, fake_tracks):
 
 
 def test_generate_playlist_empty(api_client):
-    """⚠️ Cases where Jamendo does not return any tracks"""
+    """Edge case: Jamendo returns no tracks."""
     with patch("app.routes.ai_routes.ai_executor", return_value="calm,study"), \
          patch("app.routes.ai_routes.get_tracks_for_reader", return_value=[]):
 
@@ -64,7 +64,7 @@ def test_generate_playlist_empty(api_client):
 
 
 def test_generate_playlist_agent_failure(api_client):
-    """❌ Case where the agent crashes"""
+    """Failure case: the agent crashes."""
     with patch("app.routes.ai_routes.ai_executor", side_effect=Exception("Agent crashed")):
         response = api_client.post(
             "/generate/playlist",
@@ -83,7 +83,7 @@ def test_generate_playlist_invalid_limit(api_client):
     assert response.status_code == 422
     data = response.json()
 
-    # Ici data["detail"] est une string, pas une liste de dicts
+    # detail is a plain string, not a list of dicts
     assert isinstance(data["detail"], str)
     assert "limit must be one of 10, 25, or 50" in data["detail"]
 

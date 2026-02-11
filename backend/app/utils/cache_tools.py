@@ -1,18 +1,4 @@
-"""
-cache_tools.py
-
-Utilities for caching track data in MongoDB.
-Local MongoDB cache (replacement for Azure Blob Storage - azure_only_no_longer_usable_in_localhost).
-
-Key functions:
-- generate_cache_key: Create safe cache keys for categories or moods.
-- save_cache: Save data to MongoDB cache with optional TTL.
-- get_cache: Retrieve cached data from MongoDB.
-- delete_cache: Delete a cache entry.
-- list_caches: List all cache keys.
-
-All cache entries support automatic expiration using MongoDB TTL indexes.
-"""
+"""MongoDB caching utilities with TTL-based automatic expiration."""
 
 import logging
 from typing import Optional, List, Any
@@ -23,18 +9,12 @@ from app.core.db import cache_collection
 
 logger = logging.getLogger(__name__)
 
-# --- Internal prefix for cache keys ---
+# Prefix for all cache keys
 CACHE_PREFIX = "cache/"
 
 
 async def ensure_cache_indexes() -> None:
-    """
-    Ensure TTL index exists on the cache collection.
-    This allows automatic expiration of old cache entries.
-    
-    The TTL index is set on the 'expires_at' field.
-    MongoDB will automatically delete documents when expires_at is reached.
-    """
+    """Create the TTL index on the cache collection (idempotent)."""
     try:
         # Create TTL index (expireAfterSeconds=0 means expire at the specified date)
         await cache_collection.create_index("expires_at", expireAfterSeconds=0)
@@ -44,19 +24,7 @@ async def ensure_cache_indexes() -> None:
 
 
 def generate_cache_key(category: str) -> str:
-    """
-    Generate a safe cache key for a given category or mood.
-
-    Args:
-        category (str): Music category or mood name.
-
-    Returns:
-        str: Safe cache key with "cache/" prefix, e.g., "cache/rock_roll"
-
-    Notes:
-        - Converts all characters to lowercase.
-        - Non-alphanumeric characters are replaced with underscores.
-    """
+    """Generate a safe, lowercase cache key with 'cache/' prefix."""
     safe_name = "".join(c if c.isalnum() else "_" for c in category.strip().lower())
     return f"{CACHE_PREFIX}{safe_name}"
 
@@ -66,21 +34,7 @@ async def save_cache(
     data: Any,
     ttl_days: int = 1
 ) -> bool:
-    """
-    Save data to MongoDB cache with automatic expiration.
-
-    Args:
-        cache_key (str): Unique cache identifier (should include CACHE_PREFIX).
-        data (Any): Data to cache (will be stored as-is, typically a dict or list).
-        ttl_days (int): Time-to-live in days before auto-deletion. Defaults to 7 days.
-
-    Returns:
-        bool: True if save was successful, False otherwise.
-
-    Notes:
-        - Overwrites existing cache entries with the same key.
-        - MongoDB TTL index automatically deletes expired entries.
-    """
+    """Save data to MongoDB cache with automatic expiration (default: 1 day)."""
     try:
         expires_at = datetime.now(timezone.utc) + timedelta(days=ttl_days)
         
@@ -107,19 +61,7 @@ async def save_cache(
 
 
 async def get_cache(cache_key: str) -> Optional[Any]:
-    """
-    Retrieve cached data from MongoDB.
-
-    Args:
-        cache_key (str): Unique cache identifier (should include CACHE_PREFIX).
-
-    Returns:
-        Optional[Any]: Cached data if found and not expired, None otherwise.
-
-    Notes:
-        - Returns None if cache entry doesn't exist.
-        - Expired entries are automatically removed by MongoDB TTL index.
-    """
+    """Retrieve cached data if it exists and hasn't expired."""
     try:
         cache_entry = await cache_collection.find_one({"cache_key": cache_key})
         
@@ -141,18 +83,7 @@ async def get_cache(cache_key: str) -> Optional[Any]:
 
 
 async def delete_cache(cache_key: str) -> bool:
-    """
-    Delete a cache entry from MongoDB.
-
-    Args:
-        cache_key (str): Unique cache identifier (should include CACHE_PREFIX).
-
-    Returns:
-        bool: True if deletion was successful, False otherwise.
-
-    Notes:
-        - No error is raised if the cache entry doesn't exist.
-    """
+    """Delete a single cache entry by key."""
     try:
         result = await cache_collection.delete_one({"cache_key": cache_key})
         
@@ -169,18 +100,7 @@ async def delete_cache(cache_key: str) -> bool:
 
 
 async def list_caches(prefix: Optional[str] = None) -> List[str]:
-    """
-    List all cache keys in MongoDB.
-
-    Args:
-        prefix (Optional[str]): Optional prefix filter for cache keys.
-
-    Returns:
-        List[str]: List of cache keys.
-
-    Notes:
-        - Returns empty list if no caches found or on error.
-    """
+    """List all cache keys, optionally filtered by prefix."""
     try:
         query = {}
         if prefix:
@@ -198,15 +118,7 @@ async def list_caches(prefix: Optional[str] = None) -> List[str]:
 
 
 async def clear_expired_caches() -> int:
-    """
-    Manually clear all expired cache entries.
-    
-    This is a utility function; MongoDB TTL index handles this automatically,
-    but this can be useful for immediate cleanup or testing.
-    
-    Returns:
-        int: Number of deleted entries.
-    """
+    """Manually purge expired cache entries (TTL index handles this too)."""
     try:
         result = await cache_collection.delete_many({
             "expires_at": {"$lt": datetime.now(timezone.utc)}

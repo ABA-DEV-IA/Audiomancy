@@ -1,12 +1,4 @@
-"""
-Service layer for managing user favorites (playlists).
-
-Provides CRUD operations for favorite playlists stored in MongoDB:
-- create_favorite_service: Save a new playlist to favorites
-- delete_favorite_service: Remove a favorite playlist
-- list_favorites_service: List all favorites for a user
-- rename_favorite_service: Rename an existing favorite playlist
-"""
+"""CRUD operations for favorite playlists stored in MongoDB."""
 
 from app.core.db import favorite_collection
 from app.models.favorite import Favorite, FavoriteCreateRequest, FavoriteResponse, FavoriteRenameRequest
@@ -19,18 +11,7 @@ from bson.errors import InvalidId
 
 
 async def create_favorite_service(request: FavoriteCreateRequest) -> FavoriteResponse:
-    """
-    Create a new favorite playlist for a user.
-
-    Args:
-        request (Favorite): The favorite data including user_id, name, and track_list.
-
-    Raises:
-        HTTPException(400): If a favorite with the same name already exists for this user.
-
-    Returns:
-        FavoriteResponse: Response containing the created favorite.
-    """
+    """Create a new favorite playlist. Raises 400 if name already exists."""
 
     existing = await favorite_collection.find_one({
         "user_id": request.user_id,
@@ -60,19 +41,7 @@ async def create_favorite_service(request: FavoriteCreateRequest) -> FavoriteRes
 
 
 async def delete_favorite_service(favorite_id: str, user_id: str) -> FavoriteResponse:
-    """
-    Delete a favorite playlist by ID.
-
-    Args:
-        favorite_id (str): The ObjectId of the favorite to delete.
-        user_id (str): The user's ID (ownership check).
-
-    Raises:
-        HTTPException(404): If the favorite is not found.
-
-    Returns:
-        FavoriteResponse: Confirmation of deletion.
-    """
+    """Delete a favorite by ID with ownership check."""
     
     try:
         oid = ObjectId(favorite_id)
@@ -94,15 +63,7 @@ async def delete_favorite_service(favorite_id: str, user_id: str) -> FavoriteRes
 
 
 async def list_favorites_service(user_id: str):
-    """
-    List all favorite playlists for a given user.
-
-    Args:
-        user_id (str): The user's ID.
-
-    Returns:
-        List[Favorite]: List of the user's favorite playlists.
-    """
+    """Return all favorite playlists for a given user."""
 
     favorites = await favorite_collection.find({"user_id": user_id}).to_list(None)
 
@@ -113,19 +74,7 @@ async def list_favorites_service(user_id: str):
 
 
 async def rename_favorite_service(request: FavoriteRenameRequest) -> FavoriteResponse:
-    """
-    Rename an existing favorite playlist.
-
-    Args:
-        request (FavoriteRenameRequest): Contains favorite_id, user_id, and new_name.
-
-    Raises:
-        HTTPException(400): If the new name is already in use.
-        HTTPException(404): If the favorite is not found.
-
-    Returns:
-        FavoriteResponse: Confirmation of rename.
-    """
+    """Rename an existing favorite. Raises 400 if the new name is taken."""
 
     existing = await favorite_collection.find_one({
         "user_id": request.user_id,

@@ -1,7 +1,4 @@
-"""
-Prometheus metrics endpoint for monitoring.
-Exposes application and system metrics for Prometheus scraping.
-"""
+"""Prometheus metrics endpoint and metric definitions."""
 
 from fastapi import APIRouter, Response
 from prometheus_client import (
@@ -16,9 +13,7 @@ from prometheus_client import (
 
 router = APIRouter(tags=["Metrics"])
 
-# ============================================================================
-# HTTP Metrics
-# ============================================================================
+# HTTP metrics
 
 http_requests_total = Counter(
     "http_requests_total",
@@ -34,33 +29,7 @@ http_request_duration_seconds = Histogram(
     registry=REGISTRY
 )
 
-# ============================================================================
-# System Metrics - DÉSACTIVÉ
-# ============================================================================
-# Ces métriques sont déjà collectées automatiquement par prometheus_client
-# Pas besoin de les redéfinir (évite DuplicatedTimeseries error)
-
-# process_cpu_seconds_total = Counter(
-#     "process_cpu_seconds_total",
-#     "Total CPU time consumed by the process",
-#     registry=REGISTRY
-# )
-
-# process_resident_memory_bytes = Gauge(
-#     "process_resident_memory_bytes",
-#     "Resident memory size in bytes",
-#     registry=REGISTRY
-# )
-
-# process_virtual_memory_bytes = Gauge(
-#     "process_virtual_memory_bytes",
-#     "Virtual memory size in bytes",
-#     registry=REGISTRY
-# )
-
-# ============================================================================
-# MongoDB Cache Metrics
-# ============================================================================
+# MongoDB cache metrics
 
 cache_operations_total = Counter(
     "cache_operations_total",
@@ -75,9 +44,7 @@ cache_hit_ratio = Gauge(
     registry=REGISTRY
 )
 
-# ============================================================================
-# AI/LLM Metrics (DeepSeek)
-# ============================================================================
+# DeepSeek / LLM metrics
 
 deepseek_requests_total = Counter(
     "deepseek_requests_total",
@@ -107,9 +74,7 @@ deepseek_errors_total = Counter(
     registry=REGISTRY
 )
 
-# ============================================================================
-# Jamendo API Metrics
-# ============================================================================
+# Jamendo API metrics
 
 jamendo_requests_total = Counter(
     "jamendo_requests_total",
@@ -124,9 +89,7 @@ jamendo_latency_seconds = Histogram(
     registry=REGISTRY
 )
 
-# ============================================================================
-# User Authentication Metrics (RGPD/Security)
-# ============================================================================
+# Authentication & GDPR metrics
 
 auth_attempts_total = Counter(
     "auth_attempts_total",
@@ -142,9 +105,7 @@ personal_data_access_total = Counter(
     registry=REGISTRY
 )
 
-# ============================================================================
-# Application Info
-# ============================================================================
+# Application info
 
 app_info = Gauge(
     "audiomancy_info",
@@ -157,51 +118,8 @@ app_info = Gauge(
 app_info.labels(version="1.0.0", service="audiomancy-backend").set(1)
 
 
-# ============================================================================
-# Metrics Update Functions
-# ============================================================================
-
-def update_system_metrics():
-    """Update system metrics (CPU, memory) - DÉSACTIVÉ"""
-    # Ces métriques sont automatiquement collectées par prometheus_client
-    # Pas besoin de les mettre à jour manuellement
-    pass
-
-    # process = psutil.Process()
-    # cpu_times = process.cpu_times()
-    # process_cpu_seconds_total.inc(cpu_times.user + cpu_times.system)
-    # memory_info = process.memory_info()
-    # process_resident_memory_bytes.set(memory_info.rss)
-    # process_virtual_memory_bytes.set(memory_info.vms)
-
-
-# ============================================================================
-# Metrics Endpoint
-# ============================================================================
-
 @router.get("/metrics")
 def metrics():
-    """
-    Prometheus metrics endpoint.
-
-    Exposes application, system, and business metrics in Prometheus format.
-    This endpoint is scraped by Prometheus every 15 seconds (configured in prometheus.yml).
-
-    Metrics categories:
-    - HTTP: Request counts, latency, status codes
-    - System: CPU usage, memory consumption
-    - Cache: MongoDB cache hit/miss ratio
-    - AI: DeepSeek API calls, latency, token usage
-    - External APIs: Jamendo API metrics
-    - Security: Authentication attempts, personal data access (RGPD)
-    """
-    # Update system metrics before generating output
-    update_system_metrics()
-
-    # Generate Prometheus metrics format
+    """Expose all Prometheus metrics for scraping."""
     metrics_output = generate_latest(REGISTRY)
-
-    return Response(
-        content=metrics_output,
-        media_type=CONTENT_TYPE_LATEST
-    )
+    return Response(content=metrics_output, media_type=CONTENT_TYPE_LATEST)

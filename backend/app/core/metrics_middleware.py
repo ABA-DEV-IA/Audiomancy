@@ -1,6 +1,4 @@
-"""
-Prometheus metrics middleware for automatic HTTP metrics collection.
-"""
+"""Prometheus middleware for automatic HTTP request metrics collection."""
 
 import time
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -9,13 +7,7 @@ from app.routes.metrics_routes import http_requests_total, http_request_duration
 
 
 class PrometheusMiddleware(BaseHTTPMiddleware):
-    """
-    Middleware to automatically collect HTTP request metrics.
-
-    Collects:
-    - http_requests_total: Counter of requests by method/endpoint/status
-    - http_request_duration_seconds: Histogram of request duration
-    """
+    """Collect request count and duration for every HTTP request."""
 
     async def dispatch(self, request: Request, call_next):
         # Skip metrics collection for the /metrics endpoint itself

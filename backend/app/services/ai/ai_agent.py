@@ -1,16 +1,6 @@
-"""
-AI agent module using DeepSeek with a custom ReAct execution loop.
+"""Custom ReAct-based AI agent using DeepSeek for music tag generation."""
 
-This agent follows a ReAct-style prompting strategy:
-- Thought
-- Action (web_search)
-- Observation
-- Final Answer
-
-The system prompt is loaded from an external text file to keep
-prompt engineering decoupled from application logic.
-"""
-
+import logging
 from pathlib import Path
 from typing import Optional
 
@@ -18,34 +8,19 @@ from app.services.ai.tools.web_search import web_search
 from app.services.ai.utils.deepseek_client import DeepSeekClient
 from app.services.ai.utils.filter_final_answer import filter_final_answer
 
+logger = logging.getLogger(__name__)
 
-# ---------------------------------------------------------------------
-# 🔧 AGENT CONFIGURATION
-# ---------------------------------------------------------------------
 MAX_WEB_SEARCH = 3
 MAX_ITERATIONS = 5
 
 SYSTEM_PROMPT_PATH = Path(__file__).parent / "utils" / "system_prompt.txt"
 
-
-# ---------------------------------------------------------------------
-# 🔹 Load system prompt from file
-# ---------------------------------------------------------------------
 with SYSTEM_PROMPT_PATH.open("r", encoding="utf-8") as f:
     system_prompt = f.read()
 
 
 class AIAgent:
-    """
-    Custom ReAct-based AI agent using DeepSeek as the LLM backend.
-
-    This agent:
-    - Executes a bounded ReAct loop
-    - Uses web_search as an external tool
-    - Enforces limits on iterations and tool usage
-    - Extracts a clean "Final Answer" at the end
-    - Logs all interactions for debugging
-    """
+    """ReAct-based agent: bounded loop with web_search as external tool."""
 
     def __init__(self, verbose: bool = True):
         self.verbose = verbose
@@ -53,19 +28,10 @@ class AIAgent:
 
     def _log(self, message: str) -> None:
         if self.verbose:
-            print(message)
+            logger.debug(message)
 
     def _build_llm_input(self, prompt: str, scratchpad: str) -> str:
-        """
-        Build the full input sent to the LLM, replacing placeholders.
-
-        Args:
-            prompt (str): User question.
-            scratchpad (str): Accumulated Thought/Observation history.
-
-        Returns:
-            str: Fully formatted LLM input ready for DeepSeek.
-        """
+        """Build the full LLM input by replacing placeholders in the system prompt."""
         filled_prompt = system_prompt.replace("{tools}", "web_search") \
                                      .replace("{tool_names}", "web_search") \
                                      .replace("{agent_scratchpad}", scratchpad)
@@ -96,16 +62,12 @@ class AIAgent:
 
             self._log(f"[DeepSeek Response]\n{response[:1000]}{'...' if len(response) > 1000 else ''}\n")
 
-            # ----------------------------------------------------------
-            # ✅ Final Answer → stop execution
-            # ----------------------------------------------------------
+            # Final Answer detected — stop execution
             if "Final Answer:" in response:
                 self._log("[Final Answer detected]")
                 return filter_final_answer(response)
 
-            # ----------------------------------------------------------
-            # 🔧 Tool call: web_search
-            # ----------------------------------------------------------
+            # Tool call: web_search
             if "Action: web_search" in response:
                 if web_search_count >= MAX_WEB_SEARCH:
                     self._log("[Max web_search reached → forcing output]")
@@ -133,13 +95,9 @@ Observation: {observation}
 """
                 continue
 
-            # ----------------------------------------------------------
-            # 🟡 Intermediate reasoning (Thought only)
-            # ----------------------------------------------------------
+            # Intermediate reasoning — append to scratchpad
             scratchpad += f"\n{response}"
 
-        # --------------------------------------------------------------
-        # 🔁 Safety fallback
-        # --------------------------------------------------------------
-        self._log("[Max iterations reached → fallback]")
+        # Max iterations reached
+        self._log("[Max iterations reached — fallback]")
         return filter_final_answer(scratchpad)

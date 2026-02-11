@@ -1,15 +1,12 @@
-"""
-Module providing the function filtering the final response from the agent
-"""
+"""Utility to extract and validate the Final Answer from the AI agent output."""
+
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 def filter_final_answer(text: str) -> str:
-    """
-    Extracts and validates the 'Final Answer' line from the agent output.
-
-    Ensures:
-    - Only the content after 'Final Answer:' is returned
-    - Exactly 7 space-separated tags
-    """
+    """Extract the 'Final Answer:' line and ensure at most 7 tags."""
 
     final_answer = None
 
@@ -19,20 +16,17 @@ def filter_final_answer(text: str) -> str:
             break
 
     if not final_answer:
-        print("⚠️  [FILTER DEBUG] No 'Final Answer:' found in response")
+        logger.warning("No 'Final Answer:' found in response")
         return text.strip()
 
-    print(f"✅ [FILTER DEBUG] Raw Final Answer: {final_answer}")
+    logger.debug("Raw Final Answer: %s", final_answer)
 
-    # 🔒 Normalisation et sécurité
     tags = final_answer.split()
-
-    # Si le modèle dévie, on coupe proprement
     if len(tags) > 7:
-        print(f"⚠️  [FILTER DEBUG] Truncating {len(tags)} tags to 7")
+        logger.debug("Truncating %d tags to 7", len(tags))
         tags = tags[:7]
 
     result = " ".join(tags)
-    print(f"🎯 [FILTER DEBUG] Extracted Tags ({len(tags)}): {result}")
-    
+    logger.debug("Extracted tags (%d): %s", len(tags), result)
+
     return result

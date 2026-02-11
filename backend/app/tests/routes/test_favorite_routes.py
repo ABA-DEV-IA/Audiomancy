@@ -17,10 +17,6 @@ HEADERS = {"X-API-KEY": settings.api_key}
 client = TestClient(app)
 
 
-# ---------------------------------------------------------------------------
-# Fixtures
-# ---------------------------------------------------------------------------
-
 SAMPLE_FAVORITE = Favorite(
     id="fav123",
     user_id="user456",
@@ -55,10 +51,6 @@ def mock_favorite_services(monkeypatch):
     monkeypatch.setattr("app.routes.favorite_routes.rename_favorite_service", fake_rename)
 
 
-# ---------------------------------------------------------------------------
-# POST /favorite/create
-# ---------------------------------------------------------------------------
-
 def test_create_favorite():
     """Creating a favorite returns 201 with success response."""
     payload = {
@@ -87,10 +79,6 @@ def test_create_favorite_no_api_key():
     assert response.status_code == 403
 
 
-# ---------------------------------------------------------------------------
-# DELETE /favorite/delete/{favorite_id}
-# ---------------------------------------------------------------------------
-
 def test_delete_favorite():
     """Deleting a favorite returns 200 with success response."""
     response = client.delete(
@@ -110,10 +98,6 @@ def test_delete_favorite_no_api_key():
     assert response.status_code == 403
 
 
-# ---------------------------------------------------------------------------
-# GET /favorite/list/{user_id}
-# ---------------------------------------------------------------------------
-
 def test_list_favorites():
     """Listing favorites returns a list of favorites."""
     response = client.get("/favorite/list/user456", headers=HEADERS)
@@ -129,10 +113,6 @@ def test_list_favorites_no_api_key():
     response = client.get("/favorite/list/user456")
     assert response.status_code == 403
 
-
-# ---------------------------------------------------------------------------
-# PUT /favorite/rename
-# ---------------------------------------------------------------------------
 
 def test_rename_favorite():
     """Renaming a favorite returns 200 with success response."""
