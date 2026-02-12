@@ -11,7 +11,7 @@ from bson.errors import InvalidId
 
 
 async def create_favorite_service(request: FavoriteCreateRequest) -> FavoriteResponse:
-    """Create a new favorite playlist. Raises 400 if name already exists."""
+    """Save playlist to user favorites."""
 
     existing = await favorite_collection.find_one({
         "user_id": request.user_id,
@@ -41,7 +41,7 @@ async def create_favorite_service(request: FavoriteCreateRequest) -> FavoriteRes
 
 
 async def delete_favorite_service(favorite_id: str, user_id: str) -> FavoriteResponse:
-    """Delete a favorite by ID with ownership check."""
+    """Delete favorite playlist by ID."""
     
     try:
         oid = ObjectId(favorite_id)
@@ -63,7 +63,7 @@ async def delete_favorite_service(favorite_id: str, user_id: str) -> FavoriteRes
 
 
 async def list_favorites_service(user_id: str):
-    """Return all favorite playlists for a given user."""
+    """Get all user favorite playlists."""
 
     favorites = await favorite_collection.find({"user_id": user_id}).to_list(None)
 
@@ -74,7 +74,7 @@ async def list_favorites_service(user_id: str):
 
 
 async def rename_favorite_service(request: FavoriteRenameRequest) -> FavoriteResponse:
-    """Rename an existing favorite. Raises 400 if the new name is taken."""
+    """Rename favorite playlist."""
 
     existing = await favorite_collection.find_one({
         "user_id": request.user_id,

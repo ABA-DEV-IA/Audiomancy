@@ -1,4 +1,4 @@
-"""Business logic for fetching and formatting Jamendo tracks."""
+"""Fetch and format Jamendo tracks with caching."""
 
 import logging
 import asyncio
@@ -20,7 +20,7 @@ async def get_tracks_for_reader(
     limit: int = 10,
     track_id: Optional[str] = None,
 ) -> List[JamendoTrackResponse]:
-    """Fetch and format tracks from Jamendo, with optional MongoDB cache."""
+    """Fetch tracks from Jamendo with MongoDB caching."""
 
     logger.info(
         "Fetching tracks with params: tags=%s, duration_min=%d, duration_max=%d, limit=%d, track_id=%s",

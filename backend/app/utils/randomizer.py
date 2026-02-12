@@ -1,11 +1,11 @@
-"""Random selection helpers for tags and tracks."""
+"""Random sampling utilities for tags and tracks."""
 
 import random
 from typing import List, Dict, Any
 
 
 def choose_random_tags(tags: str, max_tags: int = 3) -> str:
-    """Pick up to `max_tags` random tags from a space-separated string."""
+    """Sample random tags from space-separated string."""
     tag_list = tags.split() if tags else []
     if not tag_list:
         return ""
@@ -14,7 +14,7 @@ def choose_random_tags(tags: str, max_tags: int = 3) -> str:
 
 
 def sample_tracks(tracks: List[Dict[str, Any]], limit: int) -> List[Dict[str, Any]]:
-    """Return a random subset of up to `limit` tracks."""
+    """Sample random subset of tracks."""
     if not tracks:
         return []
     if len(tracks) > limit:

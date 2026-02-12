@@ -1,4 +1,4 @@
-"""Application settings loaded from .env and optionally overridden by HashiCorp Vault."""
+"""Settings from .env with optional HashiCorp Vault overrides."""
 
 from typing import Optional, List
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class Settings(BaseSettings):
-    """All configuration values, loaded from .env then optionally from Vault."""
+    """Application configuration with Vault secret management."""
 
     # CORS
     allowed_origins: Optional[str] = None
@@ -54,11 +54,7 @@ class Settings(BaseSettings):
     )
 
     def load_from_vault(self, force_reload: bool = False) -> None:
-        """Load secrets from HashiCorp Vault and override corresponding settings.
-
-        Does nothing if vault_url/vault_token are not configured.
-        Results are cached in memory to avoid repeated calls.
-        """
+        """Load secrets from Vault and cache them (skips if no vault_url/token)."""
 
         if not self.vault_url or not self.vault_token:
             logger.info("No Vault URL or token provided. Using .env values only.")
@@ -140,7 +136,7 @@ class Settings(BaseSettings):
 
     @property
     def cors_origins(self) -> List[str]:
-        """Parse comma-separated allowed_origins into a list for CORSMiddleware."""
+        """Parse CORS origins from comma-separated string."""
         if self.allowed_origins:
             return [origin.strip() for origin in self.allowed_origins.split(",")]
 

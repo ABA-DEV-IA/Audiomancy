@@ -1,4 +1,4 @@
-"""Normalize and format raw Jamendo track data."""
+"""Format Jamendo track data with license normalization."""
 from typing import Dict, Any
 from typing import List
 from urllib.parse import urlparse, urlunparse
@@ -6,13 +6,7 @@ from app.utils.license import LICENSE_MAP
 
 
 def normalize_license_url(url: str) -> str:
-    """
-    Converts a Jamendo license URL to a normalized base form by:
-    - enforcing HTTPS
-    - removing region-specific suffixes (e.g., /be/, /fr/)
-
-    This form is used to match against LICENSE_MAP keys.
-    """
+    """Normalize license URL to HTTPS and remove regional suffixes."""
 
     if not url:
         return ""
@@ -28,10 +22,7 @@ def normalize_license_url(url: str) -> str:
 
 
 def format_jamendo_track(track: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Format a raw Jamendo track dictionary into a clean JSON structure,
-    with a human-readable license name and regionalized license URL.
-    """
+    """Format track data with normalized license info."""
     raw_license_url = track.get("license_ccurl")
     # Normalize to find the license name
     normalized_url = normalize_license_url(raw_license_url)
@@ -56,12 +47,10 @@ def format_jamendo_track(track: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def format_jamendo_tracks(tracks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """
-    Format a list of raw Jamendo track dictionaries.
-    """
+    """Format list of track dictionaries."""
     return [format_jamendo_track(track) for track in tracks]
 
 
 def mongo_to_user_doc(document: Dict[str, Any]) -> Dict[str, Any]:
-    """Convert a MongoDB document to a dict with string id."""
+    """Convert MongoDB _id to string id field."""
     return {**document, "id": str(document["_id"])} if "_id" in document else document

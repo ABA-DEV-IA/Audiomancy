@@ -1,4 +1,4 @@
-"""Utility to extract and validate the Final Answer from the AI agent output."""
+"""Extract and validate Final Answer from AI agent output."""
 
 import logging
 
@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 
 
 def filter_final_answer(text: str) -> str:
-    """Extract the 'Final Answer:' line and ensure at most 7 tags."""
+    """Extract Final Answer and limit to 7 tags."""
 
     final_answer = None
 

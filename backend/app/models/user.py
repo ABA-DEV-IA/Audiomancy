@@ -4,9 +4,7 @@ from pydantic import BaseModel, Field, EmailStr, ConfigDict
 
 
 class User(BaseModel):
-    """
-    Represents a user stored in the database.
-    """
+    """User database model."""
     id: str
     email: EmailStr
     username: str
@@ -17,9 +15,7 @@ class User(BaseModel):
 
 
 class UserCreate(BaseModel):
-    """
-    Represents a user object ready to be inserted into the database.
-    """
+    """User creation model for database insertion."""
     email: EmailStr
     username: str
     password_hash: str
@@ -27,37 +23,27 @@ class UserCreate(BaseModel):
 
 
 class UserCreateRequest(BaseModel):
-    """
-    Request model for creating a new user (API input).
-    """
+    """User registration request with plaintext password."""
     email: EmailStr
     username: str
     password: str
 
 
 class UserLoginRequest(BaseModel):
-    """
-    Request model for user login (API input).
-    """
+    """Login request with email and password."""
     email: EmailStr
     password: str
 
 
 class UserUpdateRequest(BaseModel):
-    """
-    Request model for updating an existing user.
-    Only fields provided will be updated.
-    """
+    """Update user profile (username and/or password)."""
     id: str
     username: Optional[str] = None
     password: Optional[str] = None
 
 
 class UserPublic(BaseModel):
-    """
-    Public user model without sensitive fields (password_hash).
-    Used in API responses to avoid leaking credentials.
-    """
+    """User model without password hash for API responses."""
     id: str
     email: EmailStr
     username: str
@@ -65,9 +51,7 @@ class UserPublic(BaseModel):
 
 
 class UserResponse(BaseModel):
-    """
-    Standard response model for user operations.
-    """
+    """Standard response for user operations."""
     success: bool
     message: str
     user: Optional[UserPublic] = None

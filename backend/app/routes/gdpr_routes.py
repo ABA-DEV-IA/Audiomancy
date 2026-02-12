@@ -13,19 +13,19 @@ router = APIRouter(prefix="/gdpr", tags=["GDPR"])
 
 
 class DataExportRequest(BaseModel):
-    """Request model for data export"""
+    """GDPR data export request."""
     email: EmailStr
 
 
 class AccountDeletionRequest(BaseModel):
-    """Request model for account deletion"""
+    """Account deletion request requiring explicit confirmation."""
     email: EmailStr
-    confirmation: str  # User must type "DELETE" to confirm
+    confirmation: str
 
 
 @router.post("/data-export", status_code=status.HTTP_200_OK)
 async def export_user_data(request: DataExportRequest) -> Dict[str, Any]:
-    """Export all personal data for a user (GDPR Article 15)."""
+    """Export all user data (GDPR Article 15)."""
     logger.info(
         "GDPR data export request received",
         extra={"endpoint": "/gdpr/data-export", "email": request.email}
@@ -88,7 +88,7 @@ async def export_user_data(request: DataExportRequest) -> Dict[str, Any]:
 
 @router.delete("/account", status_code=status.HTTP_200_OK)
 async def delete_user_account(request: AccountDeletionRequest) -> Dict[str, Any]:
-    """Permanently delete a user account and all associated data (GDPR Article 17)."""
+    """Delete account and all associated data (GDPR Article 17)."""
     logger.warning(
         "GDPR account deletion request received",
         extra={"endpoint": "/gdpr/account", "email": request.email}
@@ -154,7 +154,7 @@ async def delete_user_account(request: AccountDeletionRequest) -> Dict[str, Any]
 
 @router.get("/data-retention-policy", status_code=status.HTTP_200_OK)
 async def get_data_retention_policy() -> Dict[str, Any]:
-    """Return the data retention policy (GDPR Article 13)."""
+    """Get data retention policy (GDPR Article 13)."""
     logger.info("Data retention policy requested")
 
     return {

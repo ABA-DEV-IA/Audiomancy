@@ -1,6 +1,4 @@
-"""
-Database module for MongoDB connection and collections using Motor.
-"""
+"""MongoDB connection and collections using Motor async driver."""
 
 from urllib.parse import quote_plus
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -33,7 +31,7 @@ favorite_collection = db["favorite"]
 cache_collection = db["cache"]
 
 async def check_connection() -> bool:
-    """Ping MongoDB to verify the connection is alive."""
+    """Verify MongoDB connection with ping."""
     try:
         await client.admin.command("ping")
         return True

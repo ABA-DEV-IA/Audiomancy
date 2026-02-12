@@ -12,7 +12,7 @@ router = APIRouter(prefix="/jamendo", tags=["Jamendo"])
 
 @router.post("/tracks", response_model=List[JamendoTrackResponse])
 async def get_jamendo_tracks(request: JamendoTrackRequest):
-    """Fetch a music playlist from Jamendo based on tags and duration range."""
+    """Fetch tracks from Jamendo by tags and duration."""
     logger.info(
         "Jamendo tracks request received",
         extra={

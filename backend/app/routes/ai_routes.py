@@ -13,7 +13,7 @@ router = APIRouter(prefix="/generate", tags=["Generate"])
 
 @router.post("/playlist", response_model=List[GeneratedTrack])
 async def generate_playlist(prompt: PromptRequest):
-    """Generate a playlist from a natural language prompt using DeepSeek + Jamendo."""
+    """Generate playlist from natural language prompt."""
     logger.info(
         "Playlist generation request received",
         extra={

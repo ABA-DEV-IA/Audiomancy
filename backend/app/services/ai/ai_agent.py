@@ -1,4 +1,4 @@
-"""Custom ReAct-based AI agent using DeepSeek for music tag generation."""
+"""ReAct agent for music tag generation with DeepSeek and web search."""
 
 import logging
 from pathlib import Path
@@ -20,7 +20,7 @@ with SYSTEM_PROMPT_PATH.open("r", encoding="utf-8") as f:
 
 
 class AIAgent:
-    """ReAct-based agent: bounded loop with web_search as external tool."""
+    """ReAct agent with bounded iteration loop and web search tool."""
 
     def __init__(self, verbose: bool = True):
         self.verbose = verbose
@@ -31,7 +31,7 @@ class AIAgent:
             logger.debug(message)
 
     def _build_llm_input(self, prompt: str, scratchpad: str) -> str:
-        """Build the full LLM input by replacing placeholders in the system prompt."""
+        """Build LLM input with system prompt and scratchpad."""
         filled_prompt = system_prompt.replace("{tools}", "web_search") \
                                      .replace("{tool_names}", "web_search") \
                                      .replace("{agent_scratchpad}", scratchpad)

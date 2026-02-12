@@ -22,7 +22,7 @@ router = APIRouter(prefix="/user", tags=["Users"])
 
 @router.post("/create", status_code=status.HTTP_201_CREATED, response_model=UserResponse)
 async def create_user(request: UserCreateRequest) -> UserResponse:
-    """Register a new user."""
+    """Create a new user account."""
     logger.info(
         "User creation request received",
         extra={"endpoint": "/user/create", "email": request.email}
@@ -45,7 +45,7 @@ async def create_user(request: UserCreateRequest) -> UserResponse:
 
 @router.post("/login", status_code=status.HTTP_200_OK, response_model=UserResponse)
 async def login_user(request: UserLoginRequest) -> UserResponse:
-    """Authenticate a user with email and password."""
+    """Authenticate user with email and password."""
     logger.info(
         "Login attempt",
         extra={"endpoint": "/user/login", "email": request.email}
@@ -71,5 +71,5 @@ async def login_user(request: UserLoginRequest) -> UserResponse:
 
 @router.put("/modify", status_code=status.HTTP_200_OK, response_model=UserResponse)
 async def update_user(request: UserUpdateRequest) -> UserResponse:
-    """Update an existing user's profile."""
+    """Update user profile."""
     return await update_user_service(request)

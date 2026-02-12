@@ -1,9 +1,4 @@
-"""
-APScheduler configuration for periodic background tasks.
-
-Provides daily scheduled jobs (e.g. category refresh) using
-APScheduler's BackgroundScheduler in a separate thread.
-"""
+"""APScheduler for daily background tasks like category refresh."""
 
 import logging
 from datetime import datetime, timezone
@@ -25,11 +20,7 @@ scheduler = BackgroundScheduler()
 
 
 def update_daily_categories(run_date: Optional[datetime] = None) -> None:
-    """Call the frontend API to refresh daily music categories.
-
-    Runs every day at midnight UTC. Detects late execution
-    and logs a warning if the job is > 60s behind schedule.
-    """
+    """Refresh daily music categories via frontend API (runs at midnight UTC)."""
     now = datetime.now(timezone.utc)
     if run_date:
         delay = (now - run_date).total_seconds()
@@ -62,7 +53,7 @@ def update_daily_categories(run_date: Optional[datetime] = None) -> None:
 
 
 def job_listener(event: JobExecutionEvent) -> None:
-    """Log APScheduler job events (success, error, missed)."""
+    """Log scheduler job events."""
     if event.exception:
         logger.error("Job %s failed: %s", event.job_id, event.exception)
     elif event.code == EVENT_JOB_MISSED:
@@ -70,11 +61,7 @@ def job_listener(event: JobExecutionEvent) -> None:
 
 
 def start_scheduler() -> None:
-    """Start the APScheduler with all configured jobs.
-
-    Registers the daily category update job at midnight UTC with
-    a 1-hour misfire grace period and coalescing enabled.
-    """
+    """Start scheduler with daily category update job."""
     if scheduler.running:
         logger.warning("Scheduler already running")
         return
@@ -102,7 +89,7 @@ def start_scheduler() -> None:
 
 
 def stop_scheduler() -> None:
-    """Gracefully shut down the scheduler, waiting for running jobs."""
+    """Stop scheduler and wait for running jobs to complete."""
     if scheduler.running:
         scheduler.shutdown(wait=True)
         logger.info("APScheduler stopped")

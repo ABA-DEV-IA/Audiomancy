@@ -1,6 +1,4 @@
-"""
-Health check and system status routes.
-"""
+"""Health check and scheduler status routes."""
 
 from fastapi import APIRouter
 from app.core.scheduler import scheduler
@@ -10,13 +8,13 @@ router = APIRouter(prefix="/health", tags=["Health"])
 
 @router.get("/")
 def health_check():
-    """Basic health check endpoint"""
+    """Basic health check."""
     return {"status": "healthy", "service": "audiomancy-backend"}
 
 
 @router.get("/scheduler")
 def scheduler_status():
-    """Check APScheduler status"""
+    """Get scheduler status and active jobs."""
     if not scheduler.running:
         return {
             "status": "inactive",

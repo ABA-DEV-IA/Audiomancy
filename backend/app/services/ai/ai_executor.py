@@ -1,7 +1,4 @@
-"""AI Executor — top-level entry point for the AI pipeline.
-
-Orchestrates: user prompt -> ReAct agent (DeepSeek) -> tag filtering -> Jamendo-ready result.
-"""
+"""AI pipeline orchestrator: prompt → ReAct agent → filtered tags."""
 
 import logging
 
@@ -13,7 +10,7 @@ AI_AGENT = AIAgent()
 
 
 def ai_executor(prompt: str) -> str:
-    """Run the full AI pipeline and return filtered music tags."""
+    """Execute AI pipeline and return music tags."""
     response = AI_AGENT.run(prompt)
     logger.info("Returning tags to Jamendo: '%s'", response)
     return response

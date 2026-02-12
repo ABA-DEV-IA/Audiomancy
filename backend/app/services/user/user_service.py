@@ -22,24 +22,22 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def mongo_to_user_doc(document: Dict[str, Any]) -> Dict[str, Any]:
-    """Convert a MongoDB document to a dict with string 'id' field."""
+    """Convert MongoDB document _id to string id field."""
     return {**document, "id": str(document["_id"])} if "_id" in document else document
 
 
 def hash_password(password: str) -> str:
-    """Hash a plain-text password with bcrypt."""
+    """Hash password with bcrypt."""
     return pwd_context.hash(password)
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Check a plain-text password against a bcrypt hash."""
+    """Verify password against bcrypt hash."""
     return pwd_context.verify(plain_password, hashed_password)
 
 
 def _user_to_public(doc: dict) -> UserPublic:
-    """
-    Convert a MongoDB user document to a UserPublic model (no password_hash).
-    """
+    """Convert user document to public model without password hash."""
     user_doc = mongo_to_user_doc(doc)
     return UserPublic(
         id=user_doc["id"],
@@ -50,7 +48,7 @@ def _user_to_public(doc: dict) -> UserPublic:
 
 
 async def create_user_service(request: UserCreateRequest) -> UserResponse:
-    """Create a new user. Raises 400 if email already registered."""
+    """Create user account with hashed password."""
     if not await check_connection():
         raise HTTPException(status_code=503, detail="impossible de se connecter au serveur")
     
@@ -76,7 +74,7 @@ async def create_user_service(request: UserCreateRequest) -> UserResponse:
 
 
 async def login_user_service(request: UserLoginRequest) -> UserResponse:
-    """Authenticate a user with email and password."""
+    """Authenticate user and verify password."""
     if not await check_connection():
         raise HTTPException(status_code=503, detail="impossible de se connecter au serveur")
     
@@ -95,7 +93,7 @@ async def login_user_service(request: UserLoginRequest) -> UserResponse:
 
 
 async def update_user_service(request: UserUpdateRequest) -> UserResponse:
-    """Update a user's username or password."""
+    """Update username or password."""
     if not await check_connection():
         raise HTTPException(status_code=503, detail="impossible de se connecter au serveur")
     

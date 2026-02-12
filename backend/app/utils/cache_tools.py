@@ -1,4 +1,4 @@
-"""MongoDB caching utilities with TTL-based automatic expiration."""
+"""MongoDB caching with TTL-based expiration."""
 
 import logging
 from typing import Optional, List, Any
@@ -14,7 +14,7 @@ CACHE_PREFIX = "cache/"
 
 
 async def ensure_cache_indexes() -> None:
-    """Create the TTL index on the cache collection (idempotent)."""
+    """Create TTL index on cache collection."""
     try:
         # Create TTL index (expireAfterSeconds=0 means expire at the specified date)
         await cache_collection.create_index("expires_at", expireAfterSeconds=0)
@@ -24,7 +24,7 @@ async def ensure_cache_indexes() -> None:
 
 
 def generate_cache_key(category: str) -> str:
-    """Generate a safe, lowercase cache key with 'cache/' prefix."""
+    """Generate safe cache key with prefix."""
     safe_name = "".join(c if c.isalnum() else "_" for c in category.strip().lower())
     return f"{CACHE_PREFIX}{safe_name}"
 
@@ -34,7 +34,7 @@ async def save_cache(
     data: Any,
     ttl_days: int = 1
 ) -> bool:
-    """Save data to MongoDB cache with automatic expiration (default: 1 day)."""
+    """Save data to cache with TTL expiration."""
     try:
         expires_at = datetime.now(timezone.utc) + timedelta(days=ttl_days)
         
@@ -61,7 +61,7 @@ async def save_cache(
 
 
 async def get_cache(cache_key: str) -> Optional[Any]:
-    """Retrieve cached data if it exists and hasn't expired."""
+    """Retrieve cached data if not expired."""
     try:
         cache_entry = await cache_collection.find_one({"cache_key": cache_key})
         
@@ -83,7 +83,7 @@ async def get_cache(cache_key: str) -> Optional[Any]:
 
 
 async def delete_cache(cache_key: str) -> bool:
-    """Delete a single cache entry by key."""
+    """Delete cache entry by key."""
     try:
         result = await cache_collection.delete_one({"cache_key": cache_key})
         
@@ -100,7 +100,7 @@ async def delete_cache(cache_key: str) -> bool:
 
 
 async def list_caches(prefix: Optional[str] = None) -> List[str]:
-    """List all cache keys, optionally filtered by prefix."""
+    """List cache keys with optional prefix filter."""
     try:
         query = {}
         if prefix:
@@ -118,7 +118,7 @@ async def list_caches(prefix: Optional[str] = None) -> List[str]:
 
 
 async def clear_expired_caches() -> int:
-    """Manually purge expired cache entries (TTL index handles this too)."""
+    """Manually purge expired cache entries."""
     try:
         result = await cache_collection.delete_many({
             "expires_at": {"$lt": datetime.now(timezone.utc)}
