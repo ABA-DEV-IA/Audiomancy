@@ -1,7 +1,6 @@
 """Test configuration and fixtures for pytest."""
 
 import os
-from unittest.mock import patch, MagicMock
 
 import pytest
 from dotenv import load_dotenv
@@ -14,16 +13,8 @@ if os.path.exists(env_test_path):
 else:
     print("WARNING: .env.test not found. Falling back to system env.")
 
-# Mock DeepSeekClient before importing app to prevent API key requirement
-with patch(
-    'app.services.ai.utils.deepseek_client.DeepSeekClient'
-) as mock_deepseek_client:
-    mock_deepseek_instance = MagicMock()
-    mock_deepseek_instance.generate.return_value = "rock, electronic, energetic"
-    mock_deepseek_client.return_value = mock_deepseek_instance
-
-    from app.main import app  # pylint: disable=wrong-import-position
-    from app.core.config import settings  # pylint: disable=wrong-import-position
+from app.main import app  # pylint: disable=wrong-import-position
+from app.core.config import settings  # pylint: disable=wrong-import-position
 
 # Shared TestClient instance
 client = TestClient(app)
@@ -59,16 +50,3 @@ def api_client():
             return client.delete(url, params=params, headers=HEADERS)
 
     return AuthenticatedClient()
-
-
-@pytest.fixture
-def mock_deepseek():
-    """
-    Mock DeepSeekClient.generate() to return test tags.
-    Use this fixture in tests that need to customize the AI response.
-    """
-    with patch('app.services.ai.ai_agent.DeepSeekClient') as mock:
-        mock_instance = MagicMock()
-        mock_instance.generate.return_value = "rock, electronic, energetic"
-        mock.return_value = mock_instance
-        yield mock_instance
