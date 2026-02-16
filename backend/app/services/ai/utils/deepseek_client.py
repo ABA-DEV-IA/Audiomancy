@@ -19,26 +19,36 @@ from app.routes.metrics_routes import (
 logger = logging.getLogger(__name__)
 
 
-class DeepSeekClient:
+class DeepSeekClient:  # pylint: disable=too-few-public-methods
     """Thin wrapper around OpenAI SDK configured for DeepSeek."""
 
     def __init__(self):
-        if not settings.deepseek_api_key:
-            raise RuntimeError("DEEPSEEK_API_KEY is not set")
-
-        self.client = OpenAI(
-            api_key=settings.deepseek_api_key,
-            base_url=settings.deepseek_base_url or "https://api.deepseek.com"
-        )
+        self.api_key = settings.deepseek_api_key
+        self.base_url = settings.deepseek_base_url or "https://api.deepseek.com"
         self.model = settings.deepseek_model or "deepseek-chat"
         self.temperature = settings.deepseek_temperature
         self.max_tokens = settings.deepseek_max_tokens
+        self.client: Optional[OpenAI] = None
+
+        # Initialize client only if API key is available
+        if self.api_key:
+            self.client = OpenAI(
+                api_key=self.api_key,
+                base_url=self.base_url
+            )
 
     def generate(self, prompt: str, system_prompt: Optional[str] = None) -> str:
         """Send a prompt to DeepSeek and return the generated text.
 
         Raises RuntimeError on empty responses or API failures.
         """
+        # Check if API key is configured
+        if not self.client or not self.api_key:
+            raise RuntimeError(
+                "DEEPSEEK_API_KEY is not set. "
+                "Configure it in .env or via Vault to use AI features."
+            )
+
         # Start timer
         start_time = time.time()
 
@@ -81,9 +91,15 @@ class DeepSeekClient:
 
             # Record token usage
             if response.usage:
-                deepseek_tokens_used.labels(type="prompt").inc(response.usage.prompt_tokens or 0)
-                deepseek_tokens_used.labels(type="completion").inc(response.usage.completion_tokens or 0)
-                deepseek_tokens_used.labels(type="total").inc(response.usage.total_tokens or 0)
+                deepseek_tokens_used.labels(type="prompt").inc(
+                    response.usage.prompt_tokens or 0
+                )
+                deepseek_tokens_used.labels(type="completion").inc(
+                    response.usage.completion_tokens or 0
+                )
+                deepseek_tokens_used.labels(type="total").inc(
+                    response.usage.total_tokens or 0
+                )
 
             logger.debug("DeepSeek response: %s", content[:300])
             logger.info("DeepSeek API call completed in %.2fs", latency)
@@ -104,4 +120,6 @@ class DeepSeekClient:
                 extra={"error_type": error_type},
                 exc_info=True
             )
-            raise RuntimeError(f"DeepSeek API call failed: {exc}") from exc
+            raise RuntimeError(
+                f"DeepSeek API call failed: {exc}"
+            ) from exc
