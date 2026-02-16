@@ -129,7 +129,10 @@ async def delete_user_account(request: AccountDeletionRequest) -> Dict[str, Any]
 
         return {
             "status": "success",
-            "message": f"Account and all associated data for {request.email} has been permanently deleted.",
+            "message": (
+                f"Account and all associated data for {request.email} "
+                "has been permanently deleted."
+            ),
             "deleted_at": now,
             "deleted_items": {
                 "favorites": favorites_result.deleted_count,
@@ -168,7 +171,10 @@ async def get_data_retention_policy() -> Dict[str, Any]:
             "metrics_data": "90 days (Prometheus retention)"
         },
         "anonymization": {
-            "logs": "Emails, passwords, and tokens are automatically anonymized in logs via Promtail",
+            "logs": (
+                "Emails, passwords, and tokens are automatically "
+                "anonymized in logs via Promtail"
+            ),
             "metrics": "Personal identifiers are not stored in Prometheus metrics"
         },
         "contact": {

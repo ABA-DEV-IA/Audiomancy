@@ -6,7 +6,7 @@ from starlette.requests import Request
 from app.routes.metrics_routes import http_requests_total, http_request_duration_seconds
 
 
-class PrometheusMiddleware(BaseHTTPMiddleware):
+class PrometheusMiddleware(BaseHTTPMiddleware):  # pylint: disable=too-few-public-methods
     """Collect request count and duration for every HTTP request."""
 
     async def dispatch(self, request: Request, call_next):
@@ -23,8 +23,6 @@ class PrometheusMiddleware(BaseHTTPMiddleware):
             response = await call_next(request)
             status_code = response.status_code
             return response
-        except Exception:
-            raise
         finally:
             # Calculate duration
             duration = time.time() - start_time

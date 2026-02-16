@@ -1,5 +1,6 @@
 """Main entry point for the Audiomancy FastAPI backend."""
 
+import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
@@ -20,7 +21,6 @@ from app.routes.gdpr_routes import router as gdpr_router
 from app.errors.handlers import validation_exception_handler
 from app.utils.cache_tools import ensure_cache_indexes
 from app.core.scheduler import start_scheduler, stop_scheduler
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ redoc_url = "/redoc" if settings.swagger_on else None
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(_app: FastAPI):
     """Lifespan context manager for startup and shutdown events."""
     logger.info("Starting Audiomancy Backend...")
     await ensure_cache_indexes()

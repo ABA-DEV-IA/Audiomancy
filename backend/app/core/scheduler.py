@@ -43,7 +43,11 @@ def update_daily_categories(run_date: Optional[datetime] = None) -> None:
         if response.status_code == 200:
             logger.info("Daily categories updated: %s", response.json())
         else:
-            logger.error("Category update failed — HTTP %d: %s", response.status_code, response.text)
+            logger.error(
+                "Category update failed — HTTP %d: %s",
+                response.status_code,
+                response.text
+            )
     except requests.exceptions.Timeout:
         logger.error("Category update timed out (30s)")
     except requests.exceptions.RequestException as e:

@@ -35,7 +35,11 @@ async def generate_playlist(prompt: PromptRequest):
         logger.info("Successfully generated playlist with %d tracks", len(tracks))
 
         # Convert dict/JamendoTrackResponse to GeneratedTrack
-        return [GeneratedTrack(**track) if isinstance(track, dict) else GeneratedTrack(**track.model_dump()) for track in tracks]
+        return [
+            GeneratedTrack(**track) if isinstance(track, dict)
+            else GeneratedTrack(**track.model_dump())
+            for track in tracks
+        ]
     except Exception as e:
         logger.error(
             "Error generating playlist: %s",
@@ -47,4 +51,7 @@ async def generate_playlist(prompt: PromptRequest):
             },
             exc_info=True
         )
-        raise HTTPException(status_code=500, detail="Erreur lors de la génération de la playlist") from e
+        raise HTTPException(
+            status_code=500,
+            detail="Erreur lors de la génération de la playlist"
+        ) from e

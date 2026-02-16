@@ -1,9 +1,9 @@
 """Settings from .env with optional HashiCorp Vault overrides."""
 
-from typing import Optional, List
-from pydantic_settings import BaseSettings, SettingsConfigDict
 import logging
 import requests
+from typing import Optional, List
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +53,7 @@ class Settings(BaseSettings):
         extra="ignore"
     )
 
-    def load_from_vault(self, force_reload: bool = False) -> None:
+    def load_from_vault(self, force_reload: bool = False) -> None:  # pylint: disable=too-many-locals,too-many-branches,too-many-nested-blocks
         """Load secrets from Vault and cache them (skips if no vault_url/token)."""
 
         if not self.vault_url or not self.vault_token:
@@ -102,36 +102,67 @@ class Settings(BaseSettings):
                 try:
                     # Vault KV v2 API endpoint
                     if self.vault_path_prefix:
-                        url = f"{self.vault_url}/v1/{self.vault_mount_path}/data/{self.vault_path_prefix}/{secret_name}"
+                        url = (
+                            f"{self.vault_url}/v1/{self.vault_mount_path}/"
+                            f"data/{self.vault_path_prefix}/{secret_name}"
+                        )
                     else:
-                        url = f"{self.vault_url}/v1/{self.vault_mount_path}/data/{secret_name}"
+                        url = (
+                            f"{self.vault_url}/v1/{self.vault_mount_path}/"
+                            f"data/{secret_name}"
+                        )
                     response = requests.get(url, headers=headers, timeout=5)
 
                     if response.status_code == 200:
                         data = response.json()
-                        secret_data = data['data']['data']  # KV v2 nested structure
+                        secret_data = data['data']['data']
 
                         for vault_key, settings_attr in key_mappings.items():
-                            if vault_key in secret_data and hasattr(self, settings_attr):
+                            if (vault_key in secret_data and
+                                    hasattr(self, settings_attr)):
                                 value = secret_data[vault_key]
                                 setattr(self, settings_attr, value)
                                 new_cache[settings_attr] = value
-                                logger.info("Loaded '%s.%s' → '%s'", secret_name, vault_key, settings_attr)
+                                logger.info(
+                                    "Loaded '%s.%s' → '%s'",
+                                    secret_name,
+                                    vault_key,
+                                    settings_attr
+                                )
                             elif vault_key not in secret_data:
-                                logger.warning("Key '%s' not found in secret '%s'", vault_key, secret_name)
+                                logger.warning(
+                                    "Key '%s' not found in secret '%s'",
+                                    vault_key,
+                                    secret_name
+                                )
 
                     elif response.status_code == 404:
-                        logger.warning("Secret '%s' not found in Vault", secret_name)
+                        logger.warning(
+                            "Secret '%s' not found in Vault",
+                            secret_name
+                        )
                     else:
-                        logger.warning("Failed to load '%s': HTTP %d", secret_name, response.status_code)
+                        logger.warning(
+                            "Failed to load '%s': HTTP %d",
+                            secret_name,
+                            response.status_code
+                        )
 
-                except Exception as error:
-                    logger.warning("Failed to load secret '%s': %s", secret_name, error)
+                except requests.RequestException as error:
+                    logger.warning(
+                        "Failed to load secret '%s': %s",
+                        secret_name,
+                        error
+                    )
 
             self._secrets_cache = new_cache
-            logger.info("Configuration successfully loaded from HashiCorp Vault (%d secrets).", len(new_cache))
+            logger.info(
+                "Configuration successfully loaded from HashiCorp Vault "
+                "(%d secrets).",
+                len(new_cache)
+            )
 
-        except Exception as error:
+        except requests.RequestException as error:
             logger.warning("Failed to connect to HashiCorp Vault: %s", error)
 
     @property
