@@ -7,8 +7,9 @@ Covers:
 """
 
 import logging
-import pytest
 from unittest.mock import patch, MagicMock
+
+import requests
 
 from app.core.config import Settings
 
@@ -83,7 +84,7 @@ def test_load_from_vault_success(mock_get, capfd):
 @patch("app.core.config.requests.get")
 def test_load_from_vault_failure(mock_get, caplog):
     """Should handle vault connection failure gracefully."""
-    mock_get.side_effect = Exception("Connection refused")
+    mock_get.side_effect = requests.RequestException("Connection refused")
 
     settings = Settings(vault_url="http://vault:8200", vault_token="test-token")
     with caplog.at_level(logging.WARNING, logger="app.core.config"):
