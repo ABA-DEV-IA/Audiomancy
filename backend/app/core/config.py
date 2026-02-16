@@ -1,8 +1,9 @@
 """Settings from .env with optional HashiCorp Vault overrides."""
 
 import logging
-import requests
 from typing import Optional, List
+
+import requests
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 logger = logging.getLogger(__name__)
@@ -53,7 +54,7 @@ class Settings(BaseSettings):
         extra="ignore"
     )
 
-    def load_from_vault(self, force_reload: bool = False) -> None:  # pylint: disable=too-many-locals,too-many-branches,too-many-nested-blocks
+    def load_from_vault(self, force_reload: bool = False) -> None:  # pylint: disable=too-many-locals,too-many-branches,R1702
         """Load secrets from Vault and cache them (skips if no vault_url/token)."""
 
         if not self.vault_url or not self.vault_token:
@@ -66,7 +67,7 @@ class Settings(BaseSettings):
             logger.info("Configuration loaded from Vault cache.")
             return
 
-        try:
+        try:  # pylint: disable=too-many-nested-blocks
             headers = {'X-Vault-Token': self.vault_token}
 
             # Vault secrets are grouped by service, each containing multiple keys
