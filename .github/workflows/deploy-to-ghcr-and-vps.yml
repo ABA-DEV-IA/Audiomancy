@@ -6,6 +6,7 @@ on:
       - main
       - dev
       - OVH
+      - zero_azure
     paths:
       - 'backend/**'
       - 'frontend/**'
