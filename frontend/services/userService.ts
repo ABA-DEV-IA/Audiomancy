@@ -39,6 +39,25 @@ async function fetchJsonPUT<T>(url: string, body: Record<string, unknown>): Prom
   return response.json() as Promise<T>;
 }
 
+/**
+ * Helper pour effectuer une requête DELETE et retourner du JSON typé.
+ */
+async function fetchJsonDELETE<T>(url: string, body: Record<string, unknown>): Promise<T> {
+  const response = await fetch(url, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    let data: any;
+    try { data = await response.json(); } catch { data = { detail: `HTTP ${response.status}` }; }
+    throw new Error(data?.detail || data?.message || `Erreur HTTP ${response.status}`);
+  }
+
+  return response.json() as Promise<T>;
+}
+
 interface UserResponse {
   success: boolean;
   message: string;
@@ -84,4 +103,17 @@ export async function register(email: string, username: string, password: string
 export async function modify(id: string, username: string, password: string): Promise<User> {
   const data = await fetchJsonPUT<UserResponse>("/api/user/proxyModify", { id, username, password });
   return data.user; // 🔹 On retourne seulement l'objet User
+}
+
+/**
+ * Supprime définitivement le compte utilisateur (RGPD Article 17).
+ *
+ * @param email - Adresse email du compte à supprimer.
+ * @throws Objet d'erreur JSON renvoyé par le backend.
+ */
+export async function deleteAccount(email: string): Promise<void> {
+  await fetchJsonDELETE<{ status: string; message: string }>("/api/user/proxyDelete", {
+    email,
+    confirmation: "DELETE",
+  });
 }

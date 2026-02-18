@@ -1,22 +1,26 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { Trash2 } from "lucide-react"
 import { useAuth } from "@/context/auth_context"
-import { modify as modifyService } from "@/services/userService"
+import { modify as modifyService, deleteAccount } from "@/services/userService"
+import { Button } from "@/components/ui/button"
 import { AccountHeader } from "./account/AccountHeader"
 import { SuccessMessage } from "./account/SuccessMessage"
 import { ErrorMessage } from "./account/ErrorMessage"
 import { PersonalInfoForm } from "./account/PersonalInfoForm"
 import { PasswordForm } from "./account/PasswordForm"
 import { SaveButton } from "./account/SaveButton"
+import { DeleteAccountModal } from "./account/DeleteAccountModal"
 import { generateParticles, doPasswordsMatch } from "@/utils/user/account"
 
 interface ProfilePageProps {
   onSave?: () => void
+  onDeleteSuccess?: () => void
 }
 
-export function AccountPage({ onSave }: ProfilePageProps) {
-  const { user } = useAuth()
+export function AccountPage({ onSave, onDeleteSuccess }: ProfilePageProps) {
+  const { user, logout } = useAuth()
 
   const [formData, setFormData] = useState({
     username: "",
@@ -30,6 +34,8 @@ export function AccountPage({ onSave }: ProfilePageProps) {
   const [isSaved, setIsSaved] = useState(false)
   const [error, setError] = useState<string>("")
   const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number; delay: number }>>([])
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   useEffect(() => {
     if (user?.username) {
@@ -71,6 +77,22 @@ export function AccountPage({ onSave }: ProfilePageProps) {
         err?.response?.data?.message || err?.message || "Impossible de sauvegarder les modifications."
 
       setIsLoading(false)
+      setError(apiMessage)
+      setTimeout(() => setError(""), 4000)
+    }
+  }
+
+  const handleDeleteAccount = async () => {
+    if (!user?.email) return
+    setIsDeleting(true)
+    try {
+      await deleteAccount(user.email)
+      logout()
+      if (onDeleteSuccess) onDeleteSuccess()
+    } catch (err: any) {
+      setIsDeleting(false)
+      setShowDeleteModal(false)
+      const apiMessage = err?.message || "Impossible de supprimer le compte."
       setError(apiMessage)
       setTimeout(() => setError(""), 4000)
     }
@@ -132,6 +154,25 @@ export function AccountPage({ onSave }: ProfilePageProps) {
             disabled={isLoading || !formData.username || (formData.newPassword !== "" && !doPasswordsMatch(formData.newPassword, formData.confirmPassword))}
           />
         </form>
+
+        {/* Bouton suppression de compte */}
+        <div className="flex justify-center mt-8">
+          <Button
+            type="button"
+            onClick={() => setShowDeleteModal(true)}
+            className="bg-feu-anciens hover:bg-feu-anciens/80 text-white font-bold w-full sm:w-auto px-6 sm:px-8 py-3 text-sm sm:text-base transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-feu-anciens/50"
+          >
+            <Trash2 className="h-5 w-5 mr-2" />
+            Supprimer le compte
+          </Button>
+        </div>
+
+        <DeleteAccountModal
+          isOpen={showDeleteModal}
+          isLoading={isDeleting}
+          onClose={() => setShowDeleteModal(false)}
+          onConfirm={handleDeleteAccount}
+        />
       </div>
     </div>
   )

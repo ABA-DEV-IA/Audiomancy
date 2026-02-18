@@ -12,7 +12,7 @@ export function SaveButton({ isLoading, disabled }: SaveButtonProps) {
       <Button
         type="submit"
         disabled={disabled}
-        className="bg-gradient-to-r from-encre-astrale to-amethyste-magique hover:from-amethyste-magique hover:to-encre-astrale text-white font-bold px-12 py-4 text-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-encre-astrale/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+        className="bg-gradient-to-r from-encre-astrale to-amethyste-magique hover:from-amethyste-magique hover:to-encre-astrale text-white font-bold w-full sm:w-auto px-6 sm:px-12 py-3 sm:py-4 text-sm sm:text-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-encre-astrale/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
       >
         {isLoading ? (
           <div className="flex items-center">

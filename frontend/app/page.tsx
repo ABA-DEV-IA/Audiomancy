@@ -72,7 +72,7 @@ export default function Page() {
       lecture: <HomePage onCategoryClick={() => goToLecture('default')} />,
       login: <AuthPage onLoginSuccess={() => setCurrentPage('categories')} onSwitchToRegister={() => setCurrentPage('register')} />,
       register: <RegisterPage onRegisterSuccess={() => setCurrentPage('categories')} onSwitchToLogin={() => setCurrentPage('login')} />,
-      account: <AccountPage />
+      account: <AccountPage onDeleteSuccess={() => setCurrentPage('login')} />
     };
 
     return pages[currentPage];
