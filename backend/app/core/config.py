@@ -122,6 +122,23 @@ class Settings(BaseSettings):
                             if (vault_key in secret_data and
                                     hasattr(self, settings_attr)):
                                 value = secret_data[vault_key]
+                                field = type(self).model_fields.get(settings_attr)
+                                if field is not None:
+                                    try:
+                                        if field.annotation is int:
+                                            value = int(value)
+                                        elif field.annotation is float:
+                                            value = float(value)
+                                        elif field.annotation is bool:
+                                            value = str(value).lower() in (
+                                                'true', '1', 'yes'
+                                            )
+                                    except (ValueError, TypeError):
+                                        logger.warning(
+                                            "Could not coerce '%s' to %s",
+                                            vault_key,
+                                            field.annotation,
+                                        )
                                 setattr(self, settings_attr, value)
                                 new_cache[settings_attr] = value
                                 logger.info(
