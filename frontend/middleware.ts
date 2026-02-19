@@ -17,7 +17,8 @@ import { type NextRequest, NextResponse } from 'next/server';
  */
 
 function writeLog(entry: Record<string, unknown>): void {
-  process.stdout.write(JSON.stringify(entry) + '\n');
+  // Edge Runtime n'a pas process.stdout — console.log est capturé par Loki via Docker
+  console.log(JSON.stringify(entry));
 }
 
 export function middleware(request: NextRequest): NextResponse {

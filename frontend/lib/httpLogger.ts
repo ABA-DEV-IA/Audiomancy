@@ -53,5 +53,5 @@ export function logHttp(
     ...extra,
   };
 
-  process.stdout.write(JSON.stringify(entry) + '\n');
+  console.log(JSON.stringify(entry));
 }
