@@ -5,8 +5,8 @@ on:
     branches:
       - main
       - dev
-      - OVH
       - zero_azure
+      - zero_azure_monitoring
     paths:
       - 'backend/**'
       - 'frontend/**'
