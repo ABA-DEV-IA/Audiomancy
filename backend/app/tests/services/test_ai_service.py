@@ -38,11 +38,11 @@ class TestFilterFinalAnswer:
         tags = result.split()
         assert len(tags) == 7
 
-    def test_returns_raw_text_when_no_final_answer(self):
-        """Should return stripped raw text if no 'Final Answer:' is found."""
+    def test_returns_empty_when_no_final_answer_extractable(self):
+        """Should return empty string if no 'Final Answer:' and no extractable tags."""
         text = "Thought: I need more context.\nAction: web_search"
         result = filter_final_answer(text)
-        assert result == text.strip()
+        assert result == ""
 
     def test_handles_empty_string(self):
         """Should handle empty input gracefully."""

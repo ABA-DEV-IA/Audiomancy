@@ -22,7 +22,7 @@ def filter_final_answer(text: str) -> str:
             line = line.strip()
             if not line:
                 continue
-            if any(kw in line for kw in ("Thought:", "Action:", "Question:", "Observation:", "Final Answer:")):
+            if any(kw in line for kw in ("Thought:", "Action:", "Action Input:", "Question:", "Observation:", "Final Answer:")):
                 continue
             words = line.split()
             if 1 <= len(words) <= 7:

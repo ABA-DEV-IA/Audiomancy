@@ -31,7 +31,6 @@ if not _app_logger.handlers:
     _h.setLevel(_log_level)
     _h.setFormatter(logging.Formatter("%(levelname)-8s %(name)s: %(message)s"))
     _app_logger.addHandler(_h)
-    _app_logger.propagate = False
 
 logger = logging.getLogger(__name__)
 
