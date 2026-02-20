@@ -68,6 +68,7 @@ class DeepSeekClient:  # pylint: disable=too-few-public-methods
                 messages=messages,
                 temperature=self.temperature,
                 max_tokens=self.max_tokens,
+                stop=["Observation:"],
             )
 
             # Record successful request

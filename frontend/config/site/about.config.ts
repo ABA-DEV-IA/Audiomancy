@@ -48,7 +48,7 @@ export const aboutConfig = {
     { name: 'Next.js', color: '#A45EE5' },
     { name: 'TypeScript', color: '#FF7BAC' },
     { name: 'Tailwind CSS', color: '#4CE0B3' },
-    { name: 'DEEPSEEK', color: '#FF934F' },
+    { name: 'Deepseek API', color: '#FF934F' },
     { name: 'Jamendo API', color: '#A3D5FF' },
     { name: 'Python', color: '#D9B3FF' },
     { name: 'FastAPI', color: '#6A0DAD' },

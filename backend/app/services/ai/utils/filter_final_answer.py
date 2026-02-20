@@ -17,7 +17,21 @@ def filter_final_answer(text: str) -> str:
 
     if not final_answer:
         logger.warning("No 'Final Answer:' found in response")
-        return text.strip()
+        # Try to find the last short line that looks like tags
+        for line in reversed(text.splitlines()):
+            line = line.strip()
+            if not line:
+                continue
+            if any(kw in line for kw in ("Thought:", "Action:", "Question:", "Observation:", "Final Answer:")):
+                continue
+            words = line.split()
+            if 1 <= len(words) <= 7:
+                logger.debug("Extracted tags from last line: %s", line)
+                final_answer = line
+                break
+        if not final_answer:
+            logger.error("Could not extract any tags from response")
+            return ""
 
     logger.debug("Raw Final Answer: %s", final_answer)
 

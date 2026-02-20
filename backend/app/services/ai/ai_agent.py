@@ -32,11 +32,9 @@ class AIAgent:
 
     def _build_llm_input(self, prompt: str, scratchpad: str) -> str:
         """Build LLM input with system prompt and scratchpad."""
-        filled_prompt = system_prompt.replace("{tools}", "web_search") \
-                                     .replace("{tool_names}", "web_search") \
-                                     .replace("{agent_scratchpad}", scratchpad)
-        filled_prompt += f"\nQuestion: {prompt}"
-        return filled_prompt
+        return system_prompt.replace("{tools}", "web_search") \
+                            .replace("{tool_names}", "web_search") \
+                            .replace("{agent_scratchpad}", scratchpad)
 
     def _extract_action_input(self, response: str) -> Optional[str]:
         for line in response.splitlines():
@@ -45,7 +43,7 @@ class AIAgent:
         return None
 
     def run(self, prompt: str) -> str:
-        scratchpad = ""
+        scratchpad = f"Question: {prompt}\n"
         web_search_count = 0
 
         for iteration in range(MAX_ITERATIONS):
@@ -70,13 +68,20 @@ class AIAgent:
             # Tool call: web_search
             if "Action: web_search" in response:
                 if web_search_count >= MAX_WEB_SEARCH:
-                    self._log("[Max web_search reached → forcing output]")
-                    return filter_final_answer(response)
+                    self._log("[Max web_search reached → requesting Final Answer]")
+                    force_scratchpad = (
+                        scratchpad
+                        + f"{response}\n"
+                        + "Thought: I have used web_search 3 times. I must now give the Final Answer.\n"
+                    )
+                    force_input = self._build_llm_input(prompt, force_scratchpad)
+                    final_response = self.deepseek.generate(force_input)
+                    return filter_final_answer(final_response)
 
                 query = self._extract_action_input(response)
                 if not query:
                     self._log("[Action Input missing → continuing]")
-                    scratchpad += f"\n{response}"
+                    scratchpad += f"{response}\n"
                     continue
 
                 web_search_count += 1
@@ -89,14 +94,16 @@ class AIAgent:
                     observation = "Web search failed, no result available."
                 self._log(f"[web_search #{web_search_count}] Observation: {observation}")
 
-                scratchpad += f"""
-Thought: I searched for additional context.
-Observation: {observation}
-"""
+                scratchpad += f"{response}\nObservation: {observation}\n"
                 continue
 
+            # Response looks like bare tags (no structural keywords) — treat as Final Answer
+            if not any(kw in response for kw in ("Thought:", "Action:", "Question:", "Observation:")):
+                self._log("[Bare tags detected — treating as Final Answer]")
+                return filter_final_answer(f"Final Answer: {response}")
+
             # Intermediate reasoning — append to scratchpad
-            scratchpad += f"\n{response}"
+            scratchpad += f"{response}\n"
 
         # Max iterations reached
         self._log("[Max iterations reached — fallback]")

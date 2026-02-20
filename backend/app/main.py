@@ -1,6 +1,7 @@
 """Main entry point for the Audiomancy FastAPI backend."""
 
 import logging
+import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
@@ -21,6 +22,16 @@ from app.routes.gdpr_routes import router as gdpr_router
 from app.errors.handlers import validation_exception_handler
 from app.utils.cache_tools import ensure_cache_indexes
 from app.core.scheduler import start_scheduler, stop_scheduler
+
+_log_level = getattr(logging, os.getenv("LOG_LEVEL", "INFO").upper(), logging.INFO)
+_app_logger = logging.getLogger("app")
+_app_logger.setLevel(_log_level)
+if not _app_logger.handlers:
+    _h = logging.StreamHandler()
+    _h.setLevel(_log_level)
+    _h.setFormatter(logging.Formatter("%(levelname)-8s %(name)s: %(message)s"))
+    _app_logger.addHandler(_h)
+    _app_logger.propagate = False
 
 logger = logging.getLogger(__name__)
 
