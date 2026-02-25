@@ -2,6 +2,8 @@
 
 Interface web pour gérer les tests de casse (chaos engineering) avec Chaosd.
 
+**Accès local** : http://localhost:19096
+
 ## Fonctionnalités
 
 ### 💀 Tuer un conteneur
@@ -55,7 +57,7 @@ docker-compose up -d
 ### Tester la résilience du monitoring
 ```
 1. Aller dans "Arrêter un conteneur"
-2. Entrer "orion_prometheus"
+2. Entrer "audiomancy-monitoring-prometheus"
 3. Cliquer sur "Arrêter le conteneur"
 4. Observer dans Grafana comment le système réagit
 5. Redémarrer le conteneur : docker-compose start prometheus
@@ -90,7 +92,7 @@ Liste toutes les expériences en cours
 ### POST /api/attack/container-kill
 ```json
 {
-  "container_id": "orion_prometheus",
+  "container_id": "audiomancy-monitoring-prometheus",
   "signal": "SIGKILL"
 }
 ```
@@ -98,7 +100,7 @@ Liste toutes les expériences en cours
 ### POST /api/attack/container-stop
 ```json
 {
-  "container_id": "orion_grafana"
+  "container_id": "audiomancy-monitoring-grafana"
 }
 ```
 
@@ -164,11 +166,11 @@ Arrête une expérience par son UID
 
 ### L'interface ne se connecte pas à Chaosd
 - Vérifier que le conteneur `chaosd` est démarré : `docker ps | grep chaosd`
-- Vérifier les logs : `docker logs orion_chaosd`
+- Vérifier les logs : `docker logs audiomancy-monitoring-chaosd`
 
 ### Les attaques Docker ne fonctionnent pas
 - Vérifier que Chaosd a accès au socket Docker
 - Vérifier que le conteneur est en mode `privileged`
 
 ### Les expériences ne s'arrêtent pas
-- Redémarrer le conteneur Chaosd : `docker-compose restart chaosd`
+- Redémarrer le conteneur Chaosd : `docker-compose -f docker-compose.yml -f docker-compose.monitoring.yml restart chaosd`

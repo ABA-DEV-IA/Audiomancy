@@ -140,7 +140,7 @@ Configuration: `prometheus/alert.rules.yml`
 ### Les logs ne s'affichent pas
 ```bash
 # Vérifier Promtail
-docker logs orion_promtail
+docker logs audiomancy-monitoring-promtail
 
 # Vérifier Loki
 curl http://localhost:19100/ready
@@ -155,7 +155,7 @@ docker ps | grep audiomancy
 curl http://localhost:19090/api/v1/targets
 
 # Vérifier cAdvisor
-docker logs orion_prometheus | grep cadvisor
+docker logs audiomancy-monitoring-prometheus | grep cadvisor
 ```
 
 ### Pas d'erreurs détectées alors qu'il y en a

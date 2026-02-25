@@ -96,21 +96,21 @@ DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
 
 ```bash
 # Démarrer tous les services
-docker-compose up -d
+docker-compose -f docker-compose.yml -f docker-compose.monitoring.yml up -d
 
 # Vérifier le statut
-docker-compose ps
+docker-compose -f docker-compose.yml -f docker-compose.monitoring.yml ps
 
 # Voir les logs
-docker-compose logs -f
+docker-compose -f docker-compose.yml -f docker-compose.monitoring.yml logs -f
 
 # Arrêter
-docker-compose down
+docker-compose -f docker-compose.yml -f docker-compose.monitoring.yml down
 ```
 
 ### Déploiement Production (VPS)
 
-Le déploiement en production se fait automatiquement via GitHub Actions lors d'un push sur la branche `main`.
+Le déploiement en production se fait automatiquement via GitHub Actions lors d'un push sur la branche `main` ou `zero_azure`.
 
 Pour déployer manuellement sur le VPS:
 
@@ -128,7 +128,7 @@ docker-compose -f docker-compose.prod.yaml up -d
 ### Structure des Fichiers
 
 ```
-OrionTrader_monitoring/
+monitoring/
 ├── prometheus/
 │   ├── prometheus.yml              # Config production
 │   ├── prometheus.local.yml        # Config locale
@@ -448,7 +448,7 @@ Le service utilise le port 9098 (pas 9094) pour éviter les conflits avec d'autr
 Vérifier que:
 1. Les applications exposent bien leurs métriques (`/metrics` ou `/api/metrics`)
 2. Prometheus scrappe correctement les targets (Status > Targets dans Prometheus UI)
-3. Promtail envoie les logs à Loki (vérifier `docker logs orion_promtail`)
+3. Promtail envoie les logs à Loki (vérifier `docker logs audiomancy-monitoring-promtail`)
 4. Les datasources Grafana sont connectées (Configuration > Data Sources)
 
 ### Chaosd-ui contrôle les mauvais conteneurs
@@ -458,6 +458,9 @@ Assurez-vous d'accéder à Chaosd UI via l'IP VPN (`10.8.0.1:8080`) et non en lo
 ## Documentation
 
 - [MONITORING_GUIDE.md](MONITORING_GUIDE.md) - Guide détaillé des compétences de monitoring couvertes
+- [Chaosd UI local](http://localhost:19096) - Interface web pour déclencher les tests de chaos
+- [chaosd-ui/README.md](chaosd-ui/README.md) - Guide de l'interface web Chaosd UI (API, exemples, dépannage)
+- [grafana/dashboards/README.md](grafana/dashboards/README.md) - Guide des dashboards Grafana
 - [Prometheus Documentation](https://prometheus.io/docs/)
 - [Grafana Documentation](https://grafana.com/docs/)
 - [Loki Documentation](https://grafana.com/docs/loki/)
@@ -469,22 +472,22 @@ Assurez-vous d'accéder à Chaosd UI via l'IP VPN (`10.8.0.1:8080`) et non en lo
 
 ```bash
 # Arrêter les services
-docker-compose down
+docker-compose -f docker-compose.yml -f docker-compose.monitoring.yml down
 
 # Supprimer les volumes (attention: perte de données!)
-docker volume rm oriontrader_monitoring_grafana-data
-docker volume rm oriontrader_monitoring_prometheus-data
-docker volume rm oriontrader_monitoring_loki-data
+docker volume rm audiomancy-monitoring-grafana-data
+docker volume rm audiomancy-monitoring-prometheus-data
+docker volume rm audiomancy-monitoring-loki-data
 
 # Redémarrer
-docker-compose up -d
+docker-compose -f docker-compose.yml -f docker-compose.monitoring.yml up -d
 ```
 
 ### Mise à Jour des Images
 
 ```bash
-docker-compose pull
-docker-compose up -d
+docker-compose -f docker-compose.yml -f docker-compose.monitoring.yml pull
+docker-compose -f docker-compose.yml -f docker-compose.monitoring.yml up -d
 ```
 
 ## Sécurité
@@ -498,10 +501,10 @@ docker-compose up -d
 ## Contribuer
 
 1. Créer une branche pour vos modifications
-2. Tester en local avec `docker-compose up`
+2. Tester en local avec `docker-compose -f docker-compose.yml -f docker-compose.monitoring.yml up`
 3. Tester en production avec `docker-compose -f docker-compose.prod.yaml up`
 4. Créer une pull request
 
 ## Licence
 
-Projet interne OrionTrader
+Projet interne Audiomancy
